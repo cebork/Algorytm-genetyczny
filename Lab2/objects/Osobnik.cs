@@ -14,13 +14,21 @@ namespace Lab2.objects
         private int a;
         private int b;
         private double d;
+
+
         public int Lp { get; set; }
         public double xReal { get; set; }
         public int xInt;
         public string xBin;
         public int xInt2;
         public double xReal2;
-        public double Ocena { get; set; }
+        public double Mark { get; set; }
+        public double FitValue { get; set; }
+        public double Probability { get; set; }
+        public double Distribuator { get; set; }
+        public double RandomValueToCheck { get; set; }
+        public double XRealAfterSelection { get; set; }
+
         public Osobnik(int lp, int a, int b, double d) 
         {
             Lp = lp;
@@ -33,7 +41,6 @@ namespace Lab2.objects
             BinaryToInteger();
             IntegerToReal();
             SetOcena();
-
         }
         
         private void InitGeneration()
@@ -66,7 +73,7 @@ namespace Lab2.objects
 
         private void SetOcena()
         {
-            Ocena = Math.Round(Math.Round(getMantysa(), getPrecision(d)) * (Math.Cos(20 * Math.PI * xReal) - Math.Sin(xReal)), getPrecision(d));
+            Mark = Math.Round(Math.Round(getMantysa(), getPrecision(d)) * (Math.Cos(20 * Math.PI * xReal) - Math.Sin(xReal)), getPrecision(d));
         }
 
 
@@ -100,6 +107,16 @@ namespace Lab2.objects
             double part1 = (b - a) * xInt2;
             double part2 = Math.Pow(2, getL()) - 1;
             xReal2 = Math.Round((part1 / part2) + a, getPrecision(d));
+        }
+
+        public void SetFitValue(double minValue)
+        {
+            FitValue = Mark - minValue + d;
+        }
+
+        public void SetProbability(double sumValue)
+        {
+            Probability = FitValue / sumValue;
         }
     }
 }

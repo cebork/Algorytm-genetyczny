@@ -1,4 +1,5 @@
 using Lab2.objects;
+using Lab2.Utils;
 
 namespace Lab2
 {
@@ -62,8 +63,10 @@ namespace Lab2
                     {
                         osobniks.Add(new Osobnik(i, (int)aInput.Value, (int)bInput.Value, (double)dInput.SelectedItem));
                     }
+                    SelectionUtils.SetUpFitValue(osobniks);
+                    SelectionUtils.SetUpDistribuator(osobniks);
+                    SelectionUtils.SetUpNewOsobnikAfterSelection(osobniks);
                     osobniki.DataSource = osobniks;
-                    int x = 0;
                 }
             }
         }
