@@ -45,7 +45,7 @@ namespace Lab2
 
         private void startButton_Click(object sender, EventArgs e)
         {
-            if (aInput.Value == null || dInput.SelectedItem == null || bInput.Value == null || nInput.Value == null)
+            if (aInput.Value == null || dInput.SelectedItem == null || bInput.Value == null || nInput.Value == null || pk.Value == null || pm.Value == null)
             {
                 MessageBox.Show("Nie wszystkie pola zosta³y uzupe³nione", "B³¹d");
             } 
@@ -58,15 +58,35 @@ namespace Lab2
                 } 
                 else
                 {
-                    List<Osobnik> osobniks = new List<Osobnik>();
-                    for (int i = 1; i <= nInput.Value; i++)
+                    if ((pk.Value > 1 || pk.Value < 0) || (pm.Value > 1 || pm.Value < 0))
                     {
-                        osobniks.Add(new Osobnik(i, (int)aInput.Value, (int)bInput.Value, (double)dInput.SelectedItem));
+                        MessageBox.Show("Niepoprawny przedzia³ dla pm lub pk", "B³¹d");
+                    } else
+                    {
+                        List<Osobnik> osobniks = new List<Osobnik>();
+                        for (int i = 1; i <= nInput.Value; i++)
+                        {
+                            osobniks.Add(new Osobnik(i, (int)aInput.Value, (int)bInput.Value, (double)dInput.SelectedItem, (double)pk.Value, (double)pm.Value));
+                        }
+                        SelectionUtils.SetUpFitValue(osobniks);
+                        SelectionUtils.SetUpDistribuator(osobniks);
+                        SelectionUtils.SetUpNewOsobnikAfterSelection(osobniks);
+                        foreach (var item in osobniks)
+                        {
+                            item.RealToBin(item.XRealAfterSelection);
+                            item.SetParent();
+                        }
+                        CrossUtils.SetCutPoint(osobniks);
+                        CrossUtils.CrossOsobniks(osobniks);
+                        CrossUtils.CreatePopulationAfterCrossing(osobniks);
+                        foreach (var item in osobniks)
+                        {
+                            item.Mutate();
+                            item.XRealAfterMutation = item.BinaryToReal(item.xBinAfterMutation);
+                            item.MarkAfterMutation = item.SetOcena(item.XRealAfterMutation);
+                        }
+                        osobniki.DataSource = osobniks;
                     }
-                    SelectionUtils.SetUpFitValue(osobniks);
-                    SelectionUtils.SetUpDistribuator(osobniks);
-                    SelectionUtils.SetUpNewOsobnikAfterSelection(osobniks);
-                    osobniki.DataSource = osobniks;
                 }
             }
         }

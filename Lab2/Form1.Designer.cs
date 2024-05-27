@@ -38,10 +38,16 @@
             this.aInput = new System.Windows.Forms.NumericUpDown();
             this.startButton = new System.Windows.Forms.Button();
             this.osobniki = new System.Windows.Forms.DataGridView();
+            this.label5 = new System.Windows.Forms.Label();
+            this.pk = new System.Windows.Forms.NumericUpDown();
+            this.pm = new System.Windows.Forms.NumericUpDown();
+            this.label6 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.bInput)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nInput)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.aInput)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.osobniki)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pk)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pm)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -60,6 +66,11 @@
             this.bInput.Name = "bInput";
             this.bInput.Size = new System.Drawing.Size(120, 23);
             this.bInput.TabIndex = 4;
+            this.bInput.Value = new decimal(new int[] {
+            12,
+            0,
+            0,
+            0});
             this.bInput.ValueChanged += new System.EventHandler(this.bInput_ValueChanged);
             // 
             // label2
@@ -83,6 +94,11 @@
             this.nInput.Name = "nInput";
             this.nInput.Size = new System.Drawing.Size(120, 23);
             this.nInput.TabIndex = 6;
+            this.nInput.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
             // 
             // label3
             // 
@@ -127,12 +143,17 @@
             this.aInput.Name = "aInput";
             this.aInput.Size = new System.Drawing.Size(120, 23);
             this.aInput.TabIndex = 9;
+            this.aInput.Value = new decimal(new int[] {
+            4,
+            0,
+            0,
+            -2147483648});
             this.aInput.ValueChanged += new System.EventHandler(this.aInput_ValueChanged);
             // 
             // startButton
             // 
             this.startButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.startButton.Location = new System.Drawing.Point(841, 23);
+            this.startButton.Location = new System.Drawing.Point(1546, 27);
             this.startButton.Name = "startButton";
             this.startButton.Size = new System.Drawing.Size(75, 23);
             this.startButton.TabIndex = 10;
@@ -146,14 +167,82 @@
             this.osobniki.Location = new System.Drawing.Point(32, 90);
             this.osobniki.Name = "osobniki";
             this.osobniki.RowTemplate.Height = 25;
-            this.osobniki.Size = new System.Drawing.Size(713, 372);
+            this.osobniki.Size = new System.Drawing.Size(1512, 372);
             this.osobniki.TabIndex = 11;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(799, 27);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(28, 15);
+            this.label5.TabIndex = 12;
+            this.label5.Text = "pk=";
+            // 
+            // pk
+            // 
+            this.pk.DecimalPlaces = 2;
+            this.pk.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
+            this.pk.Location = new System.Drawing.Point(833, 24);
+            this.pk.Maximum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.pk.Name = "pk";
+            this.pk.Size = new System.Drawing.Size(120, 23);
+            this.pk.TabIndex = 13;
+            this.pk.Value = new decimal(new int[] {
+            75,
+            0,
+            0,
+            131072});
+            // 
+            // pm
+            // 
+            this.pm.DecimalPlaces = 3;
+            this.pm.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            196608});
+            this.pm.Location = new System.Drawing.Point(1024, 23);
+            this.pm.Maximum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.pm.Name = "pm";
+            this.pm.Size = new System.Drawing.Size(120, 23);
+            this.pm.TabIndex = 15;
+            this.pm.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            196608});
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(990, 26);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(33, 15);
+            this.label6.TabIndex = 14;
+            this.label6.Text = "pm=";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(966, 569);
+            this.ClientSize = new System.Drawing.Size(1687, 569);
+            this.Controls.Add(this.pm);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.pk);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.osobniki);
             this.Controls.Add(this.startButton);
             this.Controls.Add(this.aInput);
@@ -171,6 +260,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.nInput)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.aInput)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.osobniki)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pk)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pm)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -187,5 +278,9 @@
         private NumericUpDown aInput;
         private Button startButton;
         private DataGridView osobniki;
+        private Label label5;
+        private NumericUpDown pk;
+        private NumericUpDown pm;
+        private Label label6;
     }
 }
