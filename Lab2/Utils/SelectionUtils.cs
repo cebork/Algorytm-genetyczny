@@ -42,8 +42,7 @@ namespace Lab2.Utils
         {
             for (int i = 0; i < osobniks.Count; i++)
             {
-                var random = new Random();
-                double randomValue = random.NextDouble();
+                double randomValue = RandomSingleton.Instance.NextDouble();
                 osobniks[i].RandomValueToCheck = randomValue;
 
                 if (osobniks[i].RandomValueToCheck <= osobniks[0].Distribuator)

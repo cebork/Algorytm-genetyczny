@@ -9,11 +9,9 @@ namespace Lab2.Utils
 {
     internal static class CrossUtils
     {
-        
         public static void SetCutPoint(List<Osobnik> osobniks)
         {
-            Random rnd = new Random();
-            int newCutPoint = rnd.Next(1, osobniks[0].getL() - 2);
+            int newCutPoint = RandomSingleton.Instance.Next(1, osobniks[0].getL() - 2);
             int iter = 0;
             foreach (var osobnik in osobniks)
             {
@@ -21,7 +19,7 @@ namespace Lab2.Utils
                 {
                     if (iter == 2)
                     {
-                        newCutPoint = rnd.Next(1, osobniks[0].getL() - 2);
+                        newCutPoint = RandomSingleton.Instance.Next(1, osobniks[0].getL() - 2);
                         iter = 0;
                     }
                     osobnik.CutPoint = newCutPoint;
@@ -95,3 +93,4 @@ namespace Lab2.Utils
         }
     }
 }
+

@@ -28,6 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.label1 = new System.Windows.Forms.Label();
             this.bInput = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
@@ -42,12 +45,29 @@
             this.pk = new System.Windows.Forms.NumericUpDown();
             this.pm = new System.Windows.Forms.NumericUpDown();
             this.label6 = new System.Windows.Forms.Label();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.tabs = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.testy = new System.Windows.Forms.DataGridView();
+            this.testyStart = new System.Windows.Forms.Button();
+            this.TInput = new System.Windows.Forms.NumericUpDown();
+            this.label7 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.bInput)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nInput)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.aInput)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.osobniki)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pk)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pm)).BeginInit();
+            this.tabs.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
+            this.tabPage3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.testy)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TInput)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -88,6 +108,11 @@
             this.nInput.Location = new System.Drawing.Point(625, 23);
             this.nInput.Maximum = new decimal(new int[] {
             10000,
+            0,
+            0,
+            0});
+            this.nInput.Minimum = new decimal(new int[] {
+            1,
             0,
             0,
             0});
@@ -164,10 +189,10 @@
             // osobniki
             // 
             this.osobniki.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.osobniki.Location = new System.Drawing.Point(32, 90);
+            this.osobniki.Location = new System.Drawing.Point(0, 0);
             this.osobniki.Name = "osobniki";
             this.osobniki.RowTemplate.Height = 25;
-            this.osobniki.Size = new System.Drawing.Size(1512, 372);
+            this.osobniki.Size = new System.Drawing.Size(1422, 717);
             this.osobniki.TabIndex = 11;
             // 
             // label5
@@ -204,7 +229,7 @@
             // 
             // pm
             // 
-            this.pm.DecimalPlaces = 3;
+            this.pm.DecimalPlaces = 4;
             this.pm.Increment = new decimal(new int[] {
             1,
             0,
@@ -234,16 +259,129 @@
             this.label6.TabIndex = 14;
             this.label6.Text = "pm=";
             // 
+            // tabs
+            // 
+            this.tabs.Controls.Add(this.tabPage1);
+            this.tabs.Controls.Add(this.tabPage2);
+            this.tabs.Controls.Add(this.tabPage3);
+            this.tabs.Location = new System.Drawing.Point(83, 58);
+            this.tabs.Name = "tabs";
+            this.tabs.SelectedIndex = 0;
+            this.tabs.Size = new System.Drawing.Size(1436, 748);
+            this.tabs.TabIndex = 16;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.osobniki);
+            this.tabPage1.Location = new System.Drawing.Point(4, 24);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(1428, 720);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Podsumowanie";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.chart1);
+            this.tabPage2.Location = new System.Drawing.Point(4, 24);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(1428, 720);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Wykresy";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // chart1
+            // 
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.chart1.Legends.Add(legend1);
+            this.chart1.Location = new System.Drawing.Point(6, 6);
+            this.chart1.Name = "chart1";
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.chart1.Series.Add(series1);
+            this.chart1.Size = new System.Drawing.Size(1419, 711);
+            this.chart1.TabIndex = 0;
+            this.chart1.Text = "chart1";
+            // 
+            // tabPage3
+            // 
+            this.tabPage3.Controls.Add(this.testy);
+            this.tabPage3.Controls.Add(this.testyStart);
+            this.tabPage3.Location = new System.Drawing.Point(4, 24);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Size = new System.Drawing.Size(1428, 720);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "Testy";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // testy
+            // 
+            this.testy.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.testy.Location = new System.Drawing.Point(3, 3);
+            this.testy.Name = "testy";
+            this.testy.RowTemplate.Height = 25;
+            this.testy.Size = new System.Drawing.Size(1242, 615);
+            this.testy.TabIndex = 20;
+            // 
+            // testyStart
+            // 
+            this.testyStart.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.testyStart.Location = new System.Drawing.Point(1304, 12);
+            this.testyStart.Name = "testyStart";
+            this.testyStart.Size = new System.Drawing.Size(102, 23);
+            this.testyStart.TabIndex = 19;
+            this.testyStart.Text = "START TESTY";
+            this.testyStart.UseVisualStyleBackColor = false;
+            this.testyStart.Click += new System.EventHandler(this.testyStart_Click);
+            // 
+            // TInput
+            // 
+            this.TInput.Location = new System.Drawing.Point(1199, 23);
+            this.TInput.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.TInput.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.TInput.Name = "TInput";
+            this.TInput.Size = new System.Drawing.Size(120, 23);
+            this.TInput.TabIndex = 18;
+            this.TInput.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(1165, 26);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(21, 15);
+            this.label7.TabIndex = 17;
+            this.label7.Text = "T=";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1687, 569);
+            this.ClientSize = new System.Drawing.Size(1687, 958);
+            this.Controls.Add(this.TInput);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.tabs);
             this.Controls.Add(this.pm);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.pk);
             this.Controls.Add(this.label5);
-            this.Controls.Add(this.osobniki);
             this.Controls.Add(this.startButton);
             this.Controls.Add(this.aInput);
             this.Controls.Add(this.label4);
@@ -262,6 +400,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.osobniki)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pk)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pm)).EndInit();
+            this.tabs.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
+            this.tabPage3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.testy)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TInput)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -282,5 +427,15 @@
         private NumericUpDown pk;
         private NumericUpDown pm;
         private Label label6;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private TabControl tabs;
+        private TabPage tabPage1;
+        private TabPage tabPage2;
+        private NumericUpDown TInput;
+        private Label label7;
+        private TabPage tabPage3;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
+        private DataGridView testy;
+        private Button testyStart;
     }
 }

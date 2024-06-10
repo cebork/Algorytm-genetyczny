@@ -9,7 +9,6 @@ namespace Lab2.objects
 {
     internal class Osobnik
     {
-        private Random rnd = new Random();
 
         private int a;
         private int b;
@@ -54,11 +53,27 @@ namespace Lab2.objects
             IntegerToReal();
             SetOcena();
         }
-        
+
+        public Osobnik(int lp, int a, int b, double d, double pk, double pm, double nextXreal)
+        {
+            Lp = lp;
+            this.a = a;
+            this.b = b;
+            this.d = d;
+            this.pk = pk;
+            this.pm = pm;
+            xReal = nextXreal;
+            RealToInt();
+            IntegerToBinary();
+            BinaryToInteger();
+            IntegerToReal();
+            SetOcena();
+        }
+
         private void InitGeneration()
         {
             int numberOfSteps = (int)((this.b - this.a) / this.d) + 1;
-            int randomStep = rnd.Next(numberOfSteps);
+            int randomStep = RandomSingleton.Instance.Next(numberOfSteps);
             double number = this.a + randomStep * this.d;
             int x = getPrecision(d);
             xReal = Math.Round(number, getPrecision(d));
@@ -161,7 +176,7 @@ namespace Lab2.objects
         {
             if (xBinParents != "-")
             {
-                CutPoint = rnd.Next(0, getL() - 2);
+                CutPoint = RandomSingleton.Instance.Next(0, getL() - 2);
             }
             else
             {
@@ -173,7 +188,7 @@ namespace Lab2.objects
 
         public void SetParent()
         {
-            double random = rnd.NextDouble();
+            double random = RandomSingleton.Instance.NextDouble();
             if (random <= pk)
             {
                 xBinParents = xBinAfterSelection;
@@ -190,7 +205,7 @@ namespace Lab2.objects
             string afterMutation = "";
             for (int i = 0; i < getL(); i++)
             {
-                double randomDouble = rnd.NextDouble();
+                double randomDouble = RandomSingleton.Instance.NextDouble();
                 
                 if (randomDouble <= pm)
                 {
