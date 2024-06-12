@@ -1,4 +1,4 @@
-using Lab2.GEO.domain;
+Ôªøusing Lab2.GEO.domain;
 using Lab2.objects;
 using Lab2.Utils;
 using System.Collections.Concurrent;
@@ -52,7 +52,7 @@ namespace Lab2
         {
             if (dInput.SelectedItem == null)
             {
-                MessageBox.Show("Nie wybrano dok≥adnoúci");
+                MessageBox.Show("Nie wybrano dok≈Çadno≈õci");
             }
             else
             {
@@ -67,25 +67,81 @@ namespace Lab2
                     GeneralUtils.GetPrecision((double)dInput.SelectedItem)
                     );
 
-
+                finalOsobniks.Clear();
+                bests.Clear();
                 finalOsobniks.Add(GEOUtils.GenerateInitialOsobnik(initialData));
                 bests.Add(GEOUtils.GenerateInitialOsobnik(initialData));
                 FinalOsobnik objToCompare = null;
                 for (int i = 0; i < initialData.T; i++)
                 {
                     objToCompare = GEOUtils.Mutate(initialData, finalOsobniks.Last());
-                    if(objToCompare.Mark > finalOsobniks.Last().Mark)
+                    if(objToCompare.Mark > bests.Last().Mark)
                     {
                         bests.Add(objToCompare);
                     }
                     else
                     {
-                        bests.Add(finalOsobniks.Last());
+                        bests.Add(bests.Last());
                     }
                     finalOsobniks.Add(objToCompare);
                 }
 
+                bestXBin.Text = bests.Last().XBin;
+                bestxReal.Text = bests.Last().XReal.ToString();
+                bestMark.Text = bests.Last().Mark.ToString();
+
                 osobniki.DataSource = finalOsobniks;
+
+
+                Dictionary<int, double> allValues = new Dictionary<int, double>();
+                for (int i = 0; i < finalOsobniks.Count; i++)
+                {
+                    allValues.Add(i, finalOsobniks[i].Mark);
+                }
+
+                Dictionary<int, double> bestsLocal = new Dictionary<int, double>();
+                for (int i = 0; i < bests.Count; i++)
+                {
+                    bestsLocal.Add(i, bests[i].Mark);
+                }
+
+
+                chart1.Series.Clear();
+
+
+                var series1 = new Series
+                {
+                    Name = "Ka≈ºdy osobnik",
+                    Color = System.Drawing.Color.Blue,
+                    ChartType = SeriesChartType.Line
+                };
+                foreach (var point in allValues)
+                {
+                    series1.Points.AddXY(point.Key, point.Value);
+                }
+                chart1.Series.Add(series1);
+
+
+                var series2 = new Series
+                {
+                    Name = "Najlepsi osobnicy",
+                    Color = System.Drawing.Color.Red,
+                    ChartType = SeriesChartType.Line
+                };
+                foreach (var point in bestsLocal)
+                {
+                    series2.Points.AddXY(point.Key, point.Value);
+                }
+                chart1.Series.Add(series2);
+
+
+                var chartArea = new ChartArea();
+                chartArea.AxisX.Title = "Iteracje";
+                chartArea.AxisY.Title = "Oceny";
+                chart1.ChartAreas.Clear();
+                chart1.ChartAreas.Add(chartArea);
+
+                chart1.ChartAreas[0].BackColor = System.Drawing.Color.LightYellow;
             }
         }
 
@@ -94,85 +150,74 @@ namespace Lab2
 
         private async void testyStart_Click(object sender, EventArgs e)
         {
+            List<FinalOsobnik> testBest = new List<FinalOsobnik>();
+            List<FinalOsobnik> testFinalOsobniks = new List<FinalOsobnik>();
+
             var watch = System.Diagnostics.Stopwatch.StartNew();
 
-            List<TestObject> list = new List<TestObject>();
+            List<GeoTestObject> list = new List<GeoTestObject>();
             var listLock = new object();
 
-            var nValues = Enumerable.Range(30, 51).Where(n => (n - 30) % 5 == 0).ToList();
-            var pkValues = Enumerable.Range(0, 9).Select(pkIndex => 0.5 + pkIndex * 0.05).ToList();
-            var pmValues = new List<double> { 0.0001, 0.0005, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01 };
-            var tValues = Enumerable.Range(50, 101).Where(t => (t - 50) % 10 == 0).ToList();
+            var tValues = new List<int> { 2000, 3000, 4000, 5000 };
+            var tetaValues = Enumerable.Range(0, (int)((5 - 0.5) / 0.1) + 1)
+                           .Select(pkIndex => 0.5 + pkIndex * 0.1)
+                           .ToList();
+            int innerLoop = 100;
+
+            progressBar1.Minimum = 0;
+            progressBar1.Maximum = tValues.Count * tetaValues.Count * innerLoop;
+            progressBar1.Value = 0;
+            progressBar1.Step = 1;
             MessageBox.Show("Zamknij okno aby kontyunuwac", "");
 
-            var tasks = new List<Task>();
-
-            foreach (var n in nValues)
+            int progresBarIter = 1;
+            foreach (var teta in tetaValues)
             {
-                foreach (var pk in pkValues)
+                foreach (var t in tValues)
                 {
-                    foreach (var pm in pmValues)
+
+                    List<FinalOsobnik> localHistory = new List<FinalOsobnik>();
+
+                    for (int test = 0; test < innerLoop; test++)
                     {
-                        foreach (var t in tValues)
+
+                        InitialData initialData = new InitialData(
+                            -4,
+                            12,
+                            0.001,
+                            t,
+                            teta,
+                            GeneralUtils.GetChromosomeLength(-4, 12, 0.001),
+                            GeneralUtils.GetPrecision(0.001)
+                        );
+
+                        testFinalOsobniks.Clear();
+                        testBest.Clear();
+                        testFinalOsobniks.Add(GEOUtils.GenerateInitialOsobnik(initialData));
+                        testBest.Add(GEOUtils.GenerateInitialOsobnik(initialData));
+                        for (int i = 0; i < initialData.T; i++)
                         {
-                            tasks.Add(Task.Run(() =>
+                            FinalOsobnik objToCompare = GEOUtils.Mutate(initialData, testFinalOsobniks.Last());
+                            if (objToCompare.Mark > testBest.Last().Mark)
                             {
-                                List<List<Osobnik>> localHistory = new List<List<Osobnik>>();
-
-                                Parallel.For(0, 10, x =>
-                                {
-                                    var osobniks = Enumerable.Range(1, n).Select(i => new Osobnik(i, -4, 12, 0.001, pk, pm)).ToList();
-
-                                    for (int t2 = 0; t2 < t; t2++)
-                                    {
-                                        SelectionUtils.SetUpFitValue(osobniks);
-                                        SelectionUtils.SetUpDistribuator(osobniks);
-                                        SelectionUtils.SetUpNewOsobnikAfterSelection(osobniks);
-
-                                        Parallel.ForEach(osobniks, item =>
-                                        {
-                                            item.RealToBin(item.XRealAfterSelection);
-                                            item.SetParent();
-                                        });
-
-                                        CrossUtils.SetCutPoint(osobniks);
-                                        CrossUtils.CrossOsobniks(osobniks);
-                                        CrossUtils.CreatePopulationAfterCrossing(osobniks);
-
-                                        Parallel.ForEach(osobniks, item =>
-                                        {
-                                            item.Mutate();
-                                            item.XRealAfterMutation = item.BinaryToReal(item.xBinAfterMutation);
-                                            item.MarkAfterMutation = item.SetOcena(item.XRealAfterMutation);
-                                        });
-
-                                        List<Osobnik> coppiedOsobniks = osobniks.ToList();
-                                        osobniks = new List<Osobnik>();
-                                        int idx = 1;
-                                        foreach (Osobnik osobnik in coppiedOsobniks)
-                                        {
-                                            osobniks.Add(new Osobnik(idx, -4, 12, 0.001, pk, pm, osobnik.XRealAfterMutation));
-                                            idx++;
-                                        }
-                                        
-                                    }
-                                    localHistory.Add(osobniks.ToList());
-                                });
-
-                                var avgMark = localHistory.SelectMany(os => os).Average(o => o.Mark);
-                                var testObject = new TestObject { N = n, pk = Math.Round(pk, 3), pm = Math.Round(pm, 4), T = t, AvgMark = Math.Round(avgMark, 3) };
-
-                                lock (localHistory)
-                                {
-                                    list.Add(testObject);
-                                }
-                            }));
+                                testBest.Add(objToCompare);
+                            }
+                            else
+                            {
+                                testBest.Add(testBest.Last());
+                            }
+                            testFinalOsobniks.Add(objToCompare);
                         }
+                        localHistory.Add(testBest.Last());
+                        Invoke(new Action(() => progressBar1.Value = progresBarIter++));
                     }
+
+                    var avgMark = localHistory.Average(o => o.Mark);
+                    var testObject = new GeoTestObject { T = t, teta = teta, Mark = Math.Round(avgMark, 3) };
+
+                    list.Add(testObject);
                 }
             }
-
-            await Task.WhenAll(tasks);
 
             
             watch.Stop();
@@ -184,11 +229,20 @@ namespace Lab2
                                                     elapsed.Minutes,
                                                     elapsed.Seconds,
                                                     elapsed.Milliseconds);
-            MessageBox.Show("Liczba wynikÛw: " + list.Count().ToString() + "\nPotrzebny czas: " + elapsedFormatted , "Sukces");
-            testy.DataSource = list.OrderByDescending(x => x.AvgMark).ToList();
+            MessageBox.Show("Liczba wynik√≥w: " + list.Count().ToString() + "\nPotrzebny czas: " + elapsedFormatted , "Sukces");
+            testy.DataSource = list.OrderByDescending(x => x.Mark).ToList();
+
+            testMark.Text = list.OrderByDescending(x => x.Mark).ToList().First().Mark.ToString();
+            testT.Text = list.OrderByDescending(x => x.Mark).ToList().First().T.ToString();
+            testTeta.Text = list.OrderByDescending(x => x.Mark).ToList().First().teta.ToString();
         }
 
         private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void testT_Click(object sender, EventArgs e)
         {
 
         }

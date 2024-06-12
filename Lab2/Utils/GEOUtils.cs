@@ -10,7 +10,7 @@ namespace Lab2.Utils
 {
     internal static class GEOUtils
     {
-        private static List<GEOSubject> opeartiveGeoVariants = new List<GEOSubject>();
+        
 
         public static FinalOsobnik GenerateInitialOsobnik(InitialData initialData)
         {
@@ -29,7 +29,7 @@ namespace Lab2.Utils
         public static List<GEOSubject> GenerateChromosomeVariants(InitialData initialData, FinalOsobnik osobnik)
         {
 
-            opeartiveGeoVariants.Clear();
+            List<GEOSubject> opeartiveGeoVariants = new List<GEOSubject>();
 
 
             for (int i = 0; i < initialData.ChromosomeLength; i++)

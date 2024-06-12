@@ -42,9 +42,25 @@
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.tabs = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.bestMark = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.bestxReal = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.bestXBin = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.testMark = new System.Windows.Forms.Label();
+            this.testMark2 = new System.Windows.Forms.Label();
+            this.testTeta = new System.Windows.Forms.Label();
+            this.testT = new System.Windows.Forms.Label();
+            this.testTeta2 = new System.Windows.Forms.Label();
+            this.testT2 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.testy = new System.Windows.Forms.DataGridView();
             this.testyStart = new System.Windows.Forms.Button();
             this.tValue = new System.Windows.Forms.NumericUpDown();
@@ -155,7 +171,7 @@
             this.osobniki.Location = new System.Drawing.Point(0, 0);
             this.osobniki.Name = "osobniki";
             this.osobniki.RowTemplate.Height = 25;
-            this.osobniki.Size = new System.Drawing.Size(1422, 717);
+            this.osobniki.Size = new System.Drawing.Size(470, 717);
             this.osobniki.TabIndex = 11;
             // 
             // tabs
@@ -171,6 +187,12 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.bestMark);
+            this.tabPage1.Controls.Add(this.label10);
+            this.tabPage1.Controls.Add(this.bestxReal);
+            this.tabPage1.Controls.Add(this.label8);
+            this.tabPage1.Controls.Add(this.bestXBin);
+            this.tabPage1.Controls.Add(this.label6);
             this.tabPage1.Controls.Add(this.osobniki);
             this.tabPage1.Location = new System.Drawing.Point(4, 24);
             this.tabPage1.Name = "tabPage1";
@@ -179,6 +201,66 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Podsumowanie";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // bestMark
+            // 
+            this.bestMark.AutoSize = true;
+            this.bestMark.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.bestMark.Location = new System.Drawing.Point(678, 156);
+            this.bestMark.Name = "bestMark";
+            this.bestMark.Size = new System.Drawing.Size(227, 28);
+            this.bestMark.TabIndex = 17;
+            this.bestMark.Text = "[wartość pojawi się tutaj]";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label10.Location = new System.Drawing.Point(563, 156);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(118, 28);
+            this.label10.TabIndex = 16;
+            this.label10.Text = "best Mark =";
+            // 
+            // bestxReal
+            // 
+            this.bestxReal.AutoSize = true;
+            this.bestxReal.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.bestxReal.Location = new System.Drawing.Point(678, 105);
+            this.bestxReal.Name = "bestxReal";
+            this.bestxReal.Size = new System.Drawing.Size(227, 28);
+            this.bestxReal.TabIndex = 15;
+            this.bestxReal.Text = "[wartość pojawi się tutaj]";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label8.Location = new System.Drawing.Point(563, 105);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(118, 28);
+            this.label8.TabIndex = 14;
+            this.label8.Text = "best xReal =";
+            // 
+            // bestXBin
+            // 
+            this.bestXBin.AutoSize = true;
+            this.bestXBin.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.bestXBin.Location = new System.Drawing.Point(678, 60);
+            this.bestXBin.Name = "bestXBin";
+            this.bestXBin.Size = new System.Drawing.Size(227, 28);
+            this.bestXBin.TabIndex = 13;
+            this.bestXBin.Text = "[wartość pojawi się tutaj]";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label6.Location = new System.Drawing.Point(563, 60);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(109, 28);
+            this.label6.TabIndex = 12;
+            this.label6.Text = "best xBin =";
             // 
             // tabPage2
             // 
@@ -209,6 +291,16 @@
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.testMark);
+            this.tabPage3.Controls.Add(this.testMark2);
+            this.tabPage3.Controls.Add(this.testTeta);
+            this.tabPage3.Controls.Add(this.testT);
+            this.tabPage3.Controls.Add(this.testTeta2);
+            this.tabPage3.Controls.Add(this.testT2);
+            this.tabPage3.Controls.Add(this.label9);
+            this.tabPage3.Controls.Add(this.label12);
+            this.tabPage3.Controls.Add(this.label14);
+            this.tabPage3.Controls.Add(this.progressBar1);
             this.tabPage3.Controls.Add(this.testy);
             this.tabPage3.Controls.Add(this.testyStart);
             this.tabPage3.Location = new System.Drawing.Point(4, 24);
@@ -218,13 +310,111 @@
             this.tabPage3.Text = "Testy";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
+            // testMark
+            // 
+            this.testMark.AutoSize = true;
+            this.testMark.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.testMark.Location = new System.Drawing.Point(709, 331);
+            this.testMark.Name = "testMark";
+            this.testMark.Size = new System.Drawing.Size(213, 28);
+            this.testMark.TabIndex = 32;
+            this.testMark.Text = "[Tutaj pojawi się wynik]";
+            // 
+            // testMark2
+            // 
+            this.testMark2.AutoSize = true;
+            this.testMark2.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.testMark2.Location = new System.Drawing.Point(546, 331);
+            this.testMark2.Name = "testMark2";
+            this.testMark2.Size = new System.Drawing.Size(170, 28);
+            this.testMark2.TabIndex = 31;
+            this.testMark2.Text = "Najlepsze Mark = ";
+            // 
+            // testTeta
+            // 
+            this.testTeta.AutoSize = true;
+            this.testTeta.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.testTeta.Location = new System.Drawing.Point(709, 280);
+            this.testTeta.Name = "testTeta";
+            this.testTeta.Size = new System.Drawing.Size(213, 28);
+            this.testTeta.TabIndex = 30;
+            this.testTeta.Text = "[Tutaj pojawi się wynik]";
+            // 
+            // testT
+            // 
+            this.testT.AutoSize = true;
+            this.testT.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.testT.Location = new System.Drawing.Point(682, 229);
+            this.testT.Name = "testT";
+            this.testT.Size = new System.Drawing.Size(213, 28);
+            this.testT.TabIndex = 29;
+            this.testT.Text = "[Tutaj pojawi się wynik]";
+            // 
+            // testTeta2
+            // 
+            this.testTeta2.AutoSize = true;
+            this.testTeta2.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.testTeta2.Location = new System.Drawing.Point(546, 280);
+            this.testTeta2.Name = "testTeta2";
+            this.testTeta2.Size = new System.Drawing.Size(159, 28);
+            this.testTeta2.TabIndex = 28;
+            this.testTeta2.Text = "Najlepsze teta = ";
+            // 
+            // testT2
+            // 
+            this.testT2.AutoSize = true;
+            this.testT2.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.testT2.Location = new System.Drawing.Point(546, 229);
+            this.testT2.Name = "testT2";
+            this.testT2.Size = new System.Drawing.Size(130, 28);
+            this.testT2.TabIndex = 27;
+            this.testT2.Text = "Najlepsze T =";
+            this.testT2.Click += new System.EventHandler(this.testT_Click);
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label9.Location = new System.Drawing.Point(546, 183);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(143, 28);
+            this.label9.TabIndex = 26;
+            this.label9.Text = "Stałe d = 0.001";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label12.Location = new System.Drawing.Point(546, 132);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(117, 28);
+            this.label12.TabIndex = 24;
+            this.label12.Text = "Stałe b = 12";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label14.Location = new System.Drawing.Point(546, 87);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(112, 28);
+            this.label14.TabIndex = 22;
+            this.label14.Text = "Stałe a = -4";
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Location = new System.Drawing.Point(546, 12);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(672, 46);
+            this.progressBar1.TabIndex = 21;
+            // 
             // testy
             // 
             this.testy.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.testy.Location = new System.Drawing.Point(3, 3);
             this.testy.Name = "testy";
             this.testy.RowTemplate.Height = 25;
-            this.testy.Size = new System.Drawing.Size(1242, 615);
+            this.testy.Size = new System.Drawing.Size(374, 615);
             this.testy.TabIndex = 20;
             // 
             // testyStart
@@ -316,9 +506,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.osobniki)).EndInit();
             this.tabs.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.tabPage3.ResumeLayout(false);
+            this.tabPage3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.testy)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tetaValue)).EndInit();
@@ -348,5 +540,21 @@
         private Label label3;
         private NumericUpDown tetaValue;
         private Label label5;
+        private Label bestXBin;
+        private Label label6;
+        private Label bestMark;
+        private Label label10;
+        private Label bestxReal;
+        private Label label8;
+        private ProgressBar progressBar1;
+        private Label testMark;
+        private Label testMark2;
+        private Label testTeta;
+        private Label testT;
+        private Label testTeta2;
+        private Label testT2;
+        private Label label9;
+        private Label label12;
+        private Label label14;
     }
 }
