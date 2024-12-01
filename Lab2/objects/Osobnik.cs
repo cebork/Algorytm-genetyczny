@@ -263,23 +263,19 @@ namespace Lab2.objects
                 {
                     double randomDouble = RandomSingleton.Instance.NextDouble();
 
-                    // Perform mutation based on probability
                     if (randomDouble <= pm)
                     {
                         MutationPosition += $"[{i}, {j}],";
                         string oldValue = MatrixAfterCross[i, j] == false ? "true" : "false";
                         string newValue = MatrixAfterCross[i, j] == true ? "false" : "true";
 
-                        // Perform mutation (toggle value)
                         afterMutation[i, j] = MatrixAfterCross[i, j] == true ? false : true;
 
-                        // Log mutation
                         mutationLog.Add($"[{i}, {j}] {oldValue} -> {newValue}");
                     }
                 }
             }
 
-            // Update the mutated matrix
             MatrixAfterMutation = afterMutation;
         }
 

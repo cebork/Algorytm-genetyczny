@@ -62,19 +62,16 @@ namespace Lab2.Utils
 
                             int cutWidth = Math.Min(fParent.MatrixWidth - fParent.CutPoint, sParent.MatrixWidth - sParent.CutPoint);
 
-                            // Cut first parent's matrix into two parts
                             bool[,] fParentPart1 = GetMatrixSlice(fParent.MatrixAfterSelection, 0, fParent.CutPoint);
                             bool[,] fParentPart2 = fParent.CutPoint + cutWidth <= sParent.MatrixAfterSelection.GetLength(1)
                                 ? GetMatrixSlice(sParent.MatrixAfterSelection, fParent.CutPoint, cutWidth)
                                 : new bool[fParent.MatrixAfterSelection.GetLength(0), 0];
 
-                            // Cut second parent's matrix into two parts
                             bool[,] sParentPart1 = GetMatrixSlice(sParent.MatrixAfterSelection, 0, sParent.CutPoint);
                             bool[,] sParentPart2 = sParent.CutPoint + cutWidth <= fParent.MatrixAfterSelection.GetLength(1)
                                 ? GetMatrixSlice(fParent.MatrixAfterSelection, sParent.CutPoint, cutWidth)
                                 : new bool[sParent.MatrixAfterSelection.GetLength(0), 0];
 
-                            // Merge the parts into children matrices
                             fParent.MatrixChild = MergeMatricesHorizontally(fParentPart1, fParentPart2);
                             sParent.MatrixChild = MergeMatricesHorizontally(sParentPart1, sParentPart2);
 
