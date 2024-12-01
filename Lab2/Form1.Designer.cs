@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.label1 = new System.Windows.Forms.Label();
             this.bInput = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
@@ -55,6 +55,7 @@
             this.testyStart = new System.Windows.Forms.Button();
             this.TInput = new System.Windows.Forms.NumericUpDown();
             this.label7 = new System.Windows.Forms.Label();
+            this.display = new System.Windows.Forms.DataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.bInput)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nInput)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.aInput)).BeginInit();
@@ -68,6 +69,7 @@
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.testy)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.TInput)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.display)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -192,7 +194,7 @@
             this.osobniki.Location = new System.Drawing.Point(0, 0);
             this.osobniki.Name = "osobniki";
             this.osobniki.RowTemplate.Height = 25;
-            this.osobniki.Size = new System.Drawing.Size(1422, 717);
+            this.osobniki.Size = new System.Drawing.Size(1422, 714);
             this.osobniki.TabIndex = 11;
             // 
             // label5
@@ -294,16 +296,16 @@
             // 
             // chart1
             // 
-            chartArea1.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            this.chart1.Legends.Add(legend1);
+            chartArea2.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            this.chart1.Legends.Add(legend2);
             this.chart1.Location = new System.Drawing.Point(6, 6);
             this.chart1.Name = "chart1";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.chart1.Series.Add(series1);
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.chart1.Series.Add(series2);
             this.chart1.Size = new System.Drawing.Size(1419, 711);
             this.chart1.TabIndex = 0;
             this.chart1.Text = "chart1";
@@ -370,11 +372,22 @@
             this.label7.TabIndex = 17;
             this.label7.Text = "T=";
             // 
+            // display
+            // 
+            this.display.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.display.Location = new System.Drawing.Point(1546, 82);
+            this.display.Name = "display";
+            this.display.RowTemplate.Height = 25;
+            this.display.Size = new System.Drawing.Size(487, 391);
+            this.display.TabIndex = 19;
+            this.display.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1687, 958);
+            this.ClientSize = new System.Drawing.Size(2123, 958);
+            this.Controls.Add(this.display);
             this.Controls.Add(this.TInput);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.tabs);
@@ -407,6 +420,7 @@
             this.tabPage3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.testy)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.TInput)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.display)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -437,5 +451,6 @@
         private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
         private DataGridView testy;
         private Button testyStart;
+        private DataGridView display;
     }
 }

@@ -47,7 +47,7 @@ namespace Lab2.Utils
 
                 if (osobniks[i].RandomValueToCheck <= osobniks[0].Distribuator)
                 {
-                    osobniks[i].XRealAfterSelection = osobniks[0].xReal;
+                    osobniks[i].MatrixAfterSelection = osobniks[0].Matrix;
                 }
                 else
                 {
@@ -55,7 +55,7 @@ namespace Lab2.Utils
                     {
                         if (osobniks[j - 1].Distribuator < osobniks[i].RandomValueToCheck && osobniks[j].Distribuator >= osobniks[i].RandomValueToCheck)
                         {
-                            osobniks[i].XRealAfterSelection = osobniks[j].xReal;
+                            osobniks[i].MatrixAfterSelection = osobniks[j].Matrix;
                         }
                     }
                 }

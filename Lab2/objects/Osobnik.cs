@@ -10,11 +10,13 @@ namespace Lab2.objects
     internal class Osobnik
     {
 
-        private int a;
-        private int b;
+        public int MatrixWidth { get; set; }
+        public int MatrixHeight { get; set; }
         private double d;
         private double pk;
         private double pm;
+
+        public bool[,] Matrix { get; set; }
 
         public int Lp { get; set; }
         public double xReal;
@@ -28,6 +30,17 @@ namespace Lab2.objects
         public double Distribuator;
         public double RandomValueToCheck;
         public double XRealAfterSelection { get; set; }
+
+        public bool[,] MatrixAfterSelection { get; set; }
+
+        public bool[,] MatrixParents { get; set; }
+
+        public bool[,] MatrixChild { get; set; }
+
+        public bool[,] MatrixAfterCross { get; set; }
+
+        public bool[,] MatrixAfterMutation { get; set; }
+
         private int xIntAfterSelection;
         public string xBinAfterSelection { get; set; }
         public string xBinParents { get; set; }
@@ -38,45 +51,50 @@ namespace Lab2.objects
         public string xBinAfterMutation { get; set; }
         public double XRealAfterMutation { get; set; }
         public double MarkAfterMutation { get; set; }
-        public Osobnik(int lp, int a, int b, double d, double pk, double pm) 
+        public Osobnik(int lp, int MatrixWidth, int MatrixHeight, double d, double pk, double pm) 
         {
             Lp = lp;
-            this.a = a;
-            this.b = b;
+            this.MatrixWidth = MatrixWidth;
+            this.MatrixHeight = MatrixHeight;
             this.d = d;
             this.pk = pk;
             this.pm = pm;
-            InitGeneration();
-            RealToInt();
-            IntegerToBinary();
-            BinaryToInteger();
-            IntegerToReal();
+            InitOsobnikMatrix();
+            //RealToInt();
+            //IntegerToBinary();
+            //BinaryToInteger();
+            //IntegerToReal();
             SetOcena();
         }
 
-        public Osobnik(int lp, int a, int b, double d, double pk, double pm, double nextXreal)
+        public Osobnik(int lp, int a, int b, double d, double pk, double pm, bool[,] nextMatrix)
         {
             Lp = lp;
-            this.a = a;
-            this.b = b;
+            this.MatrixWidth = a;
+            this.MatrixHeight = b;
             this.d = d;
             this.pk = pk;
             this.pm = pm;
-            xReal = nextXreal;
-            RealToInt();
-            IntegerToBinary();
-            BinaryToInteger();
-            IntegerToReal();
+            Matrix = nextMatrix;
+            //RealToInt();
+            //IntegerToBinary();
+            //BinaryToInteger();
+            //IntegerToReal();
             SetOcena();
         }
 
-        private void InitGeneration()
+        private void InitOsobnikMatrix()
         {
-            int numberOfSteps = (int)((this.b - this.a) / this.d) + 1;
-            int randomStep = RandomSingleton.Instance.Next(numberOfSteps);
-            double number = this.a + randomStep * this.d;
-            int x = getPrecision(d);
-            xReal = Math.Round(number, getPrecision(d));
+            Matrix = new bool[MatrixWidth, MatrixHeight];
+            Random random = RandomSingleton.Instance;
+            for (int i = 0; i < MatrixWidth; i++)
+            {
+                for (int j = 0; j < MatrixHeight; j++)
+                {
+                    Matrix[i, j] = random.Next(2) == 0;
+                }
+            }
+
         }
 
         private int getPrecision(double number)
@@ -90,7 +108,8 @@ namespace Lab2.objects
 
         public int getL()
         {
-            return (int) Math.Ceiling(Math.Log2(((b - a) / d) + 1));
+            //return (int) Math.Ceiling(Math.Log2(((MatrixWidth/2) / d) + 1));
+            return MatrixWidth;
         }
 
         private double getMantysa()
@@ -100,14 +119,44 @@ namespace Lab2.objects
 
         private void SetOcena()
         {
-            Mark = Math.Round(Math.Round(getMantysa(), getPrecision(d)) * (Math.Cos(20 * Math.PI * xReal) - Math.Sin(xReal)), getPrecision(d));
+
+            int count = 0;
+            for (int i = 0; i < MatrixWidth; i++)
+            {
+                for (int j = 0; j < MatrixHeight; j++)
+                {
+                    if (Matrix[i, j] && IsSurroundedByFalses(Matrix, i, j, MatrixWidth, MatrixHeight))
+                    {
+                        count++;
+                    }
+                }
+            }
+
+            Mark = Math.Round((double) count / (double)(MatrixWidth * MatrixHeight), getPrecision(d));
         }
 
+        static bool IsSurroundedByFalses(bool[,] matrix, int x, int y, int rows, int cols)
+        {
+            int[] dx = { -1, -1, 0, 1, 1, 1, 0, -1 };
+            int[] dy = { 0, 1, 1, 1, 0, -1, -1, -1 };
+
+            for (int dir = 0; dir < 8; dir++)
+            {
+                int nx = x + dx[dir];
+                int ny = y + dy[dir];
+
+                if (nx >= 0 && nx < rows && ny >= 0 && ny < cols && matrix[nx, ny])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
 
         private void RealToInt()
         {
-            double part1 = (double)1 / (b - a);
-            double part2 = xReal - a;
+            double part1 = (double)1 / (MatrixHeight - MatrixWidth);
+            double part2 = xReal - MatrixWidth;
             double part3 = Math.Pow(2, getL()) - 1;
             xInt = (int)(part1 * part2 * part3);
         }
@@ -131,9 +180,9 @@ namespace Lab2.objects
 
         private void IntegerToReal()
         {
-            double part1 = (b - a) * xInt2;
+            double part1 = (MatrixHeight - MatrixWidth) * xInt2;
             double part2 = Math.Pow(2, getL()) - 1;
-            xReal2 = Math.Round((part1 / part2) + a, getPrecision(d));
+            xReal2 = Math.Round((part1 / part2) + MatrixWidth, getPrecision(d));
         }
 
         public void SetFitValue(double minValue)
@@ -148,8 +197,8 @@ namespace Lab2.objects
 
         public int RealToInt(double real)
         {
-            double part1 = (double)1 / (b - a);
-            double part2 = real - a;
+            double part1 = (double)1 / (MatrixHeight - MatrixWidth);
+            double part2 = real - MatrixWidth;
             double part3 = Math.Pow(2, getL()) - 1;
             return (int)(part1 * part2 * part3);
         }
@@ -191,40 +240,47 @@ namespace Lab2.objects
             double random = RandomSingleton.Instance.NextDouble();
             if (random <= pk)
             {
-                xBinParents = xBinAfterSelection;
+                MatrixParents = MatrixAfterSelection;
             }
             else
             {
-                xBinParents = "-";
+                MatrixParents = null;
             }
         }
 
         public void Mutate()
         {
             MutationPosition = "";
-            string afterMutation = "";
-            for (int i = 0; i < getL(); i++)
+            List<string> mutationLog = new List<string>();
+            int rows = MatrixAfterCross.GetLength(0);
+            int cols = MatrixAfterCross.GetLength(1);
+
+            bool[,] afterMutation = (bool[,])MatrixAfterCross.Clone();
+
+            for (int i = 0; i < rows; i++)
             {
-                double randomDouble = RandomSingleton.Instance.NextDouble();
-                
-                if (randomDouble <= pm)
+                for (int j = 0; j < cols; j++)
                 {
-                    MutationPosition += i + ",";
-                    if (xBinAfterCross[i] == '1')
+                    double randomDouble = RandomSingleton.Instance.NextDouble();
+
+                    // Perform mutation based on probability
+                    if (randomDouble <= pm)
                     {
-                        afterMutation += "0";
+                        MutationPosition += $"[{i}, {j}],";
+                        string oldValue = MatrixAfterCross[i, j] == false ? "true" : "false";
+                        string newValue = MatrixAfterCross[i, j] == true ? "false" : "true";
+
+                        // Perform mutation (toggle value)
+                        afterMutation[i, j] = MatrixAfterCross[i, j] == true ? false : true;
+
+                        // Log mutation
+                        mutationLog.Add($"[{i}, {j}] {oldValue} -> {newValue}");
                     }
-                    else
-                    {
-                        afterMutation += "1";
-                    }
-                }
-                else
-                {
-                    afterMutation += xBinAfterCross[i];
                 }
             }
-            xBinAfterMutation = afterMutation;
+
+            // Update the mutated matrix
+            MatrixAfterMutation = afterMutation;
         }
 
 
@@ -235,9 +291,9 @@ namespace Lab2.objects
 
         private double IntegerToReal(int integerValue)
         {
-            double part1 = (b - a) * integerValue;
+            double part1 = (MatrixHeight - MatrixWidth) * integerValue;
             double part2 = Math.Pow(2, getL()) - 1;
-            return Math.Round((part1 / part2) + a, getPrecision(d));
+            return Math.Round((part1 / part2) + MatrixWidth, getPrecision(d));
         }
 
         public double BinaryToReal(string binary)
@@ -247,9 +303,21 @@ namespace Lab2.objects
         }
 
 
-        public double SetOcena(double xRealLocal)
+        public double SetOcena(bool[,] xRealLocal)
         {
-            return Math.Round(Math.Round(getMantysa(), getPrecision(d)) * (Math.Cos(20 * Math.PI * xRealLocal) - Math.Sin(xRealLocal)), getPrecision(d));
+            int count = 0;
+            for (int i = 0; i < MatrixWidth; i++)
+            {
+                for (int j = 0; j < MatrixHeight; j++)
+                {
+                    if (Matrix[i, j] && IsSurroundedByFalses(Matrix, i, j, MatrixWidth, MatrixHeight))
+                    {
+                        count++;
+                    }
+                }
+            }
+
+            return Math.Round((double)count / (double)(MatrixWidth * MatrixHeight), getPrecision(d));
         }
     }
 }

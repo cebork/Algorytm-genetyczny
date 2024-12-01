@@ -13,5 +13,6 @@ namespace Lab2.objects
         public string xBin { get; set; }
         public double Mark { get; set; }
         public double Percentage { get; set; }
+        public bool[,] Matrix { get; set; }
     }
 }

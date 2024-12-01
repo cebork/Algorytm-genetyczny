@@ -1,6 +1,7 @@
 using Lab2.objects;
 using Lab2.Utils;
 using System.Collections.Concurrent;
+using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 
 namespace Lab2
@@ -61,9 +62,9 @@ namespace Lab2
             else
             {
 
-                if ((int)aInput.Value >= (int)bInput.Value)
+                if ((int)aInput.Value <= 0 || (int)bInput.Value <= 0)
                 {
-                    MessageBox.Show("Niepoprawny przedzia³", "B³¹d");
+                    MessageBox.Show("Macierze nie mog¹ mieæ ujemnych wymiarów", "B³¹d");
                 } 
                 else
                 {
@@ -75,7 +76,7 @@ namespace Lab2
                         List<Osobnik> osobniks = new List<Osobnik>();
                         for (int i = 1; i <= nInput.Value; i++)
                         {
-                            osobniks.Add(new Osobnik(i, (int)aInput.Value, (int)bInput.Value, (double)dInput.SelectedItem, (double)pk.Value, (double)pm.Value));
+                            osobniks.Add(new Osobnik(i, (int) aInput.Value, (int) bInput.Value, (double) dInput.SelectedItem, (double) pk.Value, (double) pm.Value));
                             
                         }
                         for (int t = 0; t < TInput.Value; t++)
@@ -86,7 +87,6 @@ namespace Lab2
                             SelectionUtils.SetUpNewOsobnikAfterSelection(osobniks);
                             foreach (var item in osobniks)
                             {
-                                item.RealToBin(item.XRealAfterSelection);
                                 item.SetParent();
                             }
                             CrossUtils.SetCutPoint(osobniks);
@@ -95,8 +95,8 @@ namespace Lab2
                             foreach (var item in osobniks)
                             {
                                 item.Mutate();
-                                item.XRealAfterMutation = item.BinaryToReal(item.xBinAfterMutation);
-                                item.MarkAfterMutation = item.SetOcena(item.XRealAfterMutation);
+                                //item.XRealAfterMutation = item.BinaryToReal(item.xBinAfterMutation);
+                                item.MarkAfterMutation = item.SetOcena(item.MatrixAfterMutation);
                             }
 
 
@@ -107,13 +107,14 @@ namespace Lab2
                             int idx = 1;
                             foreach (Osobnik osobnik in coppiedOsobniks)
                             {
-                                osobniks.Add(new Osobnik(idx, (int)aInput.Value, (int)bInput.Value, (double)dInput.SelectedItem, (double)pk.Value, (double)pm.Value, osobnik.XRealAfterMutation));
+                                osobniks.Add(new Osobnik(idx, (int)aInput.Value, (int)bInput.Value, (double)dInput.SelectedItem, (double)pk.Value, (double)pm.Value, osobnik.MatrixAfterMutation));
                                 idx++;
                             }
-
+                            
+                            DisplayMatrix(osobniks.First().Matrix);
                         }
 
-                        List<Osobnik> lastGeneration  = historyOfOsobniks.Last();
+                        List<Osobnik> lastGeneration = historyOfOsobniks.Last();
                         int totalCount = lastGeneration.Count;
                         int xe = 1;
                         List<SumUp> sumUps = lastGeneration
@@ -122,13 +123,16 @@ namespace Lab2
                         {
                             lp = xe++,
                             xReal = group.Key,
-                            xBin = group.First().xBinAfterMutation,
+                            Matrix = group.First().MatrixAfterMutation,
                             Mark = group.First().MarkAfterMutation,
                             Percentage = (double)group.Count() / totalCount * 100
                         })
                         .ToList();
                         osobniki.DataSource = sumUps;
 
+                        bool[,] test = sumUps.First().Matrix;
+
+                        
 
                         Dictionary<int, double> maxValues = new Dictionary<int, double>
                         {
@@ -221,98 +225,164 @@ namespace Lab2
 
         private async void testyStart_Click(object sender, EventArgs e)
         {
-            var watch = System.Diagnostics.Stopwatch.StartNew();
+            //var watch = System.Diagnostics.Stopwatch.StartNew();
 
-            List<TestObject> list = new List<TestObject>();
-            var listLock = new object();
+            //List<TestObject> list = new List<TestObject>();
+            //var listLock = new object();
 
-            var nValues = Enumerable.Range(30, 51).Where(n => (n - 30) % 5 == 0).ToList();
-            var pkValues = Enumerable.Range(0, 9).Select(pkIndex => 0.5 + pkIndex * 0.05).ToList();
-            var pmValues = new List<double> { 0.0001, 0.0005, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01 };
-            var tValues = Enumerable.Range(50, 101).Where(t => (t - 50) % 10 == 0).ToList();
-            MessageBox.Show("Zamknij okno aby kontyunuwac", "");
+            //var nValues = Enumerable.Range(30, 51).Where(n => (n - 30) % 5 == 0).ToList();
+            //var pkValues = Enumerable.Range(0, 9).Select(pkIndex => 0.5 + pkIndex * 0.05).ToList();
+            //var pmValues = new List<double> { 0.0001, 0.0005, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01 };
+            //var tValues = Enumerable.Range(50, 101).Where(t => (t - 50) % 10 == 0).ToList();
+            //MessageBox.Show("Zamknij okno aby kontyunuwac", "");
 
-            var tasks = new List<Task>();
+            //var tasks = new List<Task>();
 
-            foreach (var n in nValues)
-            {
-                foreach (var pk in pkValues)
-                {
-                    foreach (var pm in pmValues)
-                    {
-                        foreach (var t in tValues)
-                        {
-                            tasks.Add(Task.Run(() =>
-                            {
-                                List<List<Osobnik>> localHistory = new List<List<Osobnik>>();
+            //foreach (var n in nValues)
+            //{
+            //    foreach (var pk in pkValues)
+            //    {
+            //        foreach (var pm in pmValues)
+            //        {
+            //            foreach (var t in tValues)
+            //            {
+            //                tasks.Add(Task.Run(() =>
+            //                {
+            //                    List<List<Osobnik>> localHistory = new List<List<Osobnik>>();
 
-                                Parallel.For(0, 10, x =>
-                                {
-                                    var osobniks = Enumerable.Range(1, n).Select(i => new Osobnik(i, -4, 12, 0.001, pk, pm)).ToList();
+            //                    Parallel.For(0, 10, x =>
+            //                    {
+            //                        var osobniks = Enumerable.Range(1, n).Select(i => new Osobnik(i, -4, 12, 0.001, pk, pm)).ToList();
 
-                                    for (int t2 = 0; t2 < t; t2++)
-                                    {
-                                        SelectionUtils.SetUpFitValue(osobniks);
-                                        SelectionUtils.SetUpDistribuator(osobniks);
-                                        SelectionUtils.SetUpNewOsobnikAfterSelection(osobniks);
+            //                        for (int t2 = 0; t2 < t; t2++)
+            //                        {
+            //                            SelectionUtils.SetUpFitValue(osobniks);
+            //                            SelectionUtils.SetUpDistribuator(osobniks);
+            //                            SelectionUtils.SetUpNewOsobnikAfterSelection(osobniks);
 
-                                        Parallel.ForEach(osobniks, item =>
-                                        {
-                                            item.RealToBin(item.XRealAfterSelection);
-                                            item.SetParent();
-                                        });
+            //                            Parallel.ForEach(osobniks, item =>
+            //                            {
+            //                                item.RealToBin(item.XRealAfterSelection);
+            //                                item.SetParent();
+            //                            });
 
-                                        CrossUtils.SetCutPoint(osobniks);
-                                        CrossUtils.CrossOsobniks(osobniks);
-                                        CrossUtils.CreatePopulationAfterCrossing(osobniks);
+            //                            CrossUtils.SetCutPoint(osobniks);
+            //                            CrossUtils.CrossOsobniks(osobniks);
+            //                            CrossUtils.CreatePopulationAfterCrossing(osobniks);
 
-                                        Parallel.ForEach(osobniks, item =>
-                                        {
-                                            item.Mutate();
-                                            item.XRealAfterMutation = item.BinaryToReal(item.xBinAfterMutation);
-                                            item.MarkAfterMutation = item.SetOcena(item.XRealAfterMutation);
-                                        });
+            //                            Parallel.ForEach(osobniks, item =>
+            //                            {
+            //                                item.Mutate();
+            //                                item.XRealAfterMutation = item.BinaryToReal(item.xBinAfterMutation);
+            //                                item.MarkAfterMutation = item.SetOcena(item.XRealAfterMutation);
+            //                            });
 
-                                        List<Osobnik> coppiedOsobniks = osobniks.ToList();
-                                        osobniks = new List<Osobnik>();
-                                        int idx = 1;
-                                        foreach (Osobnik osobnik in coppiedOsobniks)
-                                        {
-                                            osobniks.Add(new Osobnik(idx, -4, 12, 0.001, pk, pm, osobnik.XRealAfterMutation));
-                                            idx++;
-                                        }
+            //                            List<Osobnik> coppiedOsobniks = osobniks.ToList();
+            //                            osobniks = new List<Osobnik>();
+            //                            int idx = 1;
+            //                            foreach (Osobnik osobnik in coppiedOsobniks)
+            //                            {
+            //                                osobniks.Add(new Osobnik(idx, -4, 12, 0.001, pk, pm, osobnik.XRealAfterMutation));
+            //                                idx++;
+            //                            }
                                         
-                                    }
-                                    localHistory.Add(osobniks.ToList());
-                                });
+            //                        }
+            //                        localHistory.Add(osobniks.ToList());
+            //                    });
 
-                                var avgMark = localHistory.SelectMany(os => os).Average(o => o.Mark);
-                                var testObject = new TestObject { N = n, pk = Math.Round(pk, 3), pm = Math.Round(pm, 4), T = t, AvgMark = Math.Round(avgMark, 3) };
+            //                    var avgMark = localHistory.SelectMany(os => os).Average(o => o.Mark);
+            //                    var testObject = new TestObject { N = n, pk = Math.Round(pk, 3), pm = Math.Round(pm, 4), T = t, AvgMark = Math.Round(avgMark, 3) };
 
-                                lock (localHistory)
-                                {
-                                    list.Add(testObject);
-                                }
-                            }));
-                        }
+            //                    lock (localHistory)
+            //                    {
+            //                        list.Add(testObject);
+            //                    }
+            //                }));
+            //            }
+            //        }
+            //    }
+            //}
+
+            //await Task.WhenAll(tasks);
+
+            
+            //watch.Stop();
+            //var elapsedMs = watch.ElapsedMilliseconds;
+            //TimeSpan elapsed = TimeSpan.FromMilliseconds(elapsedMs);
+
+            //string elapsedFormatted = string.Format("{0:D2}:{1:D2}:{2:D2}.{3:D3}",
+            //                                        elapsed.Hours,
+            //                                        elapsed.Minutes,
+            //                                        elapsed.Seconds,
+            //                                        elapsed.Milliseconds);
+            //MessageBox.Show("Liczba wyników: " + list.Count().ToString() + "\nPotrzebny czas: " + elapsedFormatted , "Sukces");
+            //testy.DataSource = list.OrderByDescending(x => x.AvgMark).ToList();
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+
+        private void DisplayMatrix(bool[,] matrix)
+        {
+
+            display.Rows.Clear();
+            display.Columns.Clear();
+
+            int rows = matrix.GetLength(0);
+            int cols = matrix.GetLength(1);
+
+
+            display.AllowUserToAddRows = false;
+
+   
+            display.ColumnHeadersVisible = false; 
+            display.RowHeadersVisible = false;
+            display.ColumnCount = cols;
+
+   
+            foreach (DataGridViewColumn column in display.Columns)
+            {
+                column.Width = 30;
+            }
+
+  
+            for (int row = 0; row < rows; row++)
+            {
+                display.Rows.Add();
+                display.Rows[row].Height = 30;
+            }
+
+
+            for (int row = 0; row < rows; row++)
+            {
+                for (int col = 0; col < cols; col++)
+                {
+                    var cell = display.Rows[row].Cells[col];
+                    if (matrix[row, col])
+                    {
+                        cell.Style.BackColor = System.Drawing.Color.Red;
+                    }
+                    else
+                    {
+                        cell.Style.BackColor = System.Drawing.Color.White;
                     }
                 }
             }
 
-            await Task.WhenAll(tasks);
+            display.ReadOnly = true;
+            display.Enabled = false;
 
-            
-            watch.Stop();
-            var elapsedMs = watch.ElapsedMilliseconds;
-            TimeSpan elapsed = TimeSpan.FromMilliseconds(elapsedMs);
+            Application.DoEvents();
 
-            string elapsedFormatted = string.Format("{0:D2}:{1:D2}:{2:D2}.{3:D3}",
-                                                    elapsed.Hours,
-                                                    elapsed.Minutes,
-                                                    elapsed.Seconds,
-                                                    elapsed.Milliseconds);
-            MessageBox.Show("Liczba wyników: " + list.Count().ToString() + "\nPotrzebny czas: " + elapsedFormatted , "Sukces");
-            testy.DataSource = list.OrderByDescending(x => x.AvgMark).ToList();
+
+            Thread.Sleep(50);
+
+            display.ClearSelection();
+
         }
+
     }
 }
