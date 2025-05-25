@@ -10,9 +10,9 @@ namespace Lab2.Services
     public static class FileUtils
     {
         private static readonly string DataDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
-        private static readonly string FilePath = Path.Combine(DataDirectory, "patterns.json");
+        private static readonly string PatternsFilePath = Path.Combine(DataDirectory, "patterns.json");
+        private static readonly string ReferenceMatrixesFilePath = Path.Combine(DataDirectory, "referenceMatrixes.json");
 
-        // DTO used for serialization only
         private class SerializablePattern
         {
             public string PatternName { get; set; }
@@ -20,18 +20,22 @@ namespace Lab2.Services
             public bool[][] PatternMatrix { get; set; }
         }
 
-        /// <summary>
-        /// Appends a new pattern to the JSON file in the Data folder.
-        /// </summary>
+        private class SerializableReferenceMatrix
+        {
+            public string ReferenceMatrixName { get; set; }
+            public int MatrixSize { get; set; }
+            public bool[][] ReferenceMatrixMatrix { get; set; }
+        }
+
         public static void AppendPatternToFile(PatternChoosingDisplayColumns pattern)
         {
             Directory.CreateDirectory(DataDirectory);
 
             var existing = new List<SerializablePattern>();
 
-            if (File.Exists(FilePath))
+            if (File.Exists(PatternsFilePath))
             {
-                var json = File.ReadAllText(FilePath);
+                var json = File.ReadAllText(PatternsFilePath);
                 existing = JsonSerializer.Deserialize<List<SerializablePattern>>(json) ?? new List<SerializablePattern>();
             }
 
@@ -45,17 +49,14 @@ namespace Lab2.Services
             existing.Add(serializable);
 
             var newJson = JsonSerializer.Serialize(existing, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(FilePath, newJson);
+            File.WriteAllText(PatternsFilePath, newJson);
         }
 
-        /// <summary>
-        /// Loads all patterns from file and converts them to domain objects.
-        /// </summary>
         public static List<PatternChoosingDisplayColumns> LoadAllPatterns()
         {
-            if (!File.Exists(FilePath)) return new List<PatternChoosingDisplayColumns>();
+            if (!File.Exists(PatternsFilePath)) return new List<PatternChoosingDisplayColumns>();
 
-            var json = File.ReadAllText(FilePath);
+            var json = File.ReadAllText(PatternsFilePath);
             var loadedList = JsonSerializer.Deserialize<List<SerializablePattern>>(json);
 
             return loadedList?.Select(item => new PatternChoosingDisplayColumns
@@ -66,9 +67,6 @@ namespace Lab2.Services
             }).ToList() ?? new List<PatternChoosingDisplayColumns>();
         }
 
-        /// <summary>
-        /// Converts a 2D array to a jagged array for serialization.
-        /// </summary>
         private static bool[][] ToJaggedArray(bool[,] matrix)
         {
             int rows = matrix.GetLength(0);
@@ -87,9 +85,6 @@ namespace Lab2.Services
             return result;
         }
 
-        /// <summary>
-        /// Converts a jagged array from file back to a 2D array.
-        /// </summary>
         private static bool[,] To2DArray(bool[][] jagged)
         {
             int rows = jagged.Length;
@@ -106,5 +101,47 @@ namespace Lab2.Services
 
             return result;
         }
+
+
+        public static void AppendReferenceMatrixToFile(ReferenceMatrixDisplayColumns referenceMatrixDisplayColumns)
+        {
+            Directory.CreateDirectory(DataDirectory);
+
+            var existing = new List<SerializableReferenceMatrix>();
+
+            if (File.Exists(ReferenceMatrixesFilePath))
+            {
+                var json = File.ReadAllText(ReferenceMatrixesFilePath);
+                existing = JsonSerializer.Deserialize<List<SerializableReferenceMatrix>>(json) ?? new List<SerializableReferenceMatrix>();
+            }
+
+            var serializable = new SerializableReferenceMatrix
+            {
+                ReferenceMatrixName = referenceMatrixDisplayColumns.ReferenceMatrixName,
+                MatrixSize = referenceMatrixDisplayColumns.MatrixSize,
+                ReferenceMatrixMatrix = ToJaggedArray(referenceMatrixDisplayColumns.ReferenceMatrix),
+            };
+
+            existing.Add(serializable);
+
+            var newJson = JsonSerializer.Serialize(existing, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(ReferenceMatrixesFilePath, newJson);
+        }
+
+        public static List<ReferenceMatrixDisplayColumns> LoadAllReferenceMatrixes(int matrixSize)
+        {
+            if (!File.Exists(ReferenceMatrixesFilePath)) return new List<ReferenceMatrixDisplayColumns>();
+
+            var json = File.ReadAllText(ReferenceMatrixesFilePath);
+            var loadedList = JsonSerializer.Deserialize<List<SerializableReferenceMatrix>>(json);
+
+            return loadedList?.Where(item => item.MatrixSize == matrixSize).Select(item => new ReferenceMatrixDisplayColumns
+            {
+                ReferenceMatrixName = item.ReferenceMatrixName,
+                MatrixSize = item.MatrixSize,
+                ReferenceMatrix = To2DArray(item.ReferenceMatrixMatrix)
+            }).ToList() ?? new List<ReferenceMatrixDisplayColumns>();
+        }
+
     }
 }

@@ -30,6 +30,10 @@
         {
             this.referenceMatrixInput = new System.Windows.Forms.DataGridView();
             this.setButton = new System.Windows.Forms.Button();
+            this.saveReferenceTable = new System.Windows.Forms.Button();
+            this.referenceTableName = new System.Windows.Forms.TextBox();
+            this.referenceTableLabel = new System.Windows.Forms.Label();
+            this.referenceMatrixList = new System.Windows.Forms.ListView();
             ((System.ComponentModel.ISupportInitialize)(this.referenceMatrixInput)).BeginInit();
             this.SuspendLayout();
             // 
@@ -41,11 +45,10 @@
             this.referenceMatrixInput.Location = new System.Drawing.Point(12, 12);
             this.referenceMatrixInput.Name = "referenceMatrixInput";
             this.referenceMatrixInput.RowTemplate.Height = 25;
-            this.referenceMatrixInput.Size = new System.Drawing.Size(1084, 565);
+            this.referenceMatrixInput.Size = new System.Drawing.Size(631, 565);
             this.referenceMatrixInput.TabIndex = 0;
             this.referenceMatrixInput.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.referenceMatrixInput_CellClick);
             this.referenceMatrixInput.CellFormatting += referenceMatrixInput_CellFormatting;
-
             // 
             // setButton
             // 
@@ -57,17 +60,57 @@
             this.setButton.UseVisualStyleBackColor = true;
             this.setButton.Click += new System.EventHandler(this.setButton_Click);
             // 
+            // saveReferenceTable
+            // 
+            this.saveReferenceTable.Location = new System.Drawing.Point(922, 602);
+            this.saveReferenceTable.Name = "saveReferenceTable";
+            this.saveReferenceTable.Size = new System.Drawing.Size(174, 23);
+            this.saveReferenceTable.TabIndex = 2;
+            this.saveReferenceTable.Text = "Zapisz tablice refernacyjną";
+            this.saveReferenceTable.UseVisualStyleBackColor = true;
+            this.saveReferenceTable.Click += new System.EventHandler(this.saveReferenceTable_Click);
+            // 
+            // referenceTableName
+            // 
+            this.referenceTableName.Location = new System.Drawing.Point(649, 602);
+            this.referenceTableName.Name = "referenceTableName";
+            this.referenceTableName.Size = new System.Drawing.Size(267, 23);
+            this.referenceTableName.TabIndex = 3;
+            // 
+            // referenceTableLabel
+            // 
+            this.referenceTableLabel.AutoSize = true;
+            this.referenceTableLabel.Location = new System.Drawing.Point(492, 606);
+            this.referenceTableLabel.Name = "referenceTableLabel";
+            this.referenceTableLabel.Size = new System.Drawing.Size(151, 15);
+            this.referenceTableLabel.TabIndex = 4;
+            this.referenceTableLabel.Text = "Nazwa tablicy referencyjnej";
+            // 
+            // referenceMatrixList
+            // 
+            this.referenceMatrixList.Location = new System.Drawing.Point(662, 12);
+            this.referenceMatrixList.Name = "referenceMatrixList";
+            this.referenceMatrixList.Size = new System.Drawing.Size(421, 565);
+            this.referenceMatrixList.TabIndex = 5;
+            this.referenceMatrixList.UseCompatibleStateImageBehavior = false;
+            this.referenceMatrixList.DoubleClick += referenceMatrixListView_DoubleClick;
+            // 
             // ReferenceMatrixModalWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1108, 656);
+            this.Controls.Add(this.referenceMatrixList);
+            this.Controls.Add(this.referenceTableLabel);
+            this.Controls.Add(this.referenceTableName);
+            this.Controls.Add(this.saveReferenceTable);
             this.Controls.Add(this.setButton);
             this.Controls.Add(this.referenceMatrixInput);
             this.Name = "ReferenceMatrixModalWindow";
             this.Text = "Wybór macierzy referencyjnej";
             ((System.ComponentModel.ISupportInitialize)(this.referenceMatrixInput)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -75,5 +118,9 @@
 
         private DataGridView referenceMatrixInput;
         private Button setButton;
+        private Button saveReferenceTable;
+        private TextBox referenceTableName;
+        private Label referenceTableLabel;
+        private ListView referenceMatrixList;
     }
 }

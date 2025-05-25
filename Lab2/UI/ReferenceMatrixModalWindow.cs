@@ -4,10 +4,13 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Lab2.Core.Domain;
+using Lab2.Services;
+using Lab2.UI.Domain;
 
 namespace Lab2.UI
 {
@@ -15,6 +18,8 @@ namespace Lab2.UI
     {
 
         public InitialData InitialData { get; set; }
+
+        List<ReferenceMatrixDisplayColumns> referenceMatrixDisplayColumns1 = new List<ReferenceMatrixDisplayColumns>();
 
         public ReferenceMatrixModalWindow()
         {
@@ -66,6 +71,67 @@ namespace Lab2.UI
             referenceMatrixInput.ReadOnly = true;
             referenceMatrixInput.CurrentCell = null;
             referenceMatrixInput.ClearSelection();
+
+            var allReferenceMatrixies = FileUtils.LoadAllReferenceMatrixes((int)InitialData.MatrixSize);
+            referenceMatrixDisplayColumns1 = allReferenceMatrixies;
+            setupReferenceMatrixListView();
+        }
+
+
+        private void referenceMatrixListView_DoubleClick(object sender, EventArgs e)
+        {
+            if (referenceMatrixList.SelectedItems.Count > 0)
+            {
+                var selectedItem = referenceMatrixList.SelectedItems[0];
+                var data = selectedItem.Tag as bool[,];
+
+                int size = (int)InitialData.MatrixSize;
+                InitialData.SupervisedReferenceMatrix = data;
+
+                for (int row = 0; row < size; row++)
+                {
+                    for (int col = 0; col < size; col++)
+                    {
+                        bool value = false;
+
+                        if (InitialData.SupervisedReferenceMatrix != null &&
+                            InitialData.SupervisedReferenceMatrix.GetLength(0) == size &&
+                            InitialData.SupervisedReferenceMatrix.GetLength(1) == size)
+                        {
+                            value = InitialData.SupervisedReferenceMatrix[row, col];
+                        }
+
+                        var cell = referenceMatrixInput.Rows[row].Cells[col];
+                        cell.Value = value;
+                        cell.Style.BackColor = value ? Color.Red : Color.White;
+                    }
+                }
+
+            }
+        }
+
+        private void setupReferenceMatrixListView()
+        {
+
+
+            referenceMatrixList.Items.Clear();
+            referenceMatrixList.View = View.Details;
+            referenceMatrixList.CheckBoxes = false;
+
+            if (referenceMatrixList.Columns.Count == 0)
+            {
+                referenceMatrixList.Columns.Add("Nazwa macierzry referencyjnej", 250);
+                referenceMatrixList.Columns.Add("Rozmiar", 50);
+            }
+
+            foreach (var referenceMatrix in referenceMatrixDisplayColumns1)
+            {
+                var item = new ListViewItem(referenceMatrix.ReferenceMatrixName);
+                item.SubItems.Add(referenceMatrix.MatrixSize.ToString());
+                item.Checked = false;
+                item.Tag = referenceMatrix.ReferenceMatrix;
+                referenceMatrixList.Items.Add(item);
+            }
         }
 
 
@@ -126,5 +192,47 @@ namespace Lab2.UI
             this.Close();
         }
 
+        private void saveReferenceTable_Click(object sender, EventArgs e)
+        {
+            try {
+                new ValidationService(referenceTableName.Text);
+                int size = referenceMatrixInput.RowCount;
+                bool[,] matrix = new bool[size, size];
+
+                for (int row = 0; row < size; row++)
+                {
+                    for (int col = 0; col < size; col++)
+                    {
+                        bool value = Convert.ToBoolean(referenceMatrixInput.Rows[row].Cells[col].Value ?? false);
+                        matrix[row, col] = value;
+                    }
+                }
+
+                ReferenceMatrixDisplayColumns referenceMatrixDisplayColumns = new ReferenceMatrixDisplayColumns()
+                {
+                    ReferenceMatrixName= referenceTableName.Text,
+                    MatrixSize = (int) InitialData.MatrixSize,
+                    ReferenceMatrix = matrix
+                };
+
+                FileUtils.AppendReferenceMatrixToFile(referenceMatrixDisplayColumns);
+                referenceMatrixDisplayColumns1.Add(referenceMatrixDisplayColumns);
+
+                var item = new ListViewItem(referenceMatrixDisplayColumns.ReferenceMatrixName);
+                item.SubItems.Add(referenceMatrixDisplayColumns.MatrixSize.ToString());
+                item.Tag = referenceMatrixDisplayColumns.ReferenceMatrix;
+                item.Checked = false;
+
+                referenceMatrixList.Items.Add(item);
+
+            } 
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Błąd");
+            }
+
+
+
+        }
     }
 }

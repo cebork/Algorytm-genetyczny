@@ -137,7 +137,7 @@ namespace Lab2.Core.Domain
                 }
                 case AlgorithmType.UNSUPERVISED:
                 {
-                    Mark = CalculateMarkWithPatterns(PatternMatrixes, precision);
+                    Mark = CalculateMarkWithPatterns(null, PatternMatrixes, precision);
                     break;
                 }
 
@@ -219,7 +219,7 @@ namespace Lab2.Core.Domain
 
 
 
-        public decimal SetOcena(bool[,] xRealLocal)
+        public decimal SetOcena(bool[,] matrixAfterMutation)
         {
             switch (AlgorithmType)
             {
@@ -230,7 +230,7 @@ namespace Lab2.Core.Domain
                         {
                             for (int j = 1; j < MatrixSize - 1; j++)
                             {
-                                if (IndividualMatrix[i, j] == ReferenceMatrix[i, j])
+                                if (matrixAfterMutation[i, j] == ReferenceMatrix[i, j])
                                 {
                                     count++;
                                 }
@@ -242,7 +242,7 @@ namespace Lab2.Core.Domain
 
                 case AlgorithmType.UNSUPERVISED:
                     {
-                        return CalculateMarkWithPatterns(PatternMatrixes, precision);
+                        return CalculateMarkWithPatterns(matrixAfterMutation, PatternMatrixes, precision);
                     }
 
                 default:
@@ -251,7 +251,7 @@ namespace Lab2.Core.Domain
         }
 
 
-        private decimal CalculateMarkWithPatterns(bool[][,] referencePatterns, decimal precision)
+        private decimal CalculateMarkWithPatterns(bool[,] matrixAfterMutation, bool[][,] referencePatterns, decimal precision)
         {
             int size = MatrixSize;
             int totalPositions = 0;
@@ -263,7 +263,7 @@ namespace Lab2.Core.Domain
                 {
                     foreach (var pattern in referencePatterns)
                     {
-                        if (PatternMatchesAt(IndividualMatrix, pattern, i, j))
+                        if (PatternMatchesAt(matrixAfterMutation != null ? matrixAfterMutation : IndividualMatrix, pattern, i, j))
                         {
                             Interlocked.Increment(ref matchCount);
                             break;

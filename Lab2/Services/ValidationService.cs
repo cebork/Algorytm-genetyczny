@@ -12,6 +12,9 @@ namespace Lab2.Services
         public InitialData InitialData { get; set; }
 
         public PatternChoosingDisplayColumns patternChoosingDisplayColumns { get; set; }
+
+        public string ReferenceMatrixName { get; set; }
+
         public ValidationService(InitialData initialData) 
         {
             InitialData = initialData;
@@ -22,6 +25,12 @@ namespace Lab2.Services
         {
             this.patternChoosingDisplayColumns = patternChoosingDisplay;
             validatePatterCreation();
+        }
+
+        public ValidationService(string referenceMatrixName)
+        {
+            this.ReferenceMatrixName = referenceMatrixName;
+            validateReferenceMatrixCreation();
         }
 
         public void validate()
@@ -81,5 +90,23 @@ namespace Lab2.Services
                 throw new Exception("Minimalna długość nazwy wzorca to 5");
             }
         }
+
+        public void validateReferenceMatrixCreation()
+        {
+            if (
+                ReferenceMatrixName == null 
+            )
+            {
+                throw new Exception("Nie wszystkie pola zostały uzupełnione");
+            }
+
+            if (
+                ReferenceMatrixName.Length < 5
+            )
+            {
+                throw new Exception("Minimalna długość nazwy wzorca to 5");
+            }
+        }
+
     }
 }
