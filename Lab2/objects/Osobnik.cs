@@ -40,6 +40,7 @@ namespace Lab2.objects
         public bool[,] MatrixAfterCross { get; set; }
 
         public bool[,] MatrixAfterMutation { get; set; }
+        public bool[,] MarkMatrix { get; set; }
 
         private int xIntAfterSelection;
         public string xBinAfterSelection { get; set; }
@@ -51,7 +52,8 @@ namespace Lab2.objects
         public string xBinAfterMutation { get; set; }
         public double XRealAfterMutation { get; set; }
         public double MarkAfterMutation { get; set; }
-        public Osobnik(int lp, int MatrixWidth, int MatrixHeight, double d, double pk, double pm) 
+
+        public Osobnik(int lp, int MatrixWidth, int MatrixHeight, double d, double pk, double pm, bool[,] markMatrix) 
         {
             Lp = lp;
             this.MatrixWidth = MatrixWidth;
@@ -59,15 +61,12 @@ namespace Lab2.objects
             this.d = d;
             this.pk = pk;
             this.pm = pm;
+            this.MarkMatrix = markMatrix;
             InitOsobnikMatrix();
-            //RealToInt();
-            //IntegerToBinary();
-            //BinaryToInteger();
-            //IntegerToReal();
             SetOcena();
         }
 
-        public Osobnik(int lp, int a, int b, double d, double pk, double pm, bool[,] nextMatrix)
+        public Osobnik(int lp, int a, int b, double d, double pk, double pm, bool[,] nextMatrix, bool[,] markMatrix)
         {
             Lp = lp;
             this.MatrixWidth = a;
@@ -76,10 +75,7 @@ namespace Lab2.objects
             this.pk = pk;
             this.pm = pm;
             Matrix = nextMatrix;
-            //RealToInt();
-            //IntegerToBinary();
-            //BinaryToInteger();
-            //IntegerToReal();
+            this.MarkMatrix = markMatrix;
             SetOcena();
         }
 
@@ -112,10 +108,6 @@ namespace Lab2.objects
             return MatrixWidth;
         }
 
-        private double getMantysa()
-        {
-            return xReal - Math.Truncate(xReal);
-        }
 
         private void SetOcena()
         {
@@ -125,7 +117,7 @@ namespace Lab2.objects
             {
                 for (int j = 0; j < MatrixHeight; j++)
                 {
-                    if (Matrix[i, j] && IsSurroundedByFalses(Matrix, i, j, MatrixWidth, MatrixHeight))
+                    if (Matrix[i, j] == MarkMatrix[i, j])
                     {
                         count++;
                     }
@@ -153,38 +145,6 @@ namespace Lab2.objects
             return true;
         }
 
-        private void RealToInt()
-        {
-            double part1 = (double)1 / (MatrixHeight - MatrixWidth);
-            double part2 = xReal - MatrixWidth;
-            double part3 = Math.Pow(2, getL()) - 1;
-            xInt = (int)(part1 * part2 * part3);
-        }
-
-        private void IntegerToBinary()
-        {
-            int l = getL();
-            string binString = Convert.ToString(xInt, 2);
-            while (binString.Length < getL()) 
-            {
-                binString = "0" + binString;
-            }
-            
-            xBin = binString;
-        }
-
-        private void BinaryToInteger()
-        {
-            xInt2 = Convert.ToInt32(xBin, 2);
-        }
-
-        private void IntegerToReal()
-        {
-            double part1 = (MatrixHeight - MatrixWidth) * xInt2;
-            double part2 = Math.Pow(2, getL()) - 1;
-            xReal2 = Math.Round((part1 / part2) + MatrixWidth, getPrecision(d));
-        }
-
         public void SetFitValue(double minValue)
         {
             FitValue = Mark - minValue + d;
@@ -195,31 +155,8 @@ namespace Lab2.objects
             Probability = FitValue / sumValue;
         }
 
-        public int RealToInt(double real)
-        {
-            double part1 = (double)1 / (MatrixHeight - MatrixWidth);
-            double part2 = real - MatrixWidth;
-            double part3 = Math.Pow(2, getL()) - 1;
-            return (int)(part1 * part2 * part3);
-        }
 
-        public string IntToBin(int intNumber)
-        {
-            int l = getL();
-            string binString = Convert.ToString(intNumber, 2);
-            while (binString.Length < getL())
-            {
-                binString = "0" + binString;
-            }
 
-            return binString;
-        }
-
-        public void RealToBin(double real)
-        {
-            int integerNumebr = RealToInt(real);
-            xBinAfterSelection = IntToBin(integerNumebr);
-        }
 
         public void SetCutPoint()
         {
@@ -280,23 +217,7 @@ namespace Lab2.objects
         }
 
 
-        private int BinaryToInteger(string binary)
-        {
-            return Convert.ToInt32(binary, 2);
-        }
 
-        private double IntegerToReal(int integerValue)
-        {
-            double part1 = (MatrixHeight - MatrixWidth) * integerValue;
-            double part2 = Math.Pow(2, getL()) - 1;
-            return Math.Round((part1 / part2) + MatrixWidth, getPrecision(d));
-        }
-
-        public double BinaryToReal(string binary)
-        {
-            int tempInteger = BinaryToInteger(binary);
-            return IntegerToReal(tempInteger);
-        }
 
 
         public double SetOcena(bool[,] xRealLocal)
@@ -306,7 +227,7 @@ namespace Lab2.objects
             {
                 for (int j = 0; j < MatrixHeight; j++)
                 {
-                    if (Matrix[i, j] && IsSurroundedByFalses(Matrix, i, j, MatrixWidth, MatrixHeight))
+                    if (Matrix[i, j] == MarkMatrix[i, j])
                     {
                         count++;
                     }

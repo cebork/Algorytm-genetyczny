@@ -4,62 +4,100 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Lab2.Core.Domain;
 
 namespace Lab2.Utils
 {
     internal static class SelectionUtils
     {
-        public static void SetUpFitValue(List<Osobnik> osobniks)
+        public static void SetUpFitValue(List<Individual> individuals)
         {
-            double minValue = osobniks.Min(o => o.Mark);
-            foreach (var osobik in osobniks)
-            {
-                osobik.SetFitValue(minValue);
-            }
+            decimal minValue = individuals.Min(o => o.Mark);
+            Parallel.ForEach(individuals, individual => {
+                individual.SetFitValue(minValue);
+            });
+
         }
 
-        internal static void SetUpDistribuator(List<Osobnik> osobniks)
+        internal static void SetUpDistribuator(List<Individual> individuals)
         {
-            double sumValue = osobniks.Sum(o => o.FitValue);
-            double accumulator = 0;
-            for (int i = 0; i < osobniks.Count; i++)
+            decimal sumValue = individuals.Sum(o => o.FitValue);
+            decimal accumulator = 0;
+            for (int i = 0; i < individuals.Count; i++)
             {
-                osobniks[i].SetProbability(sumValue);
-                accumulator += osobniks[i].Probability;
+                individuals[i].SetProbability(sumValue);
+                accumulator += individuals[i].Probability;
                 if (i == 0)
                 {
-                    osobniks[i].Distribuator = osobniks[i].Probability;
+                    individuals[i].Distribuator = individuals[i].Probability;
                 }
                 else
                 {
-                    osobniks[i].Distribuator = accumulator;
+                    individuals[i].Distribuator = accumulator;
                 }
 
             }
         }
 
-        internal static void SetUpNewOsobnikAfterSelection(List<Osobnik> osobniks)
+        internal static void SetUpNewOsobnikAfterSelection(List<Individual> individuals)
         {
-            for (int i = 0; i < osobniks.Count; i++)
-            {
-                double randomValue = RandomSingleton.Instance.NextDouble();
-                osobniks[i].RandomValueToCheck = randomValue;
+            var distribList = individuals.Select(i => i.Distribuator).ToList();
 
-                if (osobniks[i].RandomValueToCheck <= osobniks[0].Distribuator)
+            Parallel.For(0, individuals.Count, i =>
+            {
+                decimal randomValue = (decimal)RandomSingleton.Instance.NextDouble();
+                individuals[i].RandomValueToCheck = randomValue;
+
+                int selectedIndex = BinarySearchDistrib(distribList, randomValue);
+                individuals[i].MatrixAfterSelection = individuals[selectedIndex].IndividualMatrix;
+            });
+        }
+
+        private static int BinarySearchDistrib(List<decimal> distribList, decimal target)
+        {
+            int left = 0;
+            int right = distribList.Count - 1;
+
+            while (left < right)
+            {
+                int mid = (left + right) / 2;
+                if (target <= distribList[mid])
                 {
-                    osobniks[i].MatrixAfterSelection = osobniks[0].Matrix;
+                    right = mid;
                 }
                 else
                 {
-                    for (int j = 1; j < osobniks.Count; j++)
-                    {
-                        if (osobniks[j - 1].Distribuator < osobniks[i].RandomValueToCheck && osobniks[j].Distribuator >= osobniks[i].RandomValueToCheck)
-                        {
-                            osobniks[i].MatrixAfterSelection = osobniks[j].Matrix;
-                        }
-                    }
+                    left = mid + 1;
                 }
             }
+
+            return left;
         }
+
+
+
+        //internal static void SetUpNewOsobnikAfterSelection(List<Individual> individuals)
+        //{
+        //    for (int i = 0; i < individuals.Count; i++)
+        //    {
+        //        decimal randomValue = (decimal)RandomSingleton.Instance.NextDouble();
+        //        individuals[i].RandomValueToCheck = randomValue;
+
+        //        if (individuals[i].RandomValueToCheck <= individuals[0].Distribuator)
+        //        {
+        //            individuals[i].MatrixAfterSelection = individuals[0].IndividualMatrix;
+        //        }
+        //        else
+        //        {
+        //            for (int j = 1; j < individuals.Count; j++)
+        //            {
+        //                if (individuals[j - 1].Distribuator < individuals[i].RandomValueToCheck && individuals[j].Distribuator >= individuals[i].RandomValueToCheck)
+        //                {
+        //                    individuals[i].MatrixAfterSelection = individuals[j].IndividualMatrix;
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
     }
 }

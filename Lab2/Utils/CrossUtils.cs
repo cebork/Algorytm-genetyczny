@@ -4,106 +4,115 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Lab2.Core.Domain;
 
 namespace Lab2.Utils
 {
     internal static class CrossUtils
     {
-        public static void SetCutPoint(List<Osobnik> osobniks)
+        public static void SetCutPoint(List<Individual> individuals)
         {
-            int newCutPoint = RandomSingleton.Instance.Next(1, osobniks[0].getL() - 2);
+            int newCutPoint = RandomSingleton.Instance.Next(1, individuals[0].getL() - 2);
             int iter = 0;
-            foreach (var osobnik in osobniks)
+            foreach (var individual in individuals)
             {
-                if (osobnik.MatrixParents != null)
+                if (individual.MatrixParents != null)
                 {
                     if (iter == 2)
                     {
-                        newCutPoint = RandomSingleton.Instance.Next(1, osobniks[0].getL() - 2);
+                        newCutPoint = RandomSingleton.Instance.Next(1, individuals[0].getL() - 2);
                         iter = 0;
                     }
-                    osobnik.CutPoint = newCutPoint;
+                    individual.CutPoint = newCutPoint;
                     iter++;
                 }
                 else
                 {
-                    osobnik.CutPoint = -1;
+                    individual.CutPoint = -1;
                 }
             }
         }
 
-        public static void CrossOsobniks(List<Osobnik> osobniks)
+        public static void CrossOsobniks(List<Individual> individuals)
         {
-            Osobnik fParent = null;
-            Osobnik sParent = null;
-            foreach (var osobnik in osobniks)
+            Individual fParent = null;
+
+            foreach (var individual in individuals)
             {
-                if (osobnik.MatrixParents != null)
+                if (individual.MatrixParents == null)
                 {
-                    if (fParent != null)
-                    {
-                        sParent = osobnik;
-                    } else
-                    {
-                        fParent = osobnik;
-                    } 
-                    if (fParent != null && sParent != null)
-                    {
-                        if (fParent.CutPoint >= 0 && fParent.CutPoint <= fParent.MatrixWidth && sParent.CutPoint >= 0 && sParent.CutPoint <= sParent.MatrixWidth)
-                        {
-                            //string fParentPart1 = fParent.xBinAfterSelection.Substring(0, fParent.CutPoint);
-                            //string fParentPart2 = fParent.CutPoint < sParent.xBinAfterSelection.Length ? sParent.xBinAfterSelection.Substring(sParent.CutPoint) : string.Empty;
+                    individual.xBinChild = "-";
+                    continue;
+                }
 
-                            //string sParentPart1 = sParent.xBinAfterSelection.Substring(0, sParent.CutPoint);
-                            //string sParentPart2 = sParent.CutPoint < fParent.xBinAfterSelection.Length ? fParent.xBinAfterSelection.Substring(fParent.CutPoint) : string.Empty;
+                if (fParent == null)
+                {
+                    fParent = individual;
+                    continue;
+                }
 
-                            //fParent.xBinChild = fParentPart1 + fParentPart2;
-                            //sParent.xBinChild = sParentPart1 + sParentPart2;
+                Individual sParent = individual;
 
-                            int cutWidth = Math.Min(fParent.MatrixWidth - fParent.CutPoint, sParent.MatrixWidth - sParent.CutPoint);
-
-                            bool[,] fParentPart1 = GetMatrixSlice(fParent.MatrixAfterSelection, 0, fParent.CutPoint);
-                            bool[,] fParentPart2 = fParent.CutPoint + cutWidth <= sParent.MatrixAfterSelection.GetLength(1)
-                                ? GetMatrixSlice(sParent.MatrixAfterSelection, fParent.CutPoint, cutWidth)
-                                : new bool[fParent.MatrixAfterSelection.GetLength(0), 0];
-
-                            bool[,] sParentPart1 = GetMatrixSlice(sParent.MatrixAfterSelection, 0, sParent.CutPoint);
-                            bool[,] sParentPart2 = sParent.CutPoint + cutWidth <= fParent.MatrixAfterSelection.GetLength(1)
-                                ? GetMatrixSlice(fParent.MatrixAfterSelection, sParent.CutPoint, cutWidth)
-                                : new bool[sParent.MatrixAfterSelection.GetLength(0), 0];
-
-                            fParent.MatrixChild = MergeMatricesHorizontally(fParentPart1, fParentPart2);
-                            sParent.MatrixChild = MergeMatricesHorizontally(sParentPart1, sParentPart2);
-
-                        }
-                        fParent = null;
-                        sParent = null;
-                    }
+                if (IsValidCutPoint(fParent) && IsValidCutPoint(sParent))
+                {
+                    PerformCrossover(fParent, sParent);
                 }
                 else
                 {
-                    osobnik.xBinChild = "-";
+                    fParent.xBinChild = "-";
+                    sParent.xBinChild = "-";
                 }
+
+                fParent = null;
             }
+
             if (fParent != null)
             {
                 fParent.xBinChild = "-";
             }
-            
+        }
+
+        private static bool IsValidCutPoint(Individual individual)
+        {
+            int cutPoint = (int)individual.CutPoint;
+            return cutPoint >= 0 && cutPoint <= individual.MatrixSize;
+        }
+
+        private static void PerformCrossover(Individual fParent, Individual sParent)
+        {
+            int cut1 = (int)fParent.CutPoint;
+            int cut2 = (int)sParent.CutPoint;
+
+            int width1 = fParent.MatrixSize - cut1;
+            int width2 = sParent.MatrixSize - cut2;
+            int cutWidth = Math.Min(width1, width2);
+
+            if (cutWidth <= 0)
+                return;
+
+            bool[,] fPart1 = GetMatrixSlice(fParent.MatrixAfterSelection, 0, cut1);
+            bool[,] fPart2 = GetMatrixSlice(sParent.MatrixAfterSelection, cut1, cutWidth);
+
+            bool[,] sPart1 = GetMatrixSlice(sParent.MatrixAfterSelection, 0, cut2);
+            bool[,] sPart2 = GetMatrixSlice(fParent.MatrixAfterSelection, cut2, cutWidth);
+
+            fParent.MatrixChild = MergeMatricesHorizontally(fPart1, fPart2);
+            sParent.MatrixChild = MergeMatricesHorizontally(sPart1, sPart2);
         }
 
 
-        public static void CreatePopulationAfterCrossing(List<Osobnik> osobniks)
+
+        public static void CreatePopulationAfterCrossing(List<Individual> individuals)
         {
-            foreach (var osobik in osobniks)
+            foreach (var individual in individuals)
             {
-                if (osobik.MatrixChild != null)
+                if (individual.MatrixChild != null)
                 {
-                    osobik.MatrixAfterCross = osobik.MatrixChild;
+                    individual.MatrixAfterCross = individual.MatrixChild;
                 }
                 else
                 {
-                    osobik.MatrixAfterCross = osobik.MatrixAfterSelection;
+                    individual.MatrixAfterCross = individual.MatrixAfterSelection;
                 }
             }
         }
@@ -125,6 +134,7 @@ namespace Lab2.Utils
 
             return slice;
         }
+
 
 
         static bool[,] MergeMatricesHorizontally(bool[,] leftMatrix, bool[,] rightMatrix)
