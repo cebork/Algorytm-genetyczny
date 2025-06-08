@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MathNet.Numerics.LinearAlgebra;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,6 @@ namespace Lab2.UI.Domain
     {
         public String PatternName { get; set; }
         public int PatternSize { get; set; }
-        public bool[,] PatternMatrix { get; set; }
+        public Matrix<double> PatternMatrix { get; set; }
     }
 }

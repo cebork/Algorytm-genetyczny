@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Lab2.Core.Domain;
+using MathNet.Numerics.LinearAlgebra;
+using System.Drawing;
 
 namespace Lab2.Utils
 {
@@ -90,11 +92,11 @@ namespace Lab2.Utils
             if (cutWidth <= 0)
                 return;
 
-            bool[,] fPart1 = GetMatrixSlice(fParent.MatrixAfterSelection, 0, cut1);
-            bool[,] fPart2 = GetMatrixSlice(sParent.MatrixAfterSelection, cut1, cutWidth);
+            Matrix<double> fPart1 = GetMatrixSlice(fParent.MatrixAfterSelection, 0, cut1);
+            Matrix<double> fPart2 = GetMatrixSlice(sParent.MatrixAfterSelection, cut1, cutWidth);
 
-            bool[,] sPart1 = GetMatrixSlice(sParent.MatrixAfterSelection, 0, cut2);
-            bool[,] sPart2 = GetMatrixSlice(fParent.MatrixAfterSelection, cut2, cutWidth);
+            Matrix<double> sPart1 = GetMatrixSlice(sParent.MatrixAfterSelection, 0, cut2);
+            Matrix<double> sPart2 = GetMatrixSlice(fParent.MatrixAfterSelection, cut2, cutWidth);
 
             fParent.MatrixChild = MergeMatricesHorizontally(fPart1, fPart2);
             sParent.MatrixChild = MergeMatricesHorizontally(sPart1, sPart2);
@@ -118,51 +120,37 @@ namespace Lab2.Utils
         }
 
 
-        static bool[,] GetMatrixSlice(bool[,] matrix, int startCol, int width)
+        static Matrix<double> GetMatrixSlice(Matrix<double> matrix, int startCol, int width)
         {
-            int rows = matrix.GetLength(0);
-            int cols = Math.Min(width, matrix.GetLength(1) - startCol);
+            int rows = matrix.RowCount;
+            int cols = Math.Min(width, matrix.ColumnCount - startCol); // zabezpieczenie końca
 
-            bool[,] slice = new bool[rows, cols];
-            for (int i = 0; i < rows; i++)
-            {
-                for (int j = 0; j < cols; j++)
-                {
-                    slice[i, j] = matrix[i, startCol + j];
-                }
-            }
-
-            return slice;
+            return matrix.SubMatrix(0, rows, startCol, cols);
         }
 
 
 
-        static bool[,] MergeMatricesHorizontally(bool[,] leftMatrix, bool[,] rightMatrix)
-        {
-            int rows = leftMatrix.GetLength(0);
-            int leftCols = leftMatrix.GetLength(1);
-            int rightCols = rightMatrix.GetLength(1);
 
-            bool[,] mergedMatrix = new bool[rows, leftCols + rightCols];
+        static Matrix<double> MergeMatricesHorizontally(Matrix<double> leftMatrix, Matrix<double> rightMatrix)
+        {
+            int rows = leftMatrix.RowCount;
+            int leftCols = leftMatrix.ColumnCount;
+            int rightCols = rightMatrix.ColumnCount;
+
+            var merged = Matrix<double>.Build.Dense(rows, leftCols + rightCols);
 
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < leftCols; j++)
-                {
-                    mergedMatrix[i, j] = leftMatrix[i, j];
-                }
-            }
+                    merged[i, j] = leftMatrix[i, j];
 
-            for (int i = 0; i < rows; i++)
-            {
                 for (int j = 0; j < rightCols; j++)
-                {
-                    mergedMatrix[i, leftCols + j] = rightMatrix[i, j];
-                }
+                    merged[i, leftCols + j] = rightMatrix[i, j];
             }
 
-            return mergedMatrix;
+            return merged;
         }
+
 
 
     }

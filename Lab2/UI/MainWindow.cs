@@ -8,6 +8,7 @@ using Lab2.Services;
 using Lab2.Core.Domain;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace Lab2
 {
@@ -26,7 +27,7 @@ namespace Lab2
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            InitialData.MatrixSize = matrixSizeInput.Value;
+            InitialData.MatrixSize = (double)matrixSizeInput.Value;
 
             precisionInput.Items.Add(0.1m);
             precisionInput.Items.Add(0.01m);
@@ -41,12 +42,18 @@ namespace Lab2
         private async void startButton_Click(object sender, EventArgs e)
         {
 
-            InitialData.MatrixSize = matrixSizeInput.Value;
-            InitialData.Precision = (decimal) precisionInput.SelectedItem;
-            InitialData.NumberOfIndividuals = individualNumberInput.Value;
-            InitialData.CrossProbability = crossProbabilityInput.Value;
-            InitialData.MutationProbability = mutationProbabilityInput.Value;
-            InitialData.NumberOfIterations = iterationNumberInput.Value;
+            InitialData.MatrixSize = (double)matrixSizeInput.Value;
+            InitialData.Precision = Convert.ToDouble(precisionInput.SelectedItem);
+            InitialData.NumberOfIndividuals = (double)individualNumberInput.Value;
+            InitialData.CrossProbability = (double)crossProbabilityInput.Value;
+            InitialData.MutationProbability = (double)mutationProbabilityInput.Value;
+            InitialData.NumberOfIterations = (double)iterationNumberInput.Value;
+            int matrixSize = (int)matrixSizeInput.Value;
+            double precision = Convert.ToDouble(precisionInput.SelectedItem);
+            int numIndividuals = (int)individualNumberInput.Value;
+            double crossProb = Convert.ToDouble(crossProbabilityInput.Value);
+            double mutationProb = Convert.ToDouble(mutationProbabilityInput.Value);
+            int iterations = (int)iterationNumberInput.Value;
 
             historyOfIndividuals.Clear();
 
@@ -65,7 +72,7 @@ namespace Lab2
 
                 try
                 {
-                    await Task.Run(() => AlgorithmRun(progress));
+                    await Task.Run(() => AlgorithmRun(progress, matrixSize, precision, crossProb, mutationProb, numIndividuals, iterations));
                 }
                 finally
                 {
@@ -84,43 +91,43 @@ namespace Lab2
                     lp = xe++,
                     Matrix = group.First().MatrixAfterMutation,
                     Mark = group.First().MarkAfterMutation,
-                    Percentage = (decimal)group.Count() / totalCount * 100
+                    Percentage = group.Count() / totalCount * 100
                 })
                 .ToList();
                 osobniki.DataSource = sumUps;
 
                 DisplayMatrix(lastGeneration.OrderByDescending(o => o.MarkAfterMutation).First().MatrixAfterMutation);
-                FileUtils.SaveResultsGa(historyOfIndividuals, InitialData);
+                //FileUtils.SaveResultsGa(historyOfIndividuals, InitialData);
 
-                Dictionary<int, decimal> maxValues = new Dictionary<int, decimal>
+                Dictionary<int, double> maxValues = new Dictionary<int, double>
                         {
                             { 0, historyOfIndividuals.First().Max(osb => osb.Mark) }
                         };
                 for (int i = 0; i < historyOfIndividuals.Count; i++)
                 {
-                    decimal max = historyOfIndividuals[i].Max(osobnik => osobnik.MarkAfterMutation);
+                    double max = historyOfIndividuals[i].Max(osobnik => osobnik.MarkAfterMutation);
                     maxValues.Add(i + 1, max);
                 }
 
 
 
-                Dictionary<int, decimal> avgValues = new Dictionary<int, decimal>
+                Dictionary<int, double> avgValues = new Dictionary<int, double>
                         {
                             { 0, historyOfIndividuals.First().Average(osb => osb.Mark) }
                         };
                 for (int i = 0; i < historyOfIndividuals.Count; i++)
                 {
-                    decimal avg = historyOfIndividuals[i].Average(osobnik => osobnik.MarkAfterMutation);
+                    double avg = historyOfIndividuals[i].Average(osobnik => osobnik.MarkAfterMutation);
                     avgValues.Add(i + 1, avg);
                 }
 
-                Dictionary<int, decimal> minValues = new Dictionary<int, decimal>
+                Dictionary<int, double> minValues = new Dictionary<int, double>
                         {
                             { 0, historyOfIndividuals.First().Min(osb => osb.Mark) }
                         };
                 for (int i = 0; i < historyOfIndividuals.Count; i++)
                 {
-                    decimal min = historyOfIndividuals[i].Min(osobnik => osobnik.MarkAfterMutation);
+                    double min = historyOfIndividuals[i].Min(osobnik => osobnik.MarkAfterMutation);
                     minValues.Add(i + 1, min);
                 }
 
@@ -217,7 +224,7 @@ namespace Lab2
                 return;
             }
 
-            if (InitialData.AlgorithmType == Core.Enums.AlgorithmType.SUPERVISED && (InitialData.SupervisedReferenceMatrix == null || InitialData.SupervisedReferenceMatrix.Length == 0) || InitialData.AlgorithmType == Core.Enums.AlgorithmType.UNSUPERVISED && (InitialData.UnsupervisedPatternMatrixes == null || InitialData.UnsupervisedPatternMatrixes.Length == 0))
+            if (InitialData.AlgorithmType == Core.Enums.AlgorithmType.SUPERVISED && (InitialData.SupervisedReferenceMatrix == null || InitialData.SupervisedReferenceMatrix.ColumnCount == 0) || InitialData.AlgorithmType == Core.Enums.AlgorithmType.UNSUPERVISED && (InitialData.UnsupervisedPatternMatrixes == null || InitialData.UnsupervisedPatternMatrixes.Length == 0))
             {
                 MessageBox.Show("Nie wybrano macierzy wzorców lub macierzy referencyjnej", "");
                 return;
@@ -228,10 +235,10 @@ namespace Lab2
             List<TestObject> list = new List<TestObject>();
             var listLock = new object();
 
-            var NValues = GenerateDecimalRange(NaInput.Value, NbInput.Value, NstepInput.Value);
-            var pkValues = GenerateDecimalRange(pkaInput.Value, PkbbInput.Value, PkstepInput.Value);
-            var pmValues = GenerateDecimalRange(pmaInput.Value, PmbInput.Value, PmstepInput.Value);
-            var tValues = GenerateDecimalRange(TaInput.Value, TbInput.Value, TstepInput.Value);
+            var NValues = GenerateDecimalRange((double)NaInput.Value, (double)NbInput.Value, (double)NstepInput.Value);
+            var pkValues = GenerateDecimalRange((double)pkaInput.Value, (double)PkbbInput.Value, (double)PkstepInput.Value);
+            var pmValues = GenerateDecimalRange((double)pmaInput.Value, (double)PmbInput.Value, (double)PmstepInput.Value);
+            var tValues = GenerateDecimalRange((double)TaInput.Value, (double)TbInput.Value, (double)TstepInput.Value);
 
             
 
@@ -253,7 +260,7 @@ namespace Lab2
 
                                 Parallel.For(0, (int)testExperimentCount.Value, x =>
                                 {
-                                    var individuals = Enumerable.Range(1, (int)n).Select(i => new Individual(i, matrixSizeInput.Value, 0.001m, pk, pm, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes)).ToList();
+                                    var individuals = Enumerable.Range(1, (int)n).Select(i => new Individual(i, matrixSizeInput.Value, 0.001, pk, pm, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes)).ToList();
 
                                     for (int t2 = 0; t2 < t; t2++)
                                     {
@@ -280,7 +287,7 @@ namespace Lab2
                                         int idx = 1;
                                         foreach (Individual individual in coppiedIndividuals)
                                         {
-                                            individuals.Add(new Individual(idx, matrixSizeInput.Value, 0.003m, crossProbabilityInput.Value, mutationProbabilityInput.Value, individual.MatrixAfterMutation, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes));
+                                            individuals.Add(new Individual(idx, matrixSizeInput.Value, 0.003, (double)crossProbabilityInput.Value, (double)mutationProbabilityInput.Value, individual.MatrixAfterMutation, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes));
                                             idx++;
                                         }
 
@@ -297,7 +304,7 @@ namespace Lab2
                                 {
                                     InitialData initial = new InitialData()
                                     {
-                                        MatrixSize = matrixSizeInput.Value,
+                                        MatrixSize = (double)matrixSizeInput.Value,
                                         NumberOfIndividuals = n,
                                         NumberOfIterations = t,
                                         MutationProbability = pm,
@@ -329,10 +336,10 @@ namespace Lab2
                                                     elapsed.Milliseconds);
             MessageBox.Show("Liczba wyników: " + list.Count().ToString() + "\nPotrzebny czas: " + elapsedFormatted, "Sukces");
 
-            InitialData.MatrixSize = matrixSizeInput.Value;
-            InitialData.Precision = (decimal) precisionInput.SelectedItem;
-            FileUtils.saveGaTunningResults(list, InitialData);
-            FileUtils.SaveMResultsGa(globalHistory);
+            InitialData.MatrixSize = (double)matrixSizeInput.Value;
+            InitialData.Precision = (double)precisionInput.SelectedItem;
+            //FileUtils.saveGaTunningResults(list, InitialData);
+            //FileUtils.SaveMResultsGa(globalHistory);
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -341,14 +348,14 @@ namespace Lab2
         }
 
 
-        private void DisplayMatrix(bool[,] matrix)
+        private void DisplayMatrix(Matrix<double> matrix)
         {
 
             display.Rows.Clear();
             display.Columns.Clear();
 
-            int rows = matrix.GetLength(0);
-            int cols = matrix.GetLength(1);
+            int rows = matrix.ColumnCount;
+            int cols = matrix.ColumnCount;
 
 
             display.AllowUserToAddRows = false;
@@ -377,7 +384,7 @@ namespace Lab2
                 for (int col = 0; col < cols; col++)
                 {
                     var cell = display.Rows[row].Cells[col];
-                    if (matrix[row, col])
+                    if (matrix[row, col] == 1)
                     {
                         cell.Style.BackColor = Color.Red;
                     }
@@ -415,7 +422,7 @@ namespace Lab2
 
         private void matrixSizeInput_ValueChanged(object sender, EventArgs e)
         {
-            InitialData.MatrixSize = matrixSizeInput.Value;
+            InitialData.MatrixSize = (double)matrixSizeInput.Value;
         }
 
         private void supervisedTypedRadioButton_CheckedChanged(object sender, EventArgs e)
@@ -438,14 +445,14 @@ namespace Lab2
             }
         }
 
-        private void AlgorithmRun(IProgress<int> progress)
+        private void AlgorithmRun(IProgress<int> progress, int matrixSize, double precision, double crossProb, double mutationProb, int numIndividuals, int iterations)
         {
             List<Individual> individuals = new List<Individual>();
-            for (int i = 1; i <= individualNumberInput.Value; i++)
+            for (int i = 1; i <= numIndividuals; i++)
             {
-                individuals.Add(new Individual(i, matrixSizeInput.Value, (decimal)precisionInput.SelectedItem, crossProbabilityInput.Value, mutationProbabilityInput.Value, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes));
+                individuals.Add(new Individual(i, matrixSize, precision, crossProb, mutationProb, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes));
             }
-            for (int t = 0; t < iterationNumberInput.Value; t++)
+            for (int t = 0; t < iterations; t++)
             {
 
                 
@@ -472,7 +479,7 @@ namespace Lab2
                 int idx = 1;
                 foreach (Individual individual in coppiedIndividuals)
                 {
-                    individuals.Add(new Individual(idx, matrixSizeInput.Value, (decimal)precisionInput.SelectedItem, crossProbabilityInput.Value, mutationProbabilityInput.Value, individual.MatrixAfterMutation, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes));
+                    individuals.Add(new Individual(idx, matrixSize, precision, crossProb, mutationProb, individual.MatrixAfterMutation, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes));
                     idx++;
                 }
 
@@ -484,15 +491,15 @@ namespace Lab2
             
         }
 
-        private List<decimal> GenerateDecimalRange(decimal start, decimal end, decimal step)
+        private List<double> GenerateDecimalRange(double start, double end, double step)
         {
             if (step <= 0)
                 throw new ArgumentException("Step must be positive and non-zero.");
 
-            var result = new List<decimal>();
-            for (decimal value = start; value <= end; value += step)
+            var result = new List<double>();
+            for (double value = start; value <= end; value += step)
             {
-                result.Add(decimal.Round(value, 10));
+                result.Add(Math.Round(value, 10));
             }
             return result;
         }

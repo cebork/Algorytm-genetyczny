@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Lab2.Core.Enums;
 using System.Globalization;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace Lab2.Core.Domain
 {
@@ -14,40 +15,40 @@ namespace Lab2.Core.Domain
         private readonly int precisionDigits;
         public AlgorithmType AlgorithmType { get; set; }
         public int MatrixSize { get; set; }
-        private decimal precision;
-        private decimal crossProbability;
-        private decimal mutationPorbability;
+        private double precision;
+        private double crossProbability;
+        private double mutationPorbability;
 
-        public bool[,] IndividualMatrix { get; set; }
+        public Matrix<double> IndividualMatrix { get; set; }
 
         public decimal OrderNumber { get; set; }
-        public decimal Mark;
-        public decimal FitValue;
-        public decimal Probability;
-        public decimal Distribuator;
-        public decimal RandomValueToCheck;
+        public double Mark;
+        public double FitValue;
+        public double Probability;
+        public double Distribuator;
+        public double RandomValueToCheck;
 
 
-        public bool[,] MatrixAfterSelection { get; set; }
+        public Matrix<double> MatrixAfterSelection { get; set; }
 
-        public bool[,] MatrixParents { get; set; }
+        public Matrix<double> MatrixParents { get; set; }
 
-        public bool[,] MatrixChild { get; set; }
+        public Matrix<double> MatrixChild { get; set; }
 
-        public bool[,] MatrixAfterCross { get; set; }
+        public Matrix<double> MatrixAfterCross { get; set; }
 
-        public bool[,] MatrixAfterMutation { get; set; }
-        public bool[,] ReferenceMatrix { get; set; }
-        public bool[][,] PatternMatrixes { get; set; }
+        public Matrix<double> MatrixAfterMutation { get; set; }
+        public Matrix<double> ReferenceMatrix { get; set; }
+        public Matrix<double>[] PatternMatrixes { get; set; }
         public string xBinParents { get; set; }
         public string xBinChild { get; set; }
         public decimal CutPoint { get; set; }
 
         public string MutationPosition { get; set; }
 
-        public decimal MarkAfterMutation { get; set; }
-        public decimal NotNormalizedMarkAfterMutation { get; set; }
-        public Individual(decimal orderNumber, decimal matrixSize, decimal precision, decimal crossProbability, decimal mutationProbability, bool[,] referenceMatrix, AlgorithmType algorithmType, bool[][,] patternMatrixes)
+        public double MarkAfterMutation { get; set; }
+        public double NotNormalizedMarkAfterMutation { get; set; }
+        public Individual(decimal orderNumber, decimal matrixSize, double precision, double crossProbability, double mutationProbability, Matrix<double> referenceMatrix, AlgorithmType algorithmType, Matrix<double>[] patternMatrixes)
         {
 
             AlgorithmType = algorithmType;
@@ -64,7 +65,7 @@ namespace Lab2.Core.Domain
 
         }
 
-        public Individual(decimal orderNumber, decimal matrixSize, decimal precision, decimal crossProbability, decimal mutationProbability, bool[,] nextMatrix, bool[,] referenceMatrix, AlgorithmType algorithmType, bool[][,] patternMatrixes)
+        public Individual(decimal orderNumber, decimal matrixSize, double precision, double crossProbability, double mutationProbability, Matrix<double> nextMatrix, Matrix<double> referenceMatrix, AlgorithmType algorithmType, Matrix<double>[] patternMatrixes)
         {
             AlgorithmType = algorithmType;
             OrderNumber = orderNumber;
@@ -78,7 +79,7 @@ namespace Lab2.Core.Domain
             precisionDigits = GetPrecisionDigits(precision);
             SetOcena();
         }
-        private int GetPrecisionDigits(decimal number)
+        private int GetPrecisionDigits(double number)
         {
             var s = number.ToString("0.#############################", CultureInfo.InvariantCulture).TrimEnd('0');
             var parts = s.Split('.');
@@ -87,13 +88,13 @@ namespace Lab2.Core.Domain
 
         private void InitOsobnikMatrix()
         {
-            IndividualMatrix = new bool[MatrixSize, MatrixSize];
+            IndividualMatrix = Matrix<double>.Build.Dense(MatrixSize, MatrixSize, 0);
             Random random = RandomSingleton.Instance;
             for (int i = 1; i < MatrixSize - 1; i++)
             {
                 for (int j = 1; j < MatrixSize - 1; j++)
                 {
-                    IndividualMatrix[i, j] = random.Next(2) == 0;
+                    IndividualMatrix[i, j] = random.Next(2);
                 }
             }
 
@@ -121,25 +122,19 @@ namespace Lab2.Core.Domain
             {
                 case AlgorithmType.SUPERVISED:
                 {
-                    int meter = 0;
-                    int denominator = 0;
-                    for (int i = 1; i < MatrixSize - 1; i++)
-                    {
-                        for (int j = 1; j < MatrixSize - 1; j++)
-                        {
-                            if (IndividualMatrix[i, j] == ReferenceMatrix[i, j] == true)
-                            {
-                                meter++;
-                                denominator++;
-                            }
-                            if ((IndividualMatrix[i, j] == true && ReferenceMatrix[i, j] == false) || (IndividualMatrix[i, j] == false && ReferenceMatrix[i, j] == true))
-                            {
-                                denominator++;
-                            }
-                        }
-                    }
+                    var m_ref = ReferenceMatrix.SubMatrix(1, MatrixSize - 2, 1, MatrixSize - 2);
+                    var m_res = IndividualMatrix.SubMatrix(1, MatrixSize - 2, 1, MatrixSize - 2);
 
-                    Mark = Math.Round((decimal)meter / denominator, precisionDigits);
+                    // Zastosowanie logicznego AND przez PointwiseMultiply
+                    var intersection = m_ref.PointwiseMultiply(m_res);
+                    double truePositive = intersection.Enumerate().Sum();
+
+                    // Liczba pozytywnych przypadków w referencyjnej macierzy
+                    double totalReferencePositive = m_ref.Enumerate().Sum();
+
+                    // Wynik
+                    Mark = totalReferencePositive == 0 ? 0 : Math.Round(truePositive / totalReferencePositive, precisionDigits);
+
                     break;
                 }
                 case AlgorithmType.UNSUPERVISED:
@@ -152,12 +147,12 @@ namespace Lab2.Core.Domain
 
         }
 
-        public void SetFitValue(decimal minValue)
+        public void SetFitValue(double minValue)
         {
             FitValue = Mark - minValue + precision;
         }
 
-        public void SetProbability(decimal sumValue)
+        public void SetProbability(double sumValue)
         {
             Probability = FitValue / sumValue;
         }
@@ -182,7 +177,7 @@ namespace Lab2.Core.Domain
         public void SetParent()
         {
             double random = RandomSingleton.Instance.NextDouble();
-            if ((decimal)random <= crossProbability)
+            if ((double)random <= crossProbability)
             {
                 MatrixParents = MatrixAfterSelection;
             }
@@ -194,63 +189,52 @@ namespace Lab2.Core.Domain
 
         public void Mutate()
         {
+            var random = RandomSingleton.Instance;
             MutationPosition = "";
-            int rows = MatrixAfterCross.GetLength(0);
-            int cols = MatrixAfterCross.GetLength(1);
 
-            bool[,] afterMutation = null;
+            var rows = MatrixAfterCross.RowCount;
+            var cols = MatrixAfterCross.ColumnCount;
 
+            // Domyślnie: brak mutacji
+            var afterMutation = MatrixAfterCross.Clone();
+
+            // Tworzymy maskę mutacji z losowych wartości (1 = mutuj, 0 = nie)
+            var mutationMask = Matrix<double>.Build.Dense(rows, cols, (i, j) =>
+                (i > 0 && i < rows - 1 && j > 0 && j < cols - 1) && ((double)random.NextDouble() <= mutationPorbability)
+                    ? 1.0 : 0.0);
+
+            // Zapisz pozycje mutacji
             for (int i = 1; i < rows - 1; i++)
             {
                 for (int j = 1; j < cols - 1; j++)
                 {
-                    double randomDouble = RandomSingleton.Instance.NextDouble();
-
-                    if ((decimal)randomDouble <= mutationPorbability)
-                    {
-                        if (afterMutation == null)
-                            afterMutation = (bool[,])MatrixAfterCross.Clone();
-
-                        afterMutation[i, j] = !MatrixAfterCross[i, j];
+                    if (mutationMask[i, j] == 1.0)
                         MutationPosition += $"[{i}, {j}],";
-
-
-                    }
                 }
             }
 
-            MatrixAfterMutation = afterMutation ?? MatrixAfterCross;
+            // Odwracamy wartości tam, gdzie mutacja == 1
+            var inverted = MatrixAfterCross.Map(x => x == 1 ? 0.0 : 1.0);
+            MatrixAfterMutation = MatrixAfterCross.PointwiseMultiply(mutationMask.Map(x => 0.0)) // gdzie mutacja = 0 → zachowaj starą
+                .Add(inverted.PointwiseMultiply(mutationMask.Map(x => (double)x))); // gdzie mutacja = 1 → użyj odwróconej
         }
 
 
-
-
-
-        public decimal SetOcena(bool[,] matrixAfterMutation)
+    public double SetOcena(Matrix<double> matrixAfterMutation)
         {
             switch (AlgorithmType)
             {
                 case AlgorithmType.SUPERVISED:
                     {
-                        int meter = 0;
-                        int denominator = 0;
-                        for (int i = 1; i < MatrixSize - 1; i++)
-                        {
-                            for (int j = 1; j < MatrixSize - 1; j++)
-                            {
-                                if (matrixAfterMutation[i, j] == true && ReferenceMatrix[i, j] == true)
-                                {
-                                    meter++;
-                                    denominator++;
-                                }
-                                if ((matrixAfterMutation[i, j] == true && ReferenceMatrix[i, j] == false) || (matrixAfterMutation[i, j] == false && ReferenceMatrix[i, j] == true))
-                                {
-                                    denominator++;
-                                }
-                            }
-                        }
-                        NotNormalizedMarkAfterMutation = meter;
-                        return Math.Round((decimal)meter / denominator, precisionDigits);
+                        var m_ref = ReferenceMatrix.SubMatrix(1, MatrixSize - 2, 1, MatrixSize - 2);
+                        var m_res = matrixAfterMutation.SubMatrix(1, MatrixSize - 2, 1, MatrixSize - 2);
+
+                        var intersection = m_ref.PointwiseMultiply(m_res);
+                        double truePositive = intersection.Enumerate().Sum();
+
+                        double totalReferencePositive = m_ref.Enumerate().Sum();
+                        NotNormalizedMarkAfterMutation = truePositive;
+                        return totalReferencePositive == 0 ? 0 : Math.Round(truePositive / totalReferencePositive, precisionDigits);
                     }
                 case AlgorithmType.UNSUPERVISED:
                     {
@@ -263,34 +247,35 @@ namespace Lab2.Core.Domain
         }
 
 
-        private decimal CalculateMarkWithPatterns(bool[,] matrixAfterMutation, bool[][,] referencePatterns, decimal precision)
+        private double CalculateMarkWithPatterns(Matrix<double> matrixAfterMutation, Matrix<double>[] referencePatterns, double precision)
         {
-            int size = MatrixSize;
-            int totalPositions = 0;
-            int matchCount = 0;
+            return 0;
+            //int size = MatrixSize;
+            //int totalPositions = 0;
+            //int matchCount = 0;
 
-            Parallel.For(1, MatrixSize - 1, i =>
-            {
-                for (int j = 1; j < MatrixSize - 1; j++)
-                {
-                    foreach (var pattern in referencePatterns)
-                    {
-                        if (PatternMatchesAt(matrixAfterMutation != null ? matrixAfterMutation : IndividualMatrix, pattern, i, j))
-                        {
-                            Interlocked.Increment(ref matchCount);
-                            break;
-                        }
-                    }
+            //Parallel.For(1, MatrixSize - 1, i =>
+            //{
+            //    for (int j = 1; j < MatrixSize - 1; j++)
+            //    {
+            //        foreach (var pattern in referencePatterns)
+            //        {
+            //            if (PatternMatchesAt(matrixAfterMutation != null ? matrixAfterMutation : IndividualMatrix, pattern, i, j))
+            //            {
+            //                Interlocked.Increment(ref matchCount);
+            //                break;
+            //            }
+            //        }
 
-                    Interlocked.Increment(ref totalPositions);
-                }
-            });
+            //        Interlocked.Increment(ref totalPositions);
+            //    }
+            //});
 
 
-            if (totalPositions == 0)
-                return 0;
+            //if (totalPositions == 0)
+            //    return 0;
 
-            return Math.Round((decimal)matchCount / totalPositions, precisionDigits);
+            //return Math.Round((decimal)matchCount / totalPositions, precisionDigits);
         }
 
 

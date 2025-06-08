@@ -12,7 +12,7 @@ namespace Lab2.Utils
     {
         public static void SetUpFitValue(List<Individual> individuals)
         {
-            decimal minValue = individuals.Min(o => o.Mark);
+            double minValue = individuals.Min(o => o.Mark);
             Parallel.ForEach(individuals, individual => {
                 individual.SetFitValue(minValue);
             });
@@ -21,8 +21,8 @@ namespace Lab2.Utils
 
         internal static void SetUpDistribuator(List<Individual> individuals)
         {
-            decimal sumValue = individuals.Sum(o => o.FitValue);
-            decimal accumulator = 0;
+            double sumValue = individuals.Sum(o => o.FitValue);
+            double accumulator = 0;
             for (int i = 0; i < individuals.Count; i++)
             {
                 individuals[i].SetProbability(sumValue);
@@ -45,7 +45,7 @@ namespace Lab2.Utils
 
             Parallel.For(0, individuals.Count, i =>
             {
-                decimal randomValue = (decimal)RandomSingleton.Instance.NextDouble();
+                double randomValue = (double)RandomSingleton.Instance.NextDouble();
                 individuals[i].RandomValueToCheck = randomValue;
 
                 int selectedIndex = BinarySearchDistrib(distribList, randomValue);
@@ -53,7 +53,7 @@ namespace Lab2.Utils
             });
         }
 
-        private static int BinarySearchDistrib(List<decimal> distribList, decimal target)
+        private static int BinarySearchDistrib(List<double> distribList, double target)
         {
             int left = 0;
             int right = distribList.Count - 1;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MathNet.Numerics.LinearAlgebra;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,6 @@ namespace Lab2.UI.Domain
         public string ReferenceMatrixName { get; set; }
 
         public int MatrixSize { get; set; }
-        public bool[,] ReferenceMatrix { get; set; }
+        public Matrix<double> ReferenceMatrix { get; set; }
     }
 }

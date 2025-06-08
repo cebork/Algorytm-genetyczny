@@ -61,7 +61,7 @@ namespace Lab2.Services
                 throw new Exception("Niepoprawny przedział dla prawdopodbieństwa mutacji");
             }
 
-            if (InitialData.AlgorithmType == Core.Enums.AlgorithmType.SUPERVISED && (InitialData.SupervisedReferenceMatrix == null || InitialData.SupervisedReferenceMatrix.Length == 0))
+            if (InitialData.AlgorithmType == Core.Enums.AlgorithmType.SUPERVISED && (InitialData.SupervisedReferenceMatrix == null || InitialData.SupervisedReferenceMatrix.ColumnCount == 0))
             {
                 throw new Exception("Macierz referencyjna jest niepoprawna");
             }

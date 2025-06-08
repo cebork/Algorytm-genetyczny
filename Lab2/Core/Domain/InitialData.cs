@@ -4,30 +4,32 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Lab2.Core.Enums;
+using MathNet.Numerics.LinearAlgebra;
+
 namespace Lab2.Core.Domain
 {
     public class InitialData
     {
 
         public AlgorithmType AlgorithmType { get; set; }
-        public decimal MatrixSize { get; set; }
-        public decimal Precision { get; set; }
-        public decimal NumberOfIndividuals { get; set; }
-        public decimal CrossProbability { get; set; }
-        public decimal MutationProbability { get; set; }
-        public decimal NumberOfIterations { get; set; }
-        public bool[,] SupervisedReferenceMatrix { get; set; }
-        public bool[][,] UnsupervisedPatternMatrixes { get; set; }
+        public double MatrixSize { get; set; }
+        public double Precision { get; set; }
+        public double NumberOfIndividuals { get; set; }
+        public double CrossProbability { get; set; }
+        public double MutationProbability { get; set; }
+        public double NumberOfIterations { get; set; }
+        public Matrix<double> SupervisedReferenceMatrix { get; set; }
+        public Matrix<double>[] UnsupervisedPatternMatrixes { get; set; }
         public InitialData() { }
 
         public InitialData(
-            decimal matrixSize,
-            decimal precision,
-            decimal numberOfIndividuals,
-            decimal crossProbability,
-            decimal mutationProbability,
-            decimal numberOfIterations,
-            bool[,] supervisedReferenceMatrix
+            double matrixSize,
+            double precision,
+            double numberOfIndividuals,
+            double crossProbability,
+            double mutationProbability,
+            double numberOfIterations,
+            Matrix<double> supervisedReferenceMatrix
         )
         {
             MatrixSize = matrixSize;

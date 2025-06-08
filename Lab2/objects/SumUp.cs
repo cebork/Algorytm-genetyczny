@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MathNet.Numerics.LinearAlgebra;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,8 +12,8 @@ namespace Lab2.objects
         public decimal lp { get; set; }
         //public decimal xReal { get; set; }
         //public decimal xBin { get; set; }
-        public decimal Mark { get; set; }
-        public decimal Percentage { get; set; }
-        public bool[,] Matrix { get; set; }
+        public double Mark { get; set; }
+        public double Percentage { get; set; }
+        public Matrix<double> Matrix { get; set; }
     }
 }

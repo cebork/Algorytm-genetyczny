@@ -5,6 +5,8 @@ using Lab2.Core.Domain;
 using Lab2.UI.Domain;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using Lab2.Services;
+using MathNet.Numerics.LinearAlgebra;
+
 namespace Lab2.UI
 {
     public partial class PatternChoosingModalWindow : Form
@@ -24,8 +26,8 @@ namespace Lab2.UI
             InitializeComponent();
             InitialData = initialData;
 
-            var allPatterns = FileUtils.LoadAllPatterns();
-            patternChoosingDisplayColumns = allPatterns;
+            //var allPatterns = FileUtils.LoadAllPatterns();
+            //patternChoosingDisplayColumns = allPatterns;
             setupPatternListView();
 
 
@@ -109,17 +111,17 @@ namespace Lab2.UI
             {
                 for (int col = 0; col < currentMatrixSize; col++)
                 {
-                    bool value = false;
+                    double value = 0;
 
                     if (InitialData.SupervisedReferenceMatrix != null &&
-                        InitialData.SupervisedReferenceMatrix.GetLength(0) == currentMatrixSize &&
-                        InitialData.SupervisedReferenceMatrix.GetLength(1) == currentMatrixSize)
+                        InitialData.SupervisedReferenceMatrix.ColumnCount == currentMatrixSize &&
+                        InitialData.SupervisedReferenceMatrix.ColumnCount == currentMatrixSize)
                     {
                         value = InitialData.SupervisedReferenceMatrix[row, col];
                     }
 
                     patternMatrixInput[col, row].Value = value;
-                    patternMatrixInput[col, row].Style.BackColor = value ? Color.Red : Color.White;
+                    patternMatrixInput[col, row].Style.BackColor = value == 1 ? Color.Red : Color.White;
                 }
             }
 
@@ -133,7 +135,7 @@ namespace Lab2.UI
         private void patternAddButtom_Click(object sender, EventArgs e)
         {
             int size = patternMatrixInput.RowCount;
-            bool[,] patternMatrix = new bool[size, size];
+            Matrix<double> patternMatrix = Matrix<double>.Build.Dense(size, size, 0);
 
             for (int row = 0; row < size; row++)
             {
@@ -141,13 +143,13 @@ namespace Lab2.UI
                 {
                     var cellValue = patternMatrixInput[col, row].Value;
 
-                    if (cellValue is bool b)
+                    if (cellValue is int b)
                     {
                         patternMatrix[row, col] = b;
                     }
                     else
                     {
-                        patternMatrix[row, col] = false;
+                        patternMatrix[row, col] = 0;
                     }
                 }
             }
@@ -164,7 +166,7 @@ namespace Lab2.UI
             {
                 new ValidationService(patternChoosingDisplayColumn);
 
-                FileUtils.AppendPatternToFile(patternChoosingDisplayColumn);
+                //FileUtils.AppendPatternToFile(patternChoosingDisplayColumn);
                 patternChoosingDisplayColumns.Add(patternChoosingDisplayColumn);
 
                 var item = new ListViewItem(patternChoosingDisplayColumn.PatternName);
@@ -240,11 +242,11 @@ namespace Lab2.UI
 
         private void setPatternsButton_Click(object sender, EventArgs e)
         {
-            var patternListTemp = new List<bool[,]>();
+            var patternListTemp = new List<Matrix<double>>();
 
             foreach (ListViewItem item in patternList.CheckedItems)
             {
-                bool[,] data = item.Tag as bool[,];
+                Matrix<double> data = item.Tag as Matrix<double>;
 
                 if (data != null)
                 {

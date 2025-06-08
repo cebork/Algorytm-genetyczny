@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using Lab2.Core.Domain;
 using Lab2.Services;
 using Lab2.UI.Domain;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace Lab2.UI
 {
@@ -53,18 +54,18 @@ namespace Lab2.UI
             {
                 for (int col = 0; col < size; col++)
                 {
-                    bool value = false;
+                    double value = 0;
 
                     if (initialData.SupervisedReferenceMatrix != null &&
-                        initialData.SupervisedReferenceMatrix.GetLength(0) == size &&
-                        initialData.SupervisedReferenceMatrix.GetLength(1) == size)
+                        initialData.SupervisedReferenceMatrix.ColumnCount == size &&
+                        initialData.SupervisedReferenceMatrix.ColumnCount == size)
                     {
                         value = initialData.SupervisedReferenceMatrix[row, col];
                     }
 
                     var cell = referenceMatrixInput.Rows[row].Cells[col];
                     cell.Value = value;
-                    cell.Style.BackColor = value ? Color.Red : Color.White;
+                    cell.Style.BackColor = value == 1 ? Color.Red : Color.White;
                 }
             }
 
@@ -72,8 +73,8 @@ namespace Lab2.UI
             referenceMatrixInput.CurrentCell = null;
             referenceMatrixInput.ClearSelection();
 
-            var allReferenceMatrixies = FileUtils.LoadAllReferenceMatrixes((int)InitialData.MatrixSize);
-            referenceMatrixDisplayColumns1 = allReferenceMatrixies;
+            //var allReferenceMatrixies = FileUtils.LoadAllReferenceMatrixes((int)InitialData.MatrixSize);
+            //referenceMatrixDisplayColumns1 = allReferenceMatrixies;
             setupReferenceMatrixListView();
         }
 
@@ -83,7 +84,7 @@ namespace Lab2.UI
             if (referenceMatrixList.SelectedItems.Count > 0)
             {
                 var selectedItem = referenceMatrixList.SelectedItems[0];
-                var data = selectedItem.Tag as bool[,];
+                var data = selectedItem.Tag as Matrix<double>;
 
                 int size = (int)InitialData.MatrixSize;
                 InitialData.SupervisedReferenceMatrix = data;
@@ -92,18 +93,18 @@ namespace Lab2.UI
                 {
                     for (int col = 0; col < size; col++)
                     {
-                        bool value = false;
+                        double value = 0;
 
                         if (InitialData.SupervisedReferenceMatrix != null &&
-                            InitialData.SupervisedReferenceMatrix.GetLength(0) == size &&
-                            InitialData.SupervisedReferenceMatrix.GetLength(1) == size)
+                            InitialData.SupervisedReferenceMatrix.ColumnCount == size &&
+                            InitialData.SupervisedReferenceMatrix.ColumnCount == size)
                         {
                             value = InitialData.SupervisedReferenceMatrix[row, col];
                         }
 
                         var cell = referenceMatrixInput.Rows[row].Cells[col];
                         cell.Value = value;
-                        cell.Style.BackColor = value ? Color.Red : Color.White;
+                        cell.Style.BackColor = value == 1 ? Color.Red : Color.White;
                     }
                 }
 
@@ -175,14 +176,14 @@ namespace Lab2.UI
         private void setButton_Click(object sender, EventArgs e)
         {
             int size = referenceMatrixInput.RowCount;
-            bool[,] matrix = new bool[size, size];
+            Matrix<double> matrix = Matrix<double>.Build.Dense(size, size, 0);
 
             for (int row = 0; row < size; row++)
             {
                 for (int col = 0; col < size; col++)
                 {
                     bool value = Convert.ToBoolean(referenceMatrixInput.Rows[row].Cells[col].Value ?? false);
-                    matrix[row, col] = value;
+                    matrix[row, col] = value ? 1 : 0;
                 }
             }
 
@@ -197,14 +198,14 @@ namespace Lab2.UI
             try {
                 new ValidationService(referenceTableName.Text);
                 int size = referenceMatrixInput.RowCount;
-                bool[,] matrix = new bool[size, size];
+                Matrix<double> matrix = Matrix<double>.Build.Dense(size, size, 0);
 
                 for (int row = 0; row < size; row++)
                 {
                     for (int col = 0; col < size; col++)
                     {
                         bool value = Convert.ToBoolean(referenceMatrixInput.Rows[row].Cells[col].Value ?? false);
-                        matrix[row, col] = value;
+                        matrix[row, col] = value ? 1 : 0;
                     }
                 }
 
@@ -215,7 +216,7 @@ namespace Lab2.UI
                     ReferenceMatrix = matrix
                 };
 
-                FileUtils.AppendReferenceMatrixToFile(referenceMatrixDisplayColumns);
+                //FileUtils.AppendReferenceMatrixToFile(referenceMatrixDisplayColumns);
                 referenceMatrixDisplayColumns1.Add(referenceMatrixDisplayColumns);
 
                 var item = new ListViewItem(referenceMatrixDisplayColumns.ReferenceMatrixName);
@@ -238,14 +239,14 @@ namespace Lab2.UI
         private void generateMatrix_Click(object sender, EventArgs e)
         {
             int size = (int)InitialData.MatrixSize;
-            InitialData.SupervisedReferenceMatrix = new bool[size, size];
+            InitialData.SupervisedReferenceMatrix = Matrix<double>.Build.Dense(size, size, 0);
 
             for (int row = 1; row < size - 1; row++)
             {
                 for (int col = 1; col < size - 1; col++)
                 {
                     bool value = (row % 2 == 1) && (col % 2 == 1);
-                    InitialData.SupervisedReferenceMatrix[row, col] = value;
+                    InitialData.SupervisedReferenceMatrix[row, col] = value ? 1 : 0;
 
                     var cell = referenceMatrixInput.Rows[row].Cells[col];
                     cell.Value = value;
