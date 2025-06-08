@@ -40,6 +40,7 @@ namespace Lab2
 
         private async void startButton_Click(object sender, EventArgs e)
         {
+
             InitialData.MatrixSize = matrixSizeInput.Value;
             InitialData.Precision = (decimal) precisionInput.SelectedItem;
             InitialData.NumberOfIndividuals = individualNumberInput.Value;
@@ -64,12 +65,10 @@ namespace Lab2
 
                 try
                 {
-                    // Run your long operation asynchronously
                     await Task.Run(() => AlgorithmRun(progress));
                 }
                 finally
                 {
-                    // Hide loading
                     runProgressBar.Visible = false;
                     startButton.Enabled = true;
                 }
@@ -90,9 +89,8 @@ namespace Lab2
                 .ToList();
                 osobniki.DataSource = sumUps;
 
-                bool[,] test = sumUps.First().Matrix;
-
-
+                DisplayMatrix(lastGeneration.OrderByDescending(o => o.MarkAfterMutation).First().MatrixAfterMutation);
+                FileUtils.SaveResultsGa(historyOfIndividuals, InitialData);
 
                 Dictionary<int, decimal> maxValues = new Dictionary<int, decimal>
                         {
@@ -196,98 +194,145 @@ namespace Lab2
 
         private async void testyStart_Click(object sender, EventArgs e)
         {
-            //var watch = System.Diagnostics.Stopwatch.StartNew();
 
-            //List<TestObject> list = new List<TestObject>();
-            //var listLock = new object();
+            if (testExperimentCount.Value <= 0)
+            {
+                MessageBox.Show("Liczba eksperymentów musi byæ wiêksza od 0", "");
+                return;
+            }
 
-            //var nValues = Enumerable.Range(30, 51).Where(n => (n - 30) % 5 == 0).ToList();
-            //var pkValues = Enumerable.Range(0, 9).Select(pkIndex => 0.5 + pkIndex * 0.05).ToList();
-            //var pmValues = new List<double> { 0.0001, 0.0005, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01 };
-            //var tValues = Enumerable.Range(50, 101).Where(t => (t - 50) % 10 == 0).ToList();
-            //MessageBox.Show("Zamknij okno aby kontyunuwac", "");
+            if (NaInput.Value <= 0 || TaInput.Value <= 0)
+            {
+                MessageBox.Show("Iloœæ osobników oraz iloœæ iteracji musi byæ wiêksza od 0", "");
+                return;
+            }
+            if (NaInput.Value >= NbInput.Value || pkaInput.Value >= PkbbInput.Value || pmaInput.Value >= PmbInput.Value || TaInput.Value >= TbInput.Value)
+            {
+                MessageBox.Show("Wartoœæ przedzia³ów testów nie mo¿e byæ odwrotna lub zerowa", "");
+                return;
+            }
+            if (NstepInput.Value == 0 || PkstepInput.Value == 0 || PmstepInput.Value == 0 || TstepInput.Value == 0)
+            {
+                MessageBox.Show("Wartoœæ kroku nie mo¿e byæ zerowa", "");
+                return;
+            }
 
-            //var tasks = new List<Task>();
+            if (InitialData.AlgorithmType == Core.Enums.AlgorithmType.SUPERVISED && (InitialData.SupervisedReferenceMatrix == null || InitialData.SupervisedReferenceMatrix.Length == 0) || InitialData.AlgorithmType == Core.Enums.AlgorithmType.UNSUPERVISED && (InitialData.UnsupervisedPatternMatrixes == null || InitialData.UnsupervisedPatternMatrixes.Length == 0))
+            {
+                MessageBox.Show("Nie wybrano macierzy wzorców lub macierzy referencyjnej", "");
+                return;
+            }
 
-            //foreach (var n in nValues)
-            //{
-            //    foreach (var pk in pkValues)
-            //    {
-            //        foreach (var pm in pmValues)
-            //        {
-            //            foreach (var t in tValues)
-            //            {
-            //                tasks.Add(Task.Run(() =>
-            //                {
-            //                    List<List<Osobnik>> localHistory = new List<List<Osobnik>>();
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            Dictionary<InitialData, List<List<Individual>>>  globalHistory = new Dictionary<InitialData, List<List<Individual>>>(); 
+            List<TestObject> list = new List<TestObject>();
+            var listLock = new object();
 
-            //                    Parallel.For(0, 10, x =>
-            //                    {
-            //                        var osobniks = Enumerable.Range(1, n).Select(i => new Osobnik(i, -4, 12, 0.001, pk, pm)).ToList();
-
-            //                        for (int t2 = 0; t2 < t; t2++)
-            //                        {
-            //                            SelectionUtils.SetUpFitValue(osobniks);
-            //                            SelectionUtils.SetUpDistribuator(osobniks);
-            //                            SelectionUtils.SetUpNewOsobnikAfterSelection(osobniks);
-
-            //                            Parallel.ForEach(osobniks, item =>
-            //                            {
-            //                                item.RealToBin(item.XRealAfterSelection);
-            //                                item.SetParent();
-            //                            });
-
-            //                            CrossUtils.SetCutPoint(osobniks);
-            //                            CrossUtils.CrossOsobniks(osobniks);
-            //                            CrossUtils.CreatePopulationAfterCrossing(osobniks);
-
-            //                            Parallel.ForEach(osobniks, item =>
-            //                            {
-            //                                item.Mutate();
-            //                                item.XRealAfterMutation = item.BinaryToReal(item.xBinAfterMutation);
-            //                                item.MarkAfterMutation = item.SetOcena(item.XRealAfterMutation);
-            //                            });
-
-            //                            List<Osobnik> coppiedOsobniks = osobniks.ToList();
-            //                            osobniks = new List<Osobnik>();
-            //                            int idx = 1;
-            //                            foreach (Osobnik osobnik in coppiedOsobniks)
-            //                            {
-            //                                osobniks.Add(new Osobnik(idx, -4, 12, 0.001, pk, pm, osobnik.XRealAfterMutation));
-            //                                idx++;
-            //                            }
-                                        
-            //                        }
-            //                        localHistory.Add(osobniks.ToList());
-            //                    });
-
-            //                    var avgMark = localHistory.SelectMany(os => os).Average(o => o.Mark);
-            //                    var testObject = new TestObject { N = n, pk = Math.Round(pk, 3), pm = Math.Round(pm, 4), T = t, AvgMark = Math.Round(avgMark, 3) };
-
-            //                    lock (localHistory)
-            //                    {
-            //                        list.Add(testObject);
-            //                    }
-            //                }));
-            //            }
-            //        }
-            //    }
-            //}
-
-            //await Task.WhenAll(tasks);
+            var NValues = GenerateDecimalRange(NaInput.Value, NbInput.Value, NstepInput.Value);
+            var pkValues = GenerateDecimalRange(pkaInput.Value, PkbbInput.Value, PkstepInput.Value);
+            var pmValues = GenerateDecimalRange(pmaInput.Value, PmbInput.Value, PmstepInput.Value);
+            var tValues = GenerateDecimalRange(TaInput.Value, TbInput.Value, TstepInput.Value);
 
             
-            //watch.Stop();
-            //var elapsedMs = watch.ElapsedMilliseconds;
-            //TimeSpan elapsed = TimeSpan.FromMilliseconds(elapsedMs);
 
-            //string elapsedFormatted = string.Format("{0:D2}:{1:D2}:{2:D2}.{3:D3}",
-            //                                        elapsed.Hours,
-            //                                        elapsed.Minutes,
-            //                                        elapsed.Seconds,
-            //                                        elapsed.Milliseconds);
-            //MessageBox.Show("Liczba wyników: " + list.Count().ToString() + "\nPotrzebny czas: " + elapsedFormatted , "Sukces");
-            //testy.DataSource = list.OrderByDescending(x => x.AvgMark).ToList();
+            MessageBox.Show("Zamknij okno aby kontyunuwac", "");
+            decimal iter = 1;
+            var tasks = new List<Task>();
+
+            foreach (var n in NValues)
+            {
+                foreach (var pk in pkValues)
+                {
+                    foreach (var pm in pmValues)
+                    {
+                        foreach (var t in tValues)
+                        {
+                            tasks.Add(Task.Run(() =>
+                            {
+                                List<List<Individual>> localHistory = new List<List<Individual>>();
+
+                                Parallel.For(0, (int)testExperimentCount.Value, x =>
+                                {
+                                    var individuals = Enumerable.Range(1, (int)n).Select(i => new Individual(i, matrixSizeInput.Value, 0.001m, pk, pm, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes)).ToList();
+
+                                    for (int t2 = 0; t2 < t; t2++)
+                                    {
+                                        SelectionUtils.SetUpFitValue(individuals);
+                                        SelectionUtils.SetUpDistribuator(individuals);
+                                        SelectionUtils.SetUpNewOsobnikAfterSelection(individuals);
+                                        Parallel.ForEach(individuals, item => {
+                                            item.SetParent();
+                                        });
+                                        CrossUtils.SetCutPoint(individuals);
+                                        CrossUtils.CrossOsobniks(individuals);
+                                        CrossUtils.CreatePopulationAfterCrossing(individuals);
+                                        Parallel.ForEach(individuals, item => {
+                                            item.Mutate();
+                                            item.MarkAfterMutation = item.SetOcena(item.MatrixAfterMutation);
+                                        });
+
+
+
+
+                                        historyOfIndividuals.Add(individuals);
+                                        List<Individual> coppiedIndividuals = individuals.ToList();
+                                        individuals = new List<Individual>();
+                                        int idx = 1;
+                                        foreach (Individual individual in coppiedIndividuals)
+                                        {
+                                            individuals.Add(new Individual(idx, matrixSizeInput.Value, 0.003m, crossProbabilityInput.Value, mutationProbabilityInput.Value, individual.MatrixAfterMutation, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes));
+                                            idx++;
+                                        }
+
+                                    }
+                                    localHistory.Add(individuals.ToList());
+                                });
+
+                                var avgMark = localHistory.SelectMany(os => os).Average(o => o.Mark);
+                                var minMark = localHistory.SelectMany(os => os).Min(o => o.Mark);
+                                var maxMark = localHistory.SelectMany(os => os).Max(o => o.Mark);
+                                var testObject = new TestObject { Iter = iter, N = n, pk = pk, pm = pm, T = t, AvgMark = avgMark, MaxMark = maxMark, MinMark = minMark };
+                                iter++;
+                                lock (localHistory)
+                                {
+                                    InitialData initial = new InitialData()
+                                    {
+                                        MatrixSize = matrixSizeInput.Value,
+                                        NumberOfIndividuals = n,
+                                        NumberOfIterations = t,
+                                        MutationProbability = pm,
+                                        CrossProbability = pk,
+                                        SupervisedReferenceMatrix = InitialData.SupervisedReferenceMatrix,
+                                        UnsupervisedPatternMatrixes = InitialData.UnsupervisedPatternMatrixes
+                                    };
+                                    globalHistory.Add(initial, localHistory);
+                                    list.Add(testObject);
+                                }
+                            }));
+                        }
+                    }
+                }
+            }
+
+            await Task.WhenAll(tasks);
+
+
+
+            watch.Stop();
+            var elapsedMs = watch.ElapsedMilliseconds;
+            TimeSpan elapsed = TimeSpan.FromMilliseconds(elapsedMs);
+
+            string elapsedFormatted = string.Format("{0:D2}:{1:D2}:{2:D2}.{3:D3}",
+                                                    elapsed.Hours,
+                                                    elapsed.Minutes,
+                                                    elapsed.Seconds,
+                                                    elapsed.Milliseconds);
+            MessageBox.Show("Liczba wyników: " + list.Count().ToString() + "\nPotrzebny czas: " + elapsedFormatted, "Sukces");
+
+            InitialData.MatrixSize = matrixSizeInput.Value;
+            InitialData.Precision = (decimal) precisionInput.SelectedItem;
+            FileUtils.saveGaTunningResults(list, InitialData);
+            FileUtils.SaveMResultsGa(globalHistory);
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -435,7 +480,21 @@ namespace Lab2
 
 
             }
-            DisplayMatrix(individuals.OrderByDescending(o => o.Mark).First().IndividualMatrix);
+
+            
+        }
+
+        private List<decimal> GenerateDecimalRange(decimal start, decimal end, decimal step)
+        {
+            if (step <= 0)
+                throw new ArgumentException("Step must be positive and non-zero.");
+
+            var result = new List<decimal>();
+            for (decimal value = start; value <= end; value += step)
+            {
+                result.Add(decimal.Round(value, 10));
+            }
+            return result;
         }
     }
 }

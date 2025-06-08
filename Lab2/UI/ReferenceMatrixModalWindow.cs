@@ -234,5 +234,25 @@ namespace Lab2.UI
 
 
         }
+
+        private void generateMatrix_Click(object sender, EventArgs e)
+        {
+            int size = (int)InitialData.MatrixSize;
+            InitialData.SupervisedReferenceMatrix = new bool[size, size];
+
+            for (int row = 1; row < size - 1; row++)
+            {
+                for (int col = 1; col < size - 1; col++)
+                {
+                    bool value = (row % 2 == 1) && (col % 2 == 1);
+                    InitialData.SupervisedReferenceMatrix[row, col] = value;
+
+                    var cell = referenceMatrixInput.Rows[row].Cells[col];
+                    cell.Value = value;
+                    cell.Style.BackColor = value ? Color.Red : Color.White;
+                }
+            }
+        }
+
     }
 }

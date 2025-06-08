@@ -46,6 +46,7 @@ namespace Lab2.Core.Domain
         public string MutationPosition { get; set; }
 
         public decimal MarkAfterMutation { get; set; }
+        public decimal NotNormalizedMarkAfterMutation { get; set; }
         public Individual(decimal orderNumber, decimal matrixSize, decimal precision, decimal crossProbability, decimal mutationProbability, bool[,] referenceMatrix, AlgorithmType algorithmType, bool[][,] patternMatrixes)
         {
 
@@ -120,19 +121,25 @@ namespace Lab2.Core.Domain
             {
                 case AlgorithmType.SUPERVISED:
                 {
-                    int count = 0;
+                    int meter = 0;
+                    int denominator = 0;
                     for (int i = 1; i < MatrixSize - 1; i++)
                     {
                         for (int j = 1; j < MatrixSize - 1; j++)
                         {
-                            if (IndividualMatrix[i, j] == ReferenceMatrix[i, j])
+                            if (IndividualMatrix[i, j] == ReferenceMatrix[i, j] == true)
                             {
-                                count++;
+                                meter++;
+                                denominator++;
+                            }
+                            if ((IndividualMatrix[i, j] == true && ReferenceMatrix[i, j] == false) || (IndividualMatrix[i, j] == false && ReferenceMatrix[i, j] == true))
+                            {
+                                denominator++;
                             }
                         }
                     }
 
-                    Mark = Math.Round((decimal)count / ((MatrixSize - 2) * (MatrixSize - 2)), precisionDigits);
+                    Mark = Math.Round((decimal)meter / denominator, precisionDigits);
                     break;
                 }
                 case AlgorithmType.UNSUPERVISED:
@@ -225,21 +232,26 @@ namespace Lab2.Core.Domain
             {
                 case AlgorithmType.SUPERVISED:
                     {
-                        int count = 0;
+                        int meter = 0;
+                        int denominator = 0;
                         for (int i = 1; i < MatrixSize - 1; i++)
                         {
                             for (int j = 1; j < MatrixSize - 1; j++)
                             {
-                                if (matrixAfterMutation[i, j] == ReferenceMatrix[i, j])
+                                if (matrixAfterMutation[i, j] == true && ReferenceMatrix[i, j] == true)
                                 {
-                                    count++;
+                                    meter++;
+                                    denominator++;
+                                }
+                                if ((matrixAfterMutation[i, j] == true && ReferenceMatrix[i, j] == false) || (matrixAfterMutation[i, j] == false && ReferenceMatrix[i, j] == true))
+                                {
+                                    denominator++;
                                 }
                             }
                         }
-
-                        return Math.Round((decimal)count / ((MatrixSize - 1) * (MatrixSize - 1)), precisionDigits);
+                        NotNormalizedMarkAfterMutation = meter;
+                        return Math.Round((decimal)meter / denominator, precisionDigits);
                     }
-
                 case AlgorithmType.UNSUPERVISED:
                     {
                         return CalculateMarkWithPatterns(matrixAfterMutation, PatternMatrixes, precision);

@@ -34,6 +34,7 @@
             this.referenceTableName = new System.Windows.Forms.TextBox();
             this.referenceTableLabel = new System.Windows.Forms.Label();
             this.referenceMatrixList = new System.Windows.Forms.ListView();
+            this.generateMatrix = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.referenceMatrixInput)).BeginInit();
             this.SuspendLayout();
             // 
@@ -93,13 +94,23 @@
             this.referenceMatrixList.Size = new System.Drawing.Size(421, 565);
             this.referenceMatrixList.TabIndex = 5;
             this.referenceMatrixList.UseCompatibleStateImageBehavior = false;
-            this.referenceMatrixList.DoubleClick += referenceMatrixListView_DoubleClick;
+            // 
+            // generateMatrix
+            // 
+            this.generateMatrix.Location = new System.Drawing.Point(93, 583);
+            this.generateMatrix.Name = "generateMatrix";
+            this.generateMatrix.Size = new System.Drawing.Size(113, 61);
+            this.generateMatrix.TabIndex = 6;
+            this.generateMatrix.Text = "Generuj macierz";
+            this.generateMatrix.UseVisualStyleBackColor = true;
+            this.generateMatrix.Click += new System.EventHandler(this.generateMatrix_Click);
             // 
             // ReferenceMatrixModalWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1108, 656);
+            this.Controls.Add(this.generateMatrix);
             this.Controls.Add(this.referenceMatrixList);
             this.Controls.Add(this.referenceTableLabel);
             this.Controls.Add(this.referenceTableName);
@@ -122,5 +133,6 @@
         private TextBox referenceTableName;
         private Label referenceTableLabel;
         private ListView referenceMatrixList;
+        private Button generateMatrix;
     }
 }

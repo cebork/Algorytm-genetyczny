@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace Lab2.objects
 {
-    internal class TestObject
+    public class TestObject
     {
-
-        public int N { get; set; }
-        public double pk { get; set; }
-        public double pm { get; set; }
-        public int T { get; set; }
-        public double AvgMark { get; set; }
+        public decimal Iter { get; set; }
+        public decimal N { get; set; }
+        public decimal pk { get; set; }
+        public decimal pm { get; set; }
+        public decimal T { get; set; }
+        public decimal AvgMark { get; set; }
+        public decimal MinMark { get; set; }
+        public decimal MaxMark { get; set; }
     }
 }
