@@ -11,7 +11,7 @@ namespace Lab2.objects
         public decimal lp { get; set; }
         //public decimal xReal { get; set; }
         //public decimal xBin { get; set; }
-        public decimal Mark { get; set; }
+        public decimal f_C_Corr { get; set; }
         public decimal Percentage { get; set; }
         public bool[,] Matrix { get; set; }
     }

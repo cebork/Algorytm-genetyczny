@@ -6,23 +6,22 @@ using System.Threading.Tasks;
 
 namespace Lab2.Core.Enums
 {
-    public enum AlgorithmType
+    public enum CrossType
     {
-        SUPERVISED, UNSUPERVISED
+        SINGLE_POINT, MULTI_POINT
     }
 
-    public static class AlgorithmTypeHelper
+    public static class CrossTypeHelper
     {
-        public static AlgorithmType? FromString(string value)
+        public static CrossType? FromString(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
                 return null;
 
-            if (Enum.TryParse<AlgorithmType>(value, true, out var result))
+            if (Enum.TryParse<CrossType>(value, true, out var result))
                 return result;
 
             return null;
         }
     }
-
 }

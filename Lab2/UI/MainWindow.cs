@@ -3,6 +3,7 @@ using Lab2.Utils;
 using System.Collections.Concurrent;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using Lab2.Core.Enums;
 using Lab2.UI;
 using Lab2.Services;
 using Lab2.Core.Domain;
@@ -35,43 +36,70 @@ namespace Lab2
 
             precisionInput.SelectedItem = 0.001m;
             supervisedTypedRadioButton.Checked = true;
+
+            setupDefaultAlgorithmOtpions();
+            seed.Enabled = false;
         }
 
 
         private async void startButton_Click(object sender, EventArgs e)
         {
-
+            if (!useSeed.Checked)
+                RandomSingleton.Reset();
+            else
+            {
+                if (int.TryParse(seed.Text, out int parsedSeed))
+                {
+                    RandomSingleton.SetSeed(parsedSeed);
+                }
+                else
+                {
+                    MessageBox.Show("Invalid seed value. Please enter a valid integer.");
+                }
+            }
             InitialData.MatrixSize = matrixSizeInput.Value;
             InitialData.Precision = (decimal) precisionInput.SelectedItem;
             InitialData.NumberOfIndividuals = individualNumberInput.Value;
             InitialData.CrossProbability = crossProbabilityInput.Value;
             InitialData.MutationProbability = mutationProbabilityInput.Value;
             InitialData.NumberOfIterations = iterationNumberInput.Value;
-
+            InitialData.NumberOfExperiments = experimentNumber.Value;
+            InitialData.CrossCount = crossPoints.Value;
+            InitialData.ProbGen1 = propGen1.Value;
             historyOfIndividuals.Clear();
 
             try
             {
                 new ValidationService(InitialData);
+                for (int i = 0; i < InitialData.NumberOfExperiments; i++)
+                {
+                    historyOfIndividuals.Clear();
+                    runProgressBar.Visible = true;
+                    runProgressBar.Value = 0;
+                    runProgressBar.Maximum = (int)InitialData.NumberOfIterations;
+                    var progress = new Progress<int>(value =>
+                    {
+                        runProgressBar.Value = value;
+                    });
+                    startButton.Enabled = false;
 
-                runProgressBar.Visible = true;
-                runProgressBar.Value = 0;
-                runProgressBar.Maximum = (int) InitialData.NumberOfIterations;
-                var progress = new Progress<int>(value =>
-                {
-                    runProgressBar.Value = value;
-                });
-                startButton.Enabled = false;
-
-                try
-                {
-                    await Task.Run(() => AlgorithmRun(progress));
+                    try
+                    {
+                        decimal precision = 0.001m;
+                        this.Invoke((MethodInvoker)(() => precision = (decimal)precisionInput.SelectedItem));
+                        await Task.Run(() => AlgorithmRun(progress, precision));
+                    }
+                    finally
+                    {
+                        runProgressBar.Visible = false;
+                        startButton.Enabled = true;
+                        if (i == 0)
+                            FileUtils.SaveMaxFCCorr(historyOfIndividuals, InitialData, false);
+                        else
+                            FileUtils.SaveMaxFCCorr(historyOfIndividuals, InitialData, true);
+                    }
                 }
-                finally
-                {
-                    runProgressBar.Visible = false;
-                    startButton.Enabled = true;
-                }
+                
 
                 List<Individual> lastGeneration = historyOfIndividuals.Last();
                 int totalCount = lastGeneration.Count;
@@ -83,7 +111,7 @@ namespace Lab2
                 {
                     lp = xe++,
                     Matrix = group.First().MatrixAfterMutation,
-                    Mark = group.First().MarkAfterMutation,
+                    f_C_Corr = group.First().MarkAfterMutation,
                     Percentage = (decimal)group.Count() / totalCount * 100
                 })
                 .ToList();
@@ -174,7 +202,7 @@ namespace Lab2
 
                 chart1.ChartAreas[0].BackColor = Color.LightYellow;
 
-
+                seed.Text = RandomSingleton.GetUsedSeed().ToString();
 
             }
             catch (Exception ex)
@@ -253,23 +281,50 @@ namespace Lab2
 
                                 Parallel.For(0, (int)testExperimentCount.Value, x =>
                                 {
-                                    var individuals = Enumerable.Range(1, (int)n).Select(i => new Individual(i, matrixSizeInput.Value, 0.001m, pk, pm, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes)).ToList();
+                                    var individuals = Enumerable.Range(1, (int)n).Select(i => new Individual(i, matrixSizeInput.Value, 0.001m, pk, pm, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes, InitialData.ProbGen1)).ToList();
 
                                     for (int t2 = 0; t2 < t; t2++)
                                     {
-                                        SelectionUtils.SetUpFitValue(individuals);
-                                        SelectionUtils.SetUpDistribuator(individuals);
-                                        SelectionUtils.SetUpNewOsobnikAfterSelection(individuals);
-                                        Parallel.ForEach(individuals, item => {
+                                        if (InitialData.SelectionType.Equals(SelectionType.ROULETTE))
+                                        {
+                                            SelectionUtils.SetUpFitValue(individuals);
+                                            SelectionUtils.SetUpDistribuator(individuals);
+                                            SelectionUtils.SetUpNewOsobnikAfterSelection(individuals);
+                                        }
+                                        else
+                                        {
+                                            SelectionUtils.SetUpNewOsobnikAfterSelectionTournament(individuals);
+                                        }
+
+
+                                        foreach (var item in individuals)
+                                        {
                                             item.SetParent();
-                                        });
-                                        CrossUtils.SetCutPoint(individuals);
-                                        CrossUtils.CrossOsobniks(individuals);
-                                        CrossUtils.CreatePopulationAfterCrossing(individuals);
-                                        Parallel.ForEach(individuals, item => {
-                                            item.Mutate();
+                                        }
+                                        if (InitialData.CrossType.Equals(CrossType.SINGLE_POINT))
+                                        {
+                                            CrossUtils.SetCutPoint(individuals);
+                                            CrossUtils.CrossOsobniks(individuals);
+                                            CrossUtils.CreatePopulationAfterCrossing(individuals);
+                                        }
+                                        else
+                                        {
+                                            CrossUtils.CreatePopulationAfterCrossingNPoints(individuals, InitialData.CrossCount);
+                                        }
+
+                                        foreach (var item in individuals)
+                                        {
+                                            if (InitialData.MutationType.Equals(MutationType.EQUALY))
+                                            {
+                                                item.Mutate();
+                                            }
+                                            else
+                                            {
+                                                item.BitSwapMutation();
+                                            }
+
                                             item.MarkAfterMutation = item.SetOcena(item.MatrixAfterMutation);
-                                        });
+                                        }
 
 
 
@@ -423,7 +478,7 @@ namespace Lab2
             RadioButton selected = sender as RadioButton;
             if (selected != null && selected.Checked)
             {
-                InitialData.AlgorithmType = Core.Enums.AlgorithmType.SUPERVISED;
+                InitialData.AlgorithmType = AlgorithmType.SUPERVISED;
                 additioanlDataButton.Text = "Wybór macierzy referencyjnej";
             }
         }
@@ -433,35 +488,60 @@ namespace Lab2
             RadioButton selected = sender as RadioButton;
             if (selected != null && selected.Checked)
             {
-                InitialData.AlgorithmType = Core.Enums.AlgorithmType.UNSUPERVISED;
+                InitialData.AlgorithmType = AlgorithmType.UNSUPERVISED;
                 additioanlDataButton.Text = "Wybór macierzy wzorców";
             }
         }
 
-        private void AlgorithmRun(IProgress<int> progress)
+        private void AlgorithmRun(IProgress<int> progress, decimal precision)
         {
             List<Individual> individuals = new List<Individual>();
             for (int i = 1; i <= individualNumberInput.Value; i++)
             {
-                individuals.Add(new Individual(i, matrixSizeInput.Value, (decimal)precisionInput.SelectedItem, crossProbabilityInput.Value, mutationProbabilityInput.Value, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes));
+                individuals.Add(new Individual(i, matrixSizeInput.Value, precision, crossProbabilityInput.Value, mutationProbabilityInput.Value, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes, InitialData.ProbGen1));
             }
             for (int t = 0; t < iterationNumberInput.Value; t++)
             {
 
-                
-                SelectionUtils.SetUpFitValue(individuals);
-                SelectionUtils.SetUpDistribuator(individuals);
-                SelectionUtils.SetUpNewOsobnikAfterSelection(individuals);
-                Parallel.ForEach(individuals, item => {
-                        item.SetParent();
-                });
-                CrossUtils.SetCutPoint(individuals);
-                CrossUtils.CrossOsobniks(individuals);
-                CrossUtils.CreatePopulationAfterCrossing(individuals);
-                Parallel.ForEach(individuals, item => {
-                    item.Mutate();
+                if(InitialData.SelectionType.Equals(SelectionType.ROULETTE))
+                {
+                    SelectionUtils.SetUpFitValue(individuals);
+                    SelectionUtils.SetUpDistribuator(individuals);
+                    SelectionUtils.SetUpNewOsobnikAfterSelection(individuals);
+                } else
+                {
+                    SelectionUtils.SetUpNewOsobnikAfterSelectionTournament(individuals);
+                }
+
+
+                foreach (var item in individuals)
+                {
+                    item.SetParent();
+                }
+                if (InitialData.CrossType.Equals(CrossType.SINGLE_POINT))
+                {
+                    CrossUtils.SetCutPoint(individuals);
+                    CrossUtils.CrossOsobniks(individuals);
+                    CrossUtils.CreatePopulationAfterCrossing(individuals);
+                }
+                else
+                {
+                    CrossUtils.CreatePopulationAfterCrossingNPoints(individuals, InitialData.CrossCount);
+                }
+
+                foreach (var item in individuals)
+                {
+                    if (InitialData.MutationType.Equals(MutationType.EQUALY))
+                    {
+                        item.Mutate();
+                    }
+                    else
+                    {
+                        item.BitSwapMutation();
+                    }
+
                     item.MarkAfterMutation = item.SetOcena(item.MatrixAfterMutation);
-                });
+                }
 
 
 
@@ -472,7 +552,7 @@ namespace Lab2
                 int idx = 1;
                 foreach (Individual individual in coppiedIndividuals)
                 {
-                    individuals.Add(new Individual(idx, matrixSizeInput.Value, (decimal)precisionInput.SelectedItem, crossProbabilityInput.Value, mutationProbabilityInput.Value, individual.MatrixAfterMutation, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes));
+                    individuals.Add(new Individual(idx, matrixSizeInput.Value, precision, crossProbabilityInput.Value, mutationProbabilityInput.Value, individual.MatrixAfterMutation, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes));
                     idx++;
                 }
 
@@ -496,5 +576,115 @@ namespace Lab2
             }
             return result;
         }
+
+        private void classicalGA_CheckedChanged(object sender, EventArgs e)
+        {
+            RadioButton selected = sender as RadioButton;
+            if (selected != null && selected.Checked)
+            {
+                InitialData.AlgorithmOption = AlgorithmOption.CLASSICAL;
+                InitialData.SelectionType = SelectionType.ROULETTE;
+                InitialData.CrossType = CrossType.SINGLE_POINT;
+                InitialData.MutationType = MutationType.EQUALY;
+                setupDefaultAlgorithmOtpions();
+            }
+        }
+
+        private void modifiedGARadio_CheckedChanged(object sender, EventArgs e)
+        {
+            RadioButton selected = sender as RadioButton;
+            if (selected != null && selected.Checked)
+            {
+                InitialData.AlgorithmOption = AlgorithmOption.MODIFIED;
+                InitialData.SelectionType = SelectionType.ROULETTE;
+                InitialData.CrossType = CrossType.SINGLE_POINT;
+                InitialData.MutationType = MutationType.EQUALY;
+
+                selectionGroup.Enabled = true;
+                crossGroup.Enabled = true;
+                mutationGroup.Enabled = true;
+            }
+        }
+
+        private void setupDefaultAlgorithmOtpions()
+        {
+
+            classicalGARadio.Checked = true;
+            ruletteRadio.Checked = true;
+            singlePointRadio.Checked = true;
+            evenlyRadio.Checked = true;
+
+            selectionGroup.Enabled = false;
+            crossGroup.Enabled = false;
+            mutationGroup.Enabled = false;
+        }
+
+        private void ruletteRadio_CheckedChanged(object sender, EventArgs e)
+        {
+            RadioButton selected = sender as RadioButton;
+            if (selected != null && selected.Checked)
+            {
+                InitialData.SelectionType = SelectionType.ROULETTE;
+            }
+        }
+
+        private void tournamentRadio_CheckedChanged(object sender, EventArgs e)
+        {
+            RadioButton selected = sender as RadioButton;
+            if (selected != null && selected.Checked)
+            {
+                InitialData.SelectionType = SelectionType.TOURNAMENT;
+            }
+        }
+
+        private void singlePointRadio_CheckedChanged(object sender, EventArgs e)
+        {
+            RadioButton selected = sender as RadioButton;
+            if (selected != null && selected.Checked)
+            {
+                InitialData.CrossType = CrossType.SINGLE_POINT;
+            }
+        }
+
+        private void multiPointRadio_CheckedChanged(object sender, EventArgs e)
+        {
+            RadioButton selected = sender as RadioButton;
+            if (selected != null && selected.Checked)
+            {
+                InitialData.CrossType = CrossType.MULTI_POINT;
+            }
+        }
+
+        private void evenlyRadio_CheckedChanged(object sender, EventArgs e)
+        {
+            RadioButton selected = sender as RadioButton;
+            if (selected != null && selected.Checked)
+            {
+                InitialData.MutationType = MutationType.EQUALY;
+            }
+        }
+
+        private void bitSwapingRadio_CheckedChanged(object sender, EventArgs e)
+        {
+            RadioButton selected = sender as RadioButton;
+            if (selected != null && selected.Checked)
+            {
+                InitialData.MutationType = MutationType.BIT_SWAPING;
+            }
+        }
+
+        private void useSeed_CheckedChanged(object sender, EventArgs e)
+        {
+            var checkbox = sender as CheckBox;
+            if (checkbox != null && checkbox.Checked)
+            {
+                seed.Enabled = checkbox.Checked;
+            }
+            else
+            {
+                seed.Enabled = checkbox.Checked;
+            }
+        }
+
     }
 }

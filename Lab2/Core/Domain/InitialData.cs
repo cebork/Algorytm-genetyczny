@@ -18,6 +18,14 @@ namespace Lab2.Core.Domain
         public decimal NumberOfIterations { get; set; }
         public bool[,] SupervisedReferenceMatrix { get; set; }
         public bool[][,] UnsupervisedPatternMatrixes { get; set; }
+        public decimal NumberOfExperiments { get; set; }
+        public AlgorithmOption AlgorithmOption { get; set; }
+        public SelectionType SelectionType { get; set; }
+        public CrossType CrossType { get; set; }
+        public decimal CrossCount { get; set; }
+        public MutationType MutationType { get; set; }
+
+        public decimal ProbGen1 { get; set; }
         public InitialData() { }
 
         public InitialData(
@@ -27,7 +35,8 @@ namespace Lab2.Core.Domain
             decimal crossProbability,
             decimal mutationProbability,
             decimal numberOfIterations,
-            bool[,] supervisedReferenceMatrix
+            bool[,] supervisedReferenceMatrix,
+            decimal numberOfExperiments
         )
         {
             MatrixSize = matrixSize;
@@ -37,6 +46,7 @@ namespace Lab2.Core.Domain
             MutationProbability = mutationProbability;
             NumberOfIterations = numberOfIterations;
             SupervisedReferenceMatrix = supervisedReferenceMatrix;
+            NumberOfExperiments = numberOfExperiments;
         }
     }
 }

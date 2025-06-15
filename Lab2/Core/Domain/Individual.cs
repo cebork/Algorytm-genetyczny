@@ -47,7 +47,8 @@ namespace Lab2.Core.Domain
 
         public decimal MarkAfterMutation { get; set; }
         public decimal NotNormalizedMarkAfterMutation { get; set; }
-        public Individual(decimal orderNumber, decimal matrixSize, decimal precision, decimal crossProbability, decimal mutationProbability, bool[,] referenceMatrix, AlgorithmType algorithmType, bool[][,] patternMatrixes)
+        public decimal ProbGen1 { get; set; }
+        public Individual(decimal orderNumber, decimal matrixSize, decimal precision, decimal crossProbability, decimal mutationProbability, bool[,] referenceMatrix, AlgorithmType algorithmType, bool[][,] patternMatrixes, decimal probGen1)
         {
 
             AlgorithmType = algorithmType;
@@ -58,10 +59,11 @@ namespace Lab2.Core.Domain
             mutationPorbability = mutationProbability;
             ReferenceMatrix = referenceMatrix;
             PatternMatrixes = patternMatrixes;
+            ProbGen1 = probGen1;
             precisionDigits = GetPrecisionDigits(precision);
             InitOsobnikMatrix();
             SetOcena();
-
+            ProbGen1 = probGen1;
         }
 
         public Individual(decimal orderNumber, decimal matrixSize, decimal precision, decimal crossProbability, decimal mutationProbability, bool[,] nextMatrix, bool[,] referenceMatrix, AlgorithmType algorithmType, bool[][,] patternMatrixes)
@@ -89,15 +91,17 @@ namespace Lab2.Core.Domain
         {
             IndividualMatrix = new bool[MatrixSize, MatrixSize];
             Random random = RandomSingleton.Instance;
+
             for (int i = 1; i < MatrixSize - 1; i++)
             {
                 for (int j = 1; j < MatrixSize - 1; j++)
                 {
-                    IndividualMatrix[i, j] = random.Next(2) == 0;
+                    // If random.NextDouble() < probgen1 → set true
+                    IndividualMatrix[i, j] = random.NextDouble() < (double)ProbGen1;
                 }
             }
-
         }
+
 
         //private int getPrecision(decimal number)
         //{
@@ -194,6 +198,11 @@ namespace Lab2.Core.Domain
 
         public void Mutate()
         {
+            if (MatrixAfterCross == null)
+            {
+                MatrixAfterMutation = null;
+                return;
+            }
             MutationPosition = "";
             int rows = MatrixAfterCross.GetLength(0);
             int cols = MatrixAfterCross.GetLength(1);
@@ -269,22 +278,25 @@ namespace Lab2.Core.Domain
             int totalPositions = 0;
             int matchCount = 0;
 
-            Parallel.For(1, MatrixSize - 1, i =>
+            for (int i = 1; i < MatrixSize - 1; i++)
             {
                 for (int j = 1; j < MatrixSize - 1; j++)
                 {
                     foreach (var pattern in referencePatterns)
                     {
-                        if (PatternMatchesAt(matrixAfterMutation != null ? matrixAfterMutation : IndividualMatrix, pattern, i, j))
+                        bool[,] sourceMatrix = matrixAfterMutation != null ? matrixAfterMutation : IndividualMatrix;
+
+                        if (PatternMatchesAt(sourceMatrix, pattern, i, j))
                         {
-                            Interlocked.Increment(ref matchCount);
+                            matchCount++;
                             break;
                         }
                     }
 
-                    Interlocked.Increment(ref totalPositions);
+                    totalPositions++;
                 }
-            });
+            }
+
 
 
             if (totalPositions == 0)
@@ -306,6 +318,75 @@ namespace Lab2.Core.Domain
             }
             return true;
         }
+
+        internal void BitSwapMutation()
+        {
+            if (MatrixAfterCross == null)
+            {
+                MatrixAfterMutation = null;
+                return;
+            }
+
+            double chance = RandomSingleton.Instance.NextDouble();
+            if ((decimal)chance > mutationPorbability)
+            {
+                MatrixAfterMutation = MatrixAfterCross;
+                return;
+            }
+
+            int rows = MatrixAfterCross.GetLength(0);
+            int cols = MatrixAfterCross.GetLength(1);
+
+            if (rows <= 2 || cols <= 2)
+            {
+                MatrixAfterMutation = MatrixAfterCross;
+                return;
+            }
+
+            int innerRows = rows - 2;
+            int innerCols = cols - 2;
+            int totalInnerBits = innerRows * innerCols;
+
+            int maxLength = Math.Min(6, totalInnerBits / 4);
+            int segmentLength = RandomSingleton.Instance.Next(2, maxLength + 1);
+
+            int maxStart = totalInnerBits - 2 * segmentLength;
+            if (maxStart <= 0)
+            {
+                MatrixAfterMutation = MatrixAfterCross;
+                return;
+            }
+
+            int firstStart = RandomSingleton.Instance.Next(0, maxStart);
+            int secondStart = RandomSingleton.Instance.Next(firstStart + segmentLength, totalInnerBits - segmentLength);
+
+            bool[] flatInner = new bool[totalInnerBits];
+            for (int i = 0; i < innerRows; i++)
+            {
+                for (int j = 0; j < innerCols; j++)
+                {
+                    flatInner[i * innerCols + j] = MatrixAfterCross[i + 1, j + 1];
+                }
+            }
+
+            for (int k = 0; k < segmentLength; k++)
+            {
+                bool temp = flatInner[firstStart + k];
+                flatInner[firstStart + k] = flatInner[secondStart + k];
+                flatInner[secondStart + k] = temp;
+            }
+
+            bool[,] afterMutation = (bool[,])MatrixAfterCross.Clone();
+            for (int i = 0; i < totalInnerBits; i++)
+            {
+                int r = i / innerCols;
+                int c = i % innerCols;
+                afterMutation[r + 1, c + 1] = flatInner[i];
+            }
+
+            MatrixAfterMutation = afterMutation;
+        }
+
 
 
     }

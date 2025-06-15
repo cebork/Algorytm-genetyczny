@@ -19,7 +19,7 @@ namespace Lab2.Services
         private static readonly string ResultDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Results");
         private static readonly string GaTunningFilePath = Path.Combine(ResultDirectory, "tunning_GA.txt");
         private static readonly string GaResultsFilePath = Path.Combine(ResultDirectory, "results_GA.txt");
-        private static readonly string mGaResultsFilePath = Path.Combine(ResultDirectory, "m_results_GA.txt");
+        private static readonly string maxFCCorr = Path.Combine(ResultDirectory, "max_f_C_corr.txt");
         private class SerializablePattern
         {
             public string PatternName { get; set; }
@@ -314,16 +314,105 @@ namespace Lab2.Services
 
         public static void SaveMResultsGa(Dictionary<InitialData, List<List<Individual>>> keyValuePairsIndividuals)
         {
-            if (File.Exists(mGaResultsFilePath))
-            {
-                File.Delete(mGaResultsFilePath);
-            }
-            foreach (var kvp in keyValuePairsIndividuals)
-            {
-                InitialData initialData = kvp.Key;
-                List<List<Individual>> history = kvp.Value;
+            //if (File.Exists(mGaResultsFilePath))
+            //{
+            //    File.Delete(mGaResultsFilePath);
+            //}
+            //foreach (var kvp in keyValuePairsIndividuals)
+            //{
+            //    InitialData initialData = kvp.Key;
+            //    List<List<Individual>> history = kvp.Value;
 
-                SaveResultsGa(history, initialData, mGaResultsFilePath, true);
+            //    SaveResultsGa(history, initialData, mGaResultsFilePath, true);
+            //}
+        }
+
+        internal static void SaveMaxFCCorr(List<List<Individual>> historyOfIndividuals, InitialData initialData, bool append)
+        {
+            if (File.Exists(maxFCCorr) && !append)
+            {
+                File.Delete(maxFCCorr);
+            }
+            Directory.CreateDirectory(ResultDirectory);
+            using (var writer = new StreamWriter(maxFCCorr, append, Encoding.UTF8))
+            {
+                if (!append)
+                {
+                    writer.WriteLine("# parametry badania");
+                    writer.WriteLine($"# Rozmiar macierzy: {initialData.MatrixSize}");
+                    writer.WriteLine($"# Pk: {initialData.CrossProbability}");
+                    writer.WriteLine($"# Pm: {initialData.MutationProbability}");
+                    writer.WriteLine($"# N: {initialData.NumberOfIndividuals}");
+                    writer.WriteLine($"# T: {initialData.NumberOfIterations}");
+                    if (initialData.AlgorithmType == Core.Enums.AlgorithmType.SUPERVISED)
+                    {
+                        writer.WriteLine("# Macierz referencyjna");
+
+                        bool[,] matrix = initialData.SupervisedReferenceMatrix;
+                        int rows = matrix.GetLength(0);
+                        int cols = matrix.GetLength(1);
+
+                        for (int row = 0; row < rows; row++)
+                        {
+                            var line = new StringBuilder("# ");
+                            for (int col = 0; col < cols; col++)
+                            {
+                                line.Append(matrix[row, col] ? "1 " : "0 ");
+                            }
+                            writer.WriteLine(line.ToString().TrimEnd());
+                        }
+                    }
+                    if (initialData.AlgorithmType == Core.Enums.AlgorithmType.UNSUPERVISED)
+                    {
+                        writer.WriteLine("# Macierze wzorców");
+
+                        bool[][,] matrices = initialData.UnsupervisedPatternMatrixes;
+
+                        for (int index = 0; index < matrices.Length; index++)
+                        {
+                            var matrix = matrices[index];
+                            int rows = matrix.GetLength(0);
+                            int cols = matrix.GetLength(1);
+
+                            writer.WriteLine($"# Macierz {index}");
+
+                            for (int row = 0; row < rows; row++)
+                            {
+                                var line = new StringBuilder("# ");
+                                for (int col = 0; col < cols; col++)
+                                {
+                                    line.Append(matrix[row, col] ? "1 " : "0 ");
+                                }
+                                writer.WriteLine(line.ToString().TrimEnd());
+                            }
+
+                            writer.WriteLine();
+                        }
+                    }
+                }
+                writer.WriteLine("# Wyniki badania");
+                writer.WriteLine("#   1                 2                     3                  4                 5            6              7");
+                writer.WriteLine("# iter         f_min_C_corr_N       f_avg_C_corr_N       f_max_C_corr_N       f_min_C      f_avg_C       f_max_C");
+
+                var rows2 = historyOfIndividuals.Select((ind, i) => new
+                {
+                    Index = i + 1,
+                    FMinCorrN = ind.Min(i => i.MarkAfterMutation),
+                    FAvgCorrN = ind.Average(i => i.MarkAfterMutation),
+                    FMaxCorrN = ind.Max(i => i.MarkAfterMutation),
+                    FMinC = ind.Min(i => i.NotNormalizedMarkAfterMutation),
+                    FAvgC = ind.Average(i => i.NotNormalizedMarkAfterMutation),
+                    FMaxC = ind.Max(i => i.NotNormalizedMarkAfterMutation),
+                });
+                var best = rows2.OrderByDescending(x => x.FMaxCorrN).First();
+                var last = rows2.OrderByDescending(x => x.Index).First();
+                writer.WriteLine(
+                    $"{"best",-12}{best.FMinCorrN,15:F3}{best.FAvgCorrN,20:F3}{best.FMaxCorrN,20:F3}{best.FMinC,15:F3}{best.FAvgC,15:F3}{best.FMaxC,15:F3}"
+                );
+                writer.WriteLine(
+                    $"{"last",-12}{last.FMinCorrN,15:F3}{last.FAvgCorrN,20:F3}{last.FMaxCorrN,20:F3}{last.FMinC,15:F3}{last.FAvgC,15:F3}{last.FMaxC,15:F3}"
+                );
+                
             }
         }
     }

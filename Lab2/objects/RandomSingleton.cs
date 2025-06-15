@@ -17,8 +17,6 @@ namespace Lab2.objects
 
         public static void SetSeed(int seed)
         {
-            if (initialized)
-                throw new InvalidOperationException("Random already initialized.");
 
             usedSeed = seed;
             instance = new Lazy<Random>(() => new Random(seed));
@@ -31,7 +29,8 @@ namespace Lab2.objects
             {
                 if (!initialized)
                 {
-                    instance = new Lazy<Random>(() => new Random());
+                    usedSeed = Environment.TickCount;
+                    instance = new Lazy<Random>(() => new Random(usedSeed));
                     initialized = true;
                 }
 
@@ -47,5 +46,6 @@ namespace Lab2.objects
             instance = null;
             usedSeed = 0;
         }
+
     }
 }

@@ -6,23 +6,22 @@ using System.Threading.Tasks;
 
 namespace Lab2.Core.Enums
 {
-    public enum AlgorithmType
+    public enum MutationType
     {
-        SUPERVISED, UNSUPERVISED
+        EQUALY, BIT_SWAPING
     }
 
-    public static class AlgorithmTypeHelper
+    public static class MutationTypeHelper
     {
-        public static AlgorithmType? FromString(string value)
+        public static MutationType? FromString(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
                 return null;
 
-            if (Enum.TryParse<AlgorithmType>(value, true, out var result))
+            if (Enum.TryParse<MutationType>(value, true, out var result))
                 return result;
 
             return null;
         }
     }
-
 }

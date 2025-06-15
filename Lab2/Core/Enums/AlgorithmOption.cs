@@ -6,23 +6,22 @@ using System.Threading.Tasks;
 
 namespace Lab2.Core.Enums
 {
-    public enum AlgorithmType
+    public enum AlgorithmOption
     {
-        SUPERVISED, UNSUPERVISED
+        CLASSICAL, MODIFIED
     }
 
-    public static class AlgorithmTypeHelper
+    public static class AlgorithmOptionHelper
     {
-        public static AlgorithmType? FromString(string value)
+        public static AlgorithmOption? FromString(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
                 return null;
 
-            if (Enum.TryParse<AlgorithmType>(value, true, out var result))
+            if (Enum.TryParse<AlgorithmOption>(value, true, out var result))
                 return result;
 
             return null;
         }
     }
-
 }

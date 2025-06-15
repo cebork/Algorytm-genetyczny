@@ -164,6 +164,112 @@ namespace Lab2.Utils
             return mergedMatrix;
         }
 
+        internal static void CreatePopulationAfterCrossingNPoints(List<Individual> individuals, decimal crossCount)
+        {
+            int numPoints = (int)crossCount;
+            var random = RandomSingleton.Instance;
+            Individual fParent = null;
+
+            foreach (var individual in individuals)
+            {
+                if (individual.MatrixParents == null)
+                {
+                    individual.xBinChild = "-";
+                    individual.MatrixAfterCross = individual.MatrixAfterSelection;
+                    continue;
+                }
+
+                if (fParent == null)
+                {
+                    fParent = individual;
+                    continue;
+                }
+
+                Individual sParent = individual;
+
+                if (fParent.MatrixAfterSelection != null && sParent.MatrixAfterSelection != null)
+                {
+                    int width = Math.Min(fParent.MatrixSize, sParent.MatrixSize);
+
+                    if (width < 3)
+                    {
+                        fParent.MatrixAfterCross = fParent.MatrixAfterSelection;
+                        sParent.MatrixAfterCross = sParent.MatrixAfterSelection;
+                        fParent.xBinChild = "-";
+                        sParent.xBinChild = "-";
+                        fParent = null;
+                        continue;
+                    }
+
+                    var cutPoints = new HashSet<int>();
+                    while (cutPoints.Count < numPoints)
+                    {
+                        int point = random.Next(1, width - 1);
+                        cutPoints.Add(point);
+                    }
+
+                    var sortedCuts = cutPoints.OrderBy(p => p).ToList();
+
+                    fParent.MatrixChild = MultiPointCrossover(fParent.MatrixAfterSelection, sParent.MatrixAfterSelection, sortedCuts);
+                    sParent.MatrixChild = MultiPointCrossover(sParent.MatrixAfterSelection, fParent.MatrixAfterSelection, sortedCuts);
+
+                    fParent.MatrixAfterCross = fParent.MatrixChild ?? fParent.MatrixAfterSelection;
+                    sParent.MatrixAfterCross = sParent.MatrixChild ?? sParent.MatrixAfterSelection;
+                }
+                else
+                {
+                    fParent.xBinChild = "-";
+                    sParent.xBinChild = "-";
+                    fParent.MatrixAfterCross = fParent.MatrixAfterSelection;
+                    sParent.MatrixAfterCross = sParent.MatrixAfterSelection;
+                }
+
+                fParent = null;
+            }
+
+            if (fParent != null)
+            {
+                fParent.xBinChild = "-";
+                fParent.MatrixAfterCross = fParent.MatrixAfterSelection;
+            }
+        }
+
+
+        private static bool[,] MultiPointCrossover(bool[,] m1, bool[,] m2, List<int> cutPoints)
+        {
+            int rows = m1.GetLength(0);
+            int cols = Math.Min(m1.GetLength(1), m2.GetLength(1));
+
+            var segments = new List<(int start, int length)>();
+            int prev = 0;
+            foreach (int cut in cutPoints)
+            {
+                segments.Add((prev, cut - prev));
+                prev = cut;
+            }
+            segments.Add((prev, cols - prev));
+
+            bool useFirst = true;
+            var result = new bool[rows, cols];
+            int colOffset = 0;
+
+            foreach (var (start, length) in segments)
+            {
+                for (int r = 0; r < rows; r++)
+                {
+                    for (int c = 0; c < length; c++)
+                    {
+                        result[r, colOffset + c] = useFirst ? m1[r, start + c] : m2[r, start + c];
+                    }
+                }
+                colOffset += length;
+                useFirst = !useFirst;
+            }
+
+            return result;
+        }
+
+
 
     }
 }

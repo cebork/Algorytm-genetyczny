@@ -13,9 +13,10 @@ namespace Lab2.Utils
         public static void SetUpFitValue(List<Individual> individuals)
         {
             decimal minValue = individuals.Min(o => o.Mark);
-            Parallel.ForEach(individuals, individual => {
+            foreach (var individual in individuals)
+            {
                 individual.SetFitValue(minValue);
-            });
+            }
 
         }
 
@@ -43,15 +44,44 @@ namespace Lab2.Utils
         {
             var distribList = individuals.Select(i => i.Distribuator).ToList();
 
-            Parallel.For(0, individuals.Count, i =>
+            for (int i = 0; i < individuals.Count; i++)
             {
                 decimal randomValue = (decimal)RandomSingleton.Instance.NextDouble();
                 individuals[i].RandomValueToCheck = randomValue;
 
                 int selectedIndex = BinarySearchDistrib(distribList, randomValue);
                 individuals[i].MatrixAfterSelection = individuals[selectedIndex].IndividualMatrix;
-            });
+            }
         }
+
+
+        internal static void SetUpNewOsobnikAfterSelectionTournament(List<Individual> individuals)
+        {
+            var random = RandomSingleton.Instance;
+            int tournamentSize = Math.Min(10, individuals.Count);
+
+
+            for (int i = 0; i < individuals.Count; i++)
+            {
+                decimal randomValue = (decimal)random.NextDouble();
+                individuals[i].RandomValueToCheck = randomValue;
+
+                var competitors = new List<Individual>();
+                while (competitors.Count < tournamentSize)
+                {
+                    int randomIndex = random.Next(individuals.Count);
+                    if (randomIndex != i)
+                    {
+                        competitors.Add(individuals[randomIndex]);
+                    }
+                }
+
+                var winner = competitors.OrderByDescending(ind => ind.FitValue).First();
+
+                individuals[i].MatrixAfterSelection = winner.IndividualMatrix;
+            }
+        }
+
 
         private static int BinarySearchDistrib(List<decimal> distribList, decimal target)
         {

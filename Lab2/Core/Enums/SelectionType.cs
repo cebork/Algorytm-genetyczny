@@ -6,23 +6,21 @@ using System.Threading.Tasks;
 
 namespace Lab2.Core.Enums
 {
-    public enum AlgorithmType
+    public enum SelectionType
     {
-        SUPERVISED, UNSUPERVISED
+        ROULETTE, TOURNAMENT
     }
-
-    public static class AlgorithmTypeHelper
+    public static class SelectionTypeHelper
     {
-        public static AlgorithmType? FromString(string value)
+        public static SelectionType? FromString(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
                 return null;
 
-            if (Enum.TryParse<AlgorithmType>(value, true, out var result))
+            if (Enum.TryParse<SelectionType>(value, true, out var result))
                 return result;
 
             return null;
         }
     }
-
 }

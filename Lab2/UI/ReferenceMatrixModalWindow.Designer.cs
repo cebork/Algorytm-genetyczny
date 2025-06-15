@@ -94,6 +94,7 @@
             this.referenceMatrixList.Size = new System.Drawing.Size(421, 565);
             this.referenceMatrixList.TabIndex = 5;
             this.referenceMatrixList.UseCompatibleStateImageBehavior = false;
+            this.referenceMatrixList.DoubleClick += new System.EventHandler(this.referenceMatrixListView_DoubleClick);
             // 
             // generateMatrix
             // 
