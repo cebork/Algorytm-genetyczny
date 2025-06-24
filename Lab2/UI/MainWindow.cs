@@ -16,13 +16,13 @@ namespace Lab2
     {
         InitialData InitialData;
 
-        List<List<Individual>> historyOfIndividuals = new List<List<Individual>>();    
+        List<List<Individual>> historyOfIndividuals = new List<List<Individual>>();
 
         public MainWindow()
         {
             InitialData = new InitialData();
             InitializeComponent();
-            
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -58,7 +58,7 @@ namespace Lab2
                 }
             }
             InitialData.MatrixSize = matrixSizeInput.Value;
-            InitialData.Precision = (decimal) precisionInput.SelectedItem;
+            InitialData.Precision = (decimal)precisionInput.SelectedItem;
             InitialData.NumberOfIndividuals = individualNumberInput.Value;
             InitialData.CrossProbability = crossProbabilityInput.Value;
             InitialData.MutationProbability = mutationProbabilityInput.Value;
@@ -66,6 +66,8 @@ namespace Lab2
             InitialData.NumberOfExperiments = experimentNumber.Value;
             InitialData.CrossCount = crossPoints.Value;
             InitialData.ProbGen1 = propGen1.Value;
+            InitialData.TournamentSelectionSize = tournamentSizeInput.Value;
+            InitialData.TournamentSoftSelectionTreshold = tournamentTresholdInput.Value;
             historyOfIndividuals.Clear();
 
             try
@@ -99,7 +101,7 @@ namespace Lab2
                             FileUtils.SaveMaxFCCorr(historyOfIndividuals, InitialData, true);
                     }
                 }
-                
+
 
                 List<Individual> lastGeneration = historyOfIndividuals.Last();
                 int totalCount = lastGeneration.Count;
@@ -220,9 +222,33 @@ namespace Lab2
 
 
 
-        private async void testyStart_Click(object sender, EventArgs e)
+        private void testyStart_Click(object sender, EventArgs e)
         {
-
+            if (!useSeed.Checked)
+                RandomSingleton.Reset();
+            else
+            {
+                if (int.TryParse(seed.Text, out int parsedSeed))
+                {
+                    RandomSingleton.SetSeed(parsedSeed);
+                }
+                else
+                {
+                    MessageBox.Show("Invalid seed value. Please enter a valid integer.");
+                }
+            }
+            InitialData.MatrixSize = matrixSizeInput.Value;
+            InitialData.Precision = (decimal)precisionInput.SelectedItem;
+            InitialData.NumberOfIndividuals = individualNumberInput.Value;
+            InitialData.CrossProbability = crossProbabilityInput.Value;
+            InitialData.MutationProbability = mutationProbabilityInput.Value;
+            InitialData.NumberOfIterations = iterationNumberInput.Value;
+            InitialData.NumberOfExperiments = experimentNumber.Value;
+            InitialData.CrossCount = crossPoints.Value;
+            InitialData.ProbGen1 = propGen1.Value;
+            InitialData.TournamentSelectionSize = tournamentSizeInput.Value;
+            InitialData.TournamentSoftSelectionTreshold = tournamentTresholdInput.Value;
+            historyOfIndividuals.Clear();
             if (testExperimentCount.Value <= 0)
             {
                 MessageBox.Show("Liczba eksperymentów musi byæ wiêksza od 0", "");
@@ -245,27 +271,27 @@ namespace Lab2
                 return;
             }
 
-            if (InitialData.AlgorithmType == Core.Enums.AlgorithmType.SUPERVISED && (InitialData.SupervisedReferenceMatrix == null || InitialData.SupervisedReferenceMatrix.Length == 0) || InitialData.AlgorithmType == Core.Enums.AlgorithmType.UNSUPERVISED && (InitialData.UnsupervisedPatternMatrixes == null || InitialData.UnsupervisedPatternMatrixes.Length == 0))
+            if (InitialData.AlgorithmType == Core.Enums.AlgorithmType.SUPERVISED && (InitialData.SupervisedReferenceMatrix == null || InitialData.SupervisedReferenceMatrix.Length == 0) ||
+                InitialData.AlgorithmType == Core.Enums.AlgorithmType.UNSUPERVISED && (InitialData.UnsupervisedPatternMatrixes == null || InitialData.UnsupervisedPatternMatrixes.Length == 0))
             {
                 MessageBox.Show("Nie wybrano macierzy wzorców lub macierzy referencyjnej", "");
                 return;
             }
 
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            Dictionary<InitialData, List<List<Individual>>>  globalHistory = new Dictionary<InitialData, List<List<Individual>>>(); 
-            List<TestObject> list = new List<TestObject>();
-            var listLock = new object();
+            ////Dictionary<InitialData, List<List<Individual>>> globalHistory = new();
+            List<TestObject> list = new();
 
             var NValues = GenerateDecimalRange(NaInput.Value, NbInput.Value, NstepInput.Value);
             var pkValues = GenerateDecimalRange(pkaInput.Value, PkbbInput.Value, PkstepInput.Value);
             var pmValues = GenerateDecimalRange(pmaInput.Value, PmbInput.Value, PmstepInput.Value);
             var tValues = GenerateDecimalRange(TaInput.Value, TbInput.Value, TstepInput.Value);
 
-            
+            int maxCount = NValues.Count * pkValues.Count * pmValues.Count * tValues.Count;
+            int currentCount = 0;
+            decimal iter = 1;
 
             MessageBox.Show("Zamknij okno aby kontyunuwac", "");
-            decimal iter = 1;
-            var tasks = new List<Task>();
 
             foreach (var n in NValues)
             {
@@ -275,120 +301,141 @@ namespace Lab2
                     {
                         foreach (var t in tValues)
                         {
-                            tasks.Add(Task.Run(() =>
+                            testCounter.Text = $"Test {++currentCount} / {maxCount}";
+                            individualCount.Text = $"Iloœæ osobników {n}";
+                            mutationProb.Text = $"Prawdopodobieñstwo mutacji {pm}";
+                            crossProb.Text = $"Prawdopodobieñstwo krzy¿owania {pk}";
+                            iterationCount.Text = $"Iloœæ iteracji {t}";
+                            Application.DoEvents();
+
+                            List<List<Individual>> localHistory = new();
+
+                            for (int x = 0; x < testExperimentCount.Value; x++)
                             {
-                                List<List<Individual>> localHistory = new List<List<Individual>>();
+                                var individuals = Enumerable.Range(1, (int)n)
+                                    .Select(i => new Individual(i, matrixSizeInput.Value, 0.001m, pk, pm, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes, InitialData.ProbGen1))
+                                    .ToList();
 
-                                Parallel.For(0, (int)testExperimentCount.Value, x =>
+                                for (int t2 = 0; t2 < t; t2++)
                                 {
-                                    var individuals = Enumerable.Range(1, (int)n).Select(i => new Individual(i, matrixSizeInput.Value, 0.001m, pk, pm, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes, InitialData.ProbGen1)).ToList();
-
-                                    for (int t2 = 0; t2 < t; t2++)
+                                    if (InitialData.SelectionType == SelectionType.ROULETTE)
                                     {
-                                        if (InitialData.SelectionType.Equals(SelectionType.ROULETTE))
-                                        {
-                                            SelectionUtils.SetUpFitValue(individuals);
-                                            SelectionUtils.SetUpDistribuator(individuals);
-                                            SelectionUtils.SetUpNewOsobnikAfterSelection(individuals);
-                                        }
-                                        else
-                                        {
-                                            SelectionUtils.SetUpNewOsobnikAfterSelectionTournament(individuals);
-                                        }
-
-
-                                        foreach (var item in individuals)
-                                        {
-                                            item.SetParent();
-                                        }
-                                        if (InitialData.CrossType.Equals(CrossType.SINGLE_POINT))
-                                        {
-                                            CrossUtils.SetCutPoint(individuals);
-                                            CrossUtils.CrossOsobniks(individuals);
-                                            CrossUtils.CreatePopulationAfterCrossing(individuals);
-                                        }
-                                        else
-                                        {
-                                            CrossUtils.CreatePopulationAfterCrossingNPoints(individuals, InitialData.CrossCount);
-                                        }
-
-                                        foreach (var item in individuals)
-                                        {
-                                            if (InitialData.MutationType.Equals(MutationType.EQUALY))
-                                            {
-                                                item.Mutate();
-                                            }
-                                            else
-                                            {
-                                                item.BitSwapMutation();
-                                            }
-
-                                            item.MarkAfterMutation = item.SetOcena(item.MatrixAfterMutation);
-                                        }
-
-
-
-
-                                        historyOfIndividuals.Add(individuals);
-                                        List<Individual> coppiedIndividuals = individuals.ToList();
-                                        individuals = new List<Individual>();
-                                        int idx = 1;
-                                        foreach (Individual individual in coppiedIndividuals)
-                                        {
-                                            individuals.Add(new Individual(idx, matrixSizeInput.Value, 0.003m, crossProbabilityInput.Value, mutationProbabilityInput.Value, individual.MatrixAfterMutation, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes));
-                                            idx++;
-                                        }
-
+                                        SelectionUtils.SetUpFitValue(individuals);
+                                        SelectionUtils.SetUpDistribuator(individuals);
+                                        SelectionUtils.SetUpNewOsobnikAfterSelection(individuals);
                                     }
-                                    localHistory.Add(individuals.ToList());
-                                });
-
-                                var avgMark = localHistory.SelectMany(os => os).Average(o => o.Mark);
-                                var minMark = localHistory.SelectMany(os => os).Min(o => o.Mark);
-                                var maxMark = localHistory.SelectMany(os => os).Max(o => o.Mark);
-                                var testObject = new TestObject { Iter = iter, N = n, pk = pk, pm = pm, T = t, AvgMark = avgMark, MaxMark = maxMark, MinMark = minMark };
-                                iter++;
-                                lock (localHistory)
-                                {
-                                    InitialData initial = new InitialData()
+                                    else if (InitialData.SelectionType == SelectionType.TOURNAMENT_HARD)
                                     {
-                                        MatrixSize = matrixSizeInput.Value,
-                                        NumberOfIndividuals = n,
-                                        NumberOfIterations = t,
-                                        MutationProbability = pm,
-                                        CrossProbability = pk,
-                                        SupervisedReferenceMatrix = InitialData.SupervisedReferenceMatrix,
-                                        UnsupervisedPatternMatrixes = InitialData.UnsupervisedPatternMatrixes
-                                    };
-                                    globalHistory.Add(initial, localHistory);
-                                    list.Add(testObject);
+                                        SelectionUtils.SetUpNewOsobnikAfterSelectionTournamentHard(individuals, InitialData.TournamentSelectionSize);
+                                    }
+                                    else if (InitialData.SelectionType == SelectionType.TOURNAMENT_SOFT)
+                                    {
+                                        SelectionUtils.SetUpNewOsobnikAfterSelectionTournamentSoft(individuals, InitialData.TournamentSelectionSize, InitialData.TournamentSoftSelectionTreshold);
+                                    }
+
+                                    foreach (var item in individuals)
+                                        item.SetParent();
+
+                                    if (InitialData.CrossType == CrossType.SINGLE_POINT)
+                                    {
+                                        CrossUtils.SetCutPoint(individuals);
+                                        CrossUtils.CrossOsobniks(individuals);
+                                        CrossUtils.CreatePopulationAfterCrossing(individuals);
+                                    }
+                                    else
+                                    {
+                                        CrossUtils.CreatePopulationAfterCrossingNPoints(individuals, InitialData.CrossCount);
+                                    }
+
+                                    foreach (var item in individuals)
+                                    {
+                                        switch (InitialData.MutationType)
+                                        {
+                                            case MutationType.EQUALY:
+                                                item.Mutate();
+                                                break;
+                                            case MutationType.BIT_SWAPING:
+                                                item.BitSwapMutation();
+                                                break;
+                                            case MutationType.UNIFORM_BLOCK:
+                                                item.MutateUniformBlock();
+                                                break;
+                                            case MutationType.RANDOM_COORDS:
+                                                item.MutateByRandomCoordinates();
+                                                break;
+                                        }
+
+                                        item.MarkAfterMutation = item.SetOcena(item.MatrixAfterMutation);
+                                    }
+
+                                    //historyOfIndividuals.Add(individuals);
+                                    var copiedIndividuals = individuals.ToList();
+                                    individuals = new();
+
+                                    int idx = 1;
+                                    foreach (var ind in copiedIndividuals)
+                                    {
+                                        individuals.Add(new Individual(idx++, matrixSizeInput.Value, 0.003m, crossProbabilityInput.Value, mutationProbabilityInput.Value, ind.MatrixAfterMutation, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes));
+                                    }
                                 }
-                            }));
+
+                                localHistory.Add(individuals.ToList());
+                            }
+
+                            var avgMark = localHistory.SelectMany(os => os).Average(o => o.Mark);
+                            var minMark = localHistory.SelectMany(os => os).Min(o => o.Mark);
+                            var maxMark = localHistory.SelectMany(os => os).Max(o => o.Mark);
+
+                            var testObject = new TestObject
+                            {
+                                Iter = iter++,
+                                N = n,
+                                pk = pk,
+                                pm = pm,
+                                T = t,
+                                AvgMark = avgMark,
+                                MaxMark = maxMark,
+                                MinMark = minMark
+                            };
+
+                            var initial = new InitialData()
+                            {
+                                MatrixSize = matrixSizeInput.Value,
+                                NumberOfIndividuals = n,
+                                NumberOfIterations = t,
+                                MutationProbability = pm,
+                                CrossProbability = pk,
+                                SupervisedReferenceMatrix = InitialData.SupervisedReferenceMatrix,
+                                UnsupervisedPatternMatrixes = InitialData.UnsupervisedPatternMatrixes
+                            };
+
+                            //globalHistory.Add(initial, localHistory);
+                            list.Add(testObject);
+
+                            localHistory.Clear();
+                            GC.Collect();
                         }
                     }
                 }
             }
 
-            await Task.WhenAll(tasks);
-
-
-
             watch.Stop();
-            var elapsedMs = watch.ElapsedMilliseconds;
-            TimeSpan elapsed = TimeSpan.FromMilliseconds(elapsedMs);
+            var elapsed = TimeSpan.FromMilliseconds(watch.ElapsedMilliseconds);
+            string elapsedFormatted = string.Format("{0:D2}:{1:D2}:{2:D2}.{3:D3}", elapsed.Hours, elapsed.Minutes, elapsed.Seconds, elapsed.Milliseconds);
 
-            string elapsedFormatted = string.Format("{0:D2}:{1:D2}:{2:D2}.{3:D3}",
-                                                    elapsed.Hours,
-                                                    elapsed.Minutes,
-                                                    elapsed.Seconds,
-                                                    elapsed.Milliseconds);
-            MessageBox.Show("Liczba wyników: " + list.Count().ToString() + "\nPotrzebny czas: " + elapsedFormatted, "Sukces");
+            MessageBox.Show("Liczba wyników: " + list.Count + "\nPotrzebny czas: " + elapsedFormatted, "Sukces");
 
             InitialData.MatrixSize = matrixSizeInput.Value;
-            InitialData.Precision = (decimal) precisionInput.SelectedItem;
+            InitialData.Precision = (decimal)precisionInput.SelectedItem;
             FileUtils.saveGaTunningResults(list, InitialData);
-            FileUtils.SaveMResultsGa(globalHistory);
+            //FileUtils.SaveMResultsGa(globalHistory);
+
+            //historyOfIndividuals.Clear();
+            //globalHistory.Clear();
+            list.Clear();
+            GC.Collect();
         }
+
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -408,18 +455,18 @@ namespace Lab2
 
             display.AllowUserToAddRows = false;
 
-   
-            display.ColumnHeadersVisible = false; 
+
+            display.ColumnHeadersVisible = false;
             display.RowHeadersVisible = false;
             display.ColumnCount = cols;
 
-   
+
             foreach (DataGridViewColumn column in display.Columns)
             {
                 column.Width = 25;
             }
 
-  
+
             for (int row = 0; row < rows; row++)
             {
                 display.Rows.Add();
@@ -465,7 +512,7 @@ namespace Lab2
                     Console.WriteLine("Unknown algorithm type");
                     break;
             }
-            
+
         }
 
         private void matrixSizeInput_ValueChanged(object sender, EventArgs e)
@@ -503,16 +550,20 @@ namespace Lab2
             for (int t = 0; t < iterationNumberInput.Value; t++)
             {
 
-                if(InitialData.SelectionType.Equals(SelectionType.ROULETTE))
+                if (InitialData.SelectionType.Equals(SelectionType.ROULETTE))
                 {
                     SelectionUtils.SetUpFitValue(individuals);
                     SelectionUtils.SetUpDistribuator(individuals);
                     SelectionUtils.SetUpNewOsobnikAfterSelection(individuals);
-                } else
-                {
-                    SelectionUtils.SetUpNewOsobnikAfterSelectionTournament(individuals);
                 }
-
+                else if (InitialData.SelectionType.Equals(SelectionType.TOURNAMENT_HARD))
+                {
+                    SelectionUtils.SetUpNewOsobnikAfterSelectionTournamentHard(individuals, InitialData.TournamentSelectionSize);
+                }
+                else if (InitialData.SelectionType.Equals(SelectionType.TOURNAMENT_SOFT))
+                {
+                    SelectionUtils.SetUpNewOsobnikAfterSelectionTournamentSoft(individuals, InitialData.TournamentSelectionSize, InitialData.TournamentSoftSelectionTreshold);
+                }
 
                 foreach (var item in individuals)
                 {
@@ -535,11 +586,18 @@ namespace Lab2
                     {
                         item.Mutate();
                     }
-                    else
+                    else if (InitialData.MutationType.Equals(MutationType.EQUALY))
                     {
                         item.BitSwapMutation();
                     }
-
+                    else if (InitialData.MutationType.Equals(MutationType.UNIFORM_BLOCK))
+                    {
+                        item.MutateUniformBlock();
+                    }
+                    else if (InitialData.MutationType.Equals(MutationType.RANDOM_COORDS))
+                    {
+                        item.MutateByRandomCoordinates();
+                    }
                     item.MarkAfterMutation = item.SetOcena(item.MatrixAfterMutation);
                 }
 
@@ -561,7 +619,7 @@ namespace Lab2
 
             }
 
-            
+
         }
 
         private List<decimal> GenerateDecimalRange(decimal start, decimal end, decimal step)
@@ -625,15 +683,30 @@ namespace Lab2
             if (selected != null && selected.Checked)
             {
                 InitialData.SelectionType = SelectionType.ROULETTE;
+                tournamentSizeInput.Enabled = false;
+                tournamentTresholdInput.Enabled = false;
             }
         }
 
-        private void tournamentRadio_CheckedChanged(object sender, EventArgs e)
+        private void tournamentHardRadio_CheckedChanged(object sender, EventArgs e)
         {
             RadioButton selected = sender as RadioButton;
             if (selected != null && selected.Checked)
             {
-                InitialData.SelectionType = SelectionType.TOURNAMENT;
+                InitialData.SelectionType = SelectionType.TOURNAMENT_HARD;
+                tournamentSizeInput.Enabled = true;
+                tournamentTresholdInput.Enabled = false;
+            }
+        }
+
+        private void tournamentSoftRadio_CheckedChanged(object sender, EventArgs e)
+        {
+            RadioButton selected = sender as RadioButton;
+            if (selected != null && selected.Checked)
+            {
+                InitialData.SelectionType = SelectionType.TOURNAMENT_SOFT;
+                tournamentSizeInput.Enabled = true;
+                tournamentTresholdInput.Enabled = true;
             }
         }
 
@@ -643,6 +716,7 @@ namespace Lab2
             if (selected != null && selected.Checked)
             {
                 InitialData.CrossType = CrossType.SINGLE_POINT;
+                crossPoints.Enabled = false;
             }
         }
 
@@ -652,6 +726,7 @@ namespace Lab2
             if (selected != null && selected.Checked)
             {
                 InitialData.CrossType = CrossType.MULTI_POINT;
+                crossPoints.Enabled = true;
             }
         }
 
@@ -673,6 +748,24 @@ namespace Lab2
             }
         }
 
+        private void smashingRadio_CheckedChanged(object sender, EventArgs e)
+        {
+            RadioButton selected = sender as RadioButton;
+            if (selected != null && selected.Checked)
+            {
+                InitialData.MutationType = MutationType.UNIFORM_BLOCK;
+            }
+        }
+
+        private void randomMutationInput_CheckedChanged(object sender, EventArgs e)
+        {
+            RadioButton selected = sender as RadioButton;
+            if (selected != null && selected.Checked)
+            {
+                InitialData.MutationType = MutationType.RANDOM_COORDS;
+            }
+        }
+
         private void useSeed_CheckedChanged(object sender, EventArgs e)
         {
             var checkbox = sender as CheckBox;
@@ -686,5 +779,19 @@ namespace Lab2
             }
         }
 
+        private void historyViewButton_Click(object sender, EventArgs e)
+        {
+            if (historyOfIndividuals.Count != 0)
+            {
+                HistoryViewModalWindow historyViewModalWindow = new HistoryViewModalWindow(historyOfIndividuals);
+                historyViewModalWindow.Show();
+            }
+            else
+            {
+                MessageBox.Show("Brak elementów do podgl¹du");
+            }
+            
+
+        }
     }
 }

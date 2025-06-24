@@ -8,7 +8,7 @@ namespace Lab2.Core.Enums
 {
     public enum SelectionType
     {
-        ROULETTE, TOURNAMENT
+        ROULETTE, TOURNAMENT_HARD, TOURNAMENT_SOFT
     }
     public static class SelectionTypeHelper
     {

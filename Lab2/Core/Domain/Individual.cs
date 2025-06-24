@@ -387,7 +387,102 @@ namespace Lab2.Core.Domain
             MatrixAfterMutation = afterMutation;
         }
 
+        public void MutateUniformBlock()
+        {
+            if (MatrixAfterCross == null)
+            {
+                MatrixAfterMutation = null;
+                return;
+            }
 
+            MutationPosition = "";
+            int rows = MatrixAfterCross.GetLength(0);
+            int cols = MatrixAfterCross.GetLength(1);
+
+            bool[,] afterMutation = null;
+            var sourceMatrix = MatrixAfterCross;
+
+            for (int i = 1; i < rows - 1; i++)
+            {
+                for (int j = 1; j < cols - 1; j++)
+                {
+                    bool centerValue = sourceMatrix[i, j];
+                    bool isUniform = true;
+
+                    for (int di = -1; di <= 1 && isUniform; di++)
+                    {
+                        for (int dj = -1; dj <= 1 && isUniform; dj++)
+                        {
+                            if (sourceMatrix[i + di, j + dj] != centerValue)
+                                isUniform = false;
+                        }
+                    }
+
+                    if (isUniform)
+                    {
+                        if (afterMutation == null)
+                            afterMutation = (bool[,])MatrixAfterCross.Clone();
+
+                        for (int di = -1; di <= 1; di++)
+                        {
+                            for (int dj = -1; dj <= 1; dj++)
+                            {
+                                int x = i + di;
+                                int y = j + dj;
+                                afterMutation[x, y] = !centerValue;
+                                MutationPosition += $"[{x}, {y}]b,";
+                            }
+                        }
+                    }
+                }
+            }
+
+            MatrixAfterMutation = afterMutation ?? MatrixAfterCross;
+        }
+
+        public void MutateByRandomCoordinates()
+        {
+            if (MatrixAfterCross == null)
+            {
+                MatrixAfterMutation = null;
+                return;
+            }
+
+            MutationPosition = "";
+            int rows = MatrixAfterCross.GetLength(0);
+            int cols = MatrixAfterCross.GetLength(1);
+
+            int validHeight = rows - 2;
+            int validWidth = cols - 2;
+
+            int mutationTargetCount = (int)Math.Round(mutationPorbability * validHeight * validWidth);
+            if (mutationTargetCount <= 0)
+            {
+                MatrixAfterMutation = MatrixAfterCross;
+                return;
+            }
+
+            bool[,] afterMutation = (bool[,])MatrixAfterCross.Clone();
+            var usedCoords = new HashSet<(int, int)>();
+            var rand = RandomSingleton.Instance;
+
+            int attempts = 0;
+            while (usedCoords.Count < mutationTargetCount && attempts < mutationTargetCount * 10)
+            {
+                int i = rand.Next(1, rows - 1); 
+                int j = rand.Next(1, cols - 1);
+
+                if (usedCoords.Add((i, j)))
+                {
+                    afterMutation[i, j] = !MatrixAfterCross[i, j];
+                    MutationPosition += $"[{i}, {j}],";
+                }
+
+                attempts++;
+            }
+
+            MatrixAfterMutation = afterMutation;
+        }
 
     }
 }

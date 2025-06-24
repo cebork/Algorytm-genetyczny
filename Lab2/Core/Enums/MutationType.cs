@@ -8,7 +8,7 @@ namespace Lab2.Core.Enums
 {
     public enum MutationType
     {
-        EQUALY, BIT_SWAPING
+        EQUALY, BIT_SWAPING, UNIFORM_BLOCK, RANDOM_COORDS
     }
 
     public static class MutationTypeHelper

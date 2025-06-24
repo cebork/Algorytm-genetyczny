@@ -28,1167 +28,1180 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            this.matrixSizeLabel = new System.Windows.Forms.Label();
-            this.matrixSizeInput = new System.Windows.Forms.NumericUpDown();
-            this.individualNumberInput = new System.Windows.Forms.NumericUpDown();
-            this.individualNumberLabel = new System.Windows.Forms.Label();
-            this.precisionInput = new System.Windows.Forms.ComboBox();
-            this.precisionLabel = new System.Windows.Forms.Label();
-            this.startButton = new System.Windows.Forms.Button();
-            this.corssProbabilityLabel = new System.Windows.Forms.Label();
-            this.crossProbabilityInput = new System.Windows.Forms.NumericUpDown();
-            this.mutationProbabilityInput = new System.Windows.Forms.NumericUpDown();
-            this.mutationProbabilityLabel = new System.Windows.Forms.Label();
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.tabs = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.osobniki = new System.Windows.Forms.DataGridView();
-            this.display = new System.Windows.Forms.DataGridView();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.TstepILabel = new System.Windows.Forms.Label();
-            this.TstepInput = new System.Windows.Forms.NumericUpDown();
-            this.TbLabel = new System.Windows.Forms.Label();
-            this.TbInput = new System.Windows.Forms.NumericUpDown();
-            this.TaLabel = new System.Windows.Forms.Label();
-            this.TaInput = new System.Windows.Forms.NumericUpDown();
-            this.pmgroupbox = new System.Windows.Forms.GroupBox();
-            this.pmbsizeLabel = new System.Windows.Forms.Label();
-            this.PmstepInput = new System.Windows.Forms.NumericUpDown();
-            this.pmblabel = new System.Windows.Forms.Label();
-            this.PmbInput = new System.Windows.Forms.NumericUpDown();
-            this.PmaLabel = new System.Windows.Forms.Label();
-            this.pmaInput = new System.Windows.Forms.NumericUpDown();
-            this.pkgroupbox = new System.Windows.Forms.GroupBox();
-            this.PkSizeLabel = new System.Windows.Forms.Label();
-            this.PkstepInput = new System.Windows.Forms.NumericUpDown();
-            this.pkbLabel = new System.Windows.Forms.Label();
-            this.PkbbInput = new System.Windows.Forms.NumericUpDown();
-            this.pka = new System.Windows.Forms.Label();
-            this.pkaInput = new System.Windows.Forms.NumericUpDown();
-            this.individiualsCountGroupBox = new System.Windows.Forms.GroupBox();
-            this.NstepLabel = new System.Windows.Forms.Label();
-            this.NstepInput = new System.Windows.Forms.NumericUpDown();
-            this.NbLabel = new System.Windows.Forms.Label();
-            this.NbInput = new System.Windows.Forms.NumericUpDown();
-            this.NaLabel = new System.Windows.Forms.Label();
-            this.NaInput = new System.Windows.Forms.NumericUpDown();
-            this.testExperimentCountLabel = new System.Windows.Forms.Label();
-            this.testExperimentCount = new System.Windows.Forms.NumericUpDown();
-            this.testyStart = new System.Windows.Forms.Button();
-            this.iterationNumberInput = new System.Windows.Forms.NumericUpDown();
-            this.iterationNumberLabel = new System.Windows.Forms.Label();
-            this.additioanlDataButton = new System.Windows.Forms.Button();
-            this.algorithmTypeGroupBox = new System.Windows.Forms.GroupBox();
-            this.unsupervisedTypeRadioButton = new System.Windows.Forms.RadioButton();
-            this.supervisedTypedRadioButton = new System.Windows.Forms.RadioButton();
-            this.inputDataGroupBox = new System.Windows.Forms.GroupBox();
-            this.seed = new System.Windows.Forms.TextBox();
-            this.useSeed = new System.Windows.Forms.CheckBox();
-            this.experimentNumberLabel = new System.Windows.Forms.Label();
-            this.experimentNumber = new System.Windows.Forms.NumericUpDown();
-            this.runProgressBar = new System.Windows.Forms.ProgressBar();
-            this.GAmodification = new System.Windows.Forms.GroupBox();
-            this.modifiedGARadio = new System.Windows.Forms.RadioButton();
-            this.classicalGARadio = new System.Windows.Forms.RadioButton();
-            this.selectionGroup = new System.Windows.Forms.GroupBox();
-            this.tournamentRadio = new System.Windows.Forms.RadioButton();
-            this.ruletteRadio = new System.Windows.Forms.RadioButton();
-            this.crossGroup = new System.Windows.Forms.GroupBox();
-            this.crossPoints = new System.Windows.Forms.NumericUpDown();
-            this.multiPointRadio = new System.Windows.Forms.RadioButton();
-            this.singlePointRadio = new System.Windows.Forms.RadioButton();
-            this.mutationGroup = new System.Windows.Forms.GroupBox();
-            this.bitSwapingRadio = new System.Windows.Forms.RadioButton();
-            this.evenlyRadio = new System.Windows.Forms.RadioButton();
-            this.probGen1Group = new System.Windows.Forms.GroupBox();
-            this.propGen1 = new System.Windows.Forms.NumericUpDown();
-            ((System.ComponentModel.ISupportInitialize)(this.matrixSizeInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.individualNumberInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.crossProbabilityInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.mutationProbabilityInput)).BeginInit();
-            this.tabs.SuspendLayout();
-            this.tabPage1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.osobniki)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.display)).BeginInit();
-            this.tabPage2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
-            this.tabPage3.SuspendLayout();
-            this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.TstepInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.TbInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.TaInput)).BeginInit();
-            this.pmgroupbox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.PmstepInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PmbInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pmaInput)).BeginInit();
-            this.pkgroupbox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.PkstepInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PkbbInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pkaInput)).BeginInit();
-            this.individiualsCountGroupBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.NstepInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.NbInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.NaInput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.testExperimentCount)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.iterationNumberInput)).BeginInit();
-            this.algorithmTypeGroupBox.SuspendLayout();
-            this.inputDataGroupBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.experimentNumber)).BeginInit();
-            this.GAmodification.SuspendLayout();
-            this.selectionGroup.SuspendLayout();
-            this.crossGroup.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.crossPoints)).BeginInit();
-            this.mutationGroup.SuspendLayout();
-            this.probGen1Group.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.propGen1)).BeginInit();
-            this.SuspendLayout();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            matrixSizeLabel = new Label();
+            matrixSizeInput = new NumericUpDown();
+            individualNumberInput = new NumericUpDown();
+            individualNumberLabel = new Label();
+            precisionInput = new ComboBox();
+            precisionLabel = new Label();
+            startButton = new Button();
+            corssProbabilityLabel = new Label();
+            crossProbabilityInput = new NumericUpDown();
+            mutationProbabilityInput = new NumericUpDown();
+            mutationProbabilityLabel = new Label();
+            backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            tabs = new TabControl();
+            tabPage1 = new TabPage();
+            osobniki = new DataGridView();
+            display = new DataGridView();
+            tabPage2 = new TabPage();
+            chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            tabPage3 = new TabPage();
+            testCounter = new Label();
+            groupBox1 = new GroupBox();
+            TstepILabel = new Label();
+            TstepInput = new NumericUpDown();
+            TbLabel = new Label();
+            TbInput = new NumericUpDown();
+            TaLabel = new Label();
+            TaInput = new NumericUpDown();
+            pmgroupbox = new GroupBox();
+            pmbsizeLabel = new Label();
+            PmstepInput = new NumericUpDown();
+            pmblabel = new Label();
+            PmbInput = new NumericUpDown();
+            PmaLabel = new Label();
+            pmaInput = new NumericUpDown();
+            pkgroupbox = new GroupBox();
+            PkSizeLabel = new Label();
+            PkstepInput = new NumericUpDown();
+            pkbLabel = new Label();
+            PkbbInput = new NumericUpDown();
+            pka = new Label();
+            pkaInput = new NumericUpDown();
+            individiualsCountGroupBox = new GroupBox();
+            NstepLabel = new Label();
+            NstepInput = new NumericUpDown();
+            NbLabel = new Label();
+            NbInput = new NumericUpDown();
+            NaLabel = new Label();
+            NaInput = new NumericUpDown();
+            testExperimentCountLabel = new Label();
+            testExperimentCount = new NumericUpDown();
+            testyStart = new Button();
+            iterationNumberInput = new NumericUpDown();
+            iterationNumberLabel = new Label();
+            additioanlDataButton = new Button();
+            algorithmTypeGroupBox = new GroupBox();
+            unsupervisedTypeRadioButton = new RadioButton();
+            supervisedTypedRadioButton = new RadioButton();
+            inputDataGroupBox = new GroupBox();
+            seed = new TextBox();
+            useSeed = new CheckBox();
+            experimentNumberLabel = new Label();
+            experimentNumber = new NumericUpDown();
+            runProgressBar = new ProgressBar();
+            GAmodification = new GroupBox();
+            modifiedGARadio = new RadioButton();
+            classicalGARadio = new RadioButton();
+            selectionGroup = new GroupBox();
+            tournamentTresholdLabel = new Label();
+            tournamentTresholdInput = new NumericUpDown();
+            torunamentSizeLabel = new Label();
+            tournamentSizeInput = new NumericUpDown();
+            tournamentSoftRadio = new RadioButton();
+            tournamentHardRadio = new RadioButton();
+            ruletteRadio = new RadioButton();
+            crossGroup = new GroupBox();
+            crossPoints = new NumericUpDown();
+            multiPointRadio = new RadioButton();
+            singlePointRadio = new RadioButton();
+            mutationGroup = new GroupBox();
+            randomMutationInput = new RadioButton();
+            smashingRadio = new RadioButton();
+            bitSwapingRadio = new RadioButton();
+            evenlyRadio = new RadioButton();
+            probGen1Group = new GroupBox();
+            propGen1 = new NumericUpDown();
+            historyViewButton = new Button();
+            crossProb = new Label();
+            individualCount = new Label();
+            mutationProb = new Label();
+            iterationCount = new Label();
+            ((System.ComponentModel.ISupportInitialize)matrixSizeInput).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)individualNumberInput).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)crossProbabilityInput).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)mutationProbabilityInput).BeginInit();
+            tabs.SuspendLayout();
+            tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)osobniki).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)display).BeginInit();
+            tabPage2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)chart1).BeginInit();
+            tabPage3.SuspendLayout();
+            groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)TstepInput).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)TbInput).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)TaInput).BeginInit();
+            pmgroupbox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)PmstepInput).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)PmbInput).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pmaInput).BeginInit();
+            pkgroupbox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)PkstepInput).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)PkbbInput).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pkaInput).BeginInit();
+            individiualsCountGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)NstepInput).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)NbInput).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)NaInput).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)testExperimentCount).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)iterationNumberInput).BeginInit();
+            algorithmTypeGroupBox.SuspendLayout();
+            inputDataGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)experimentNumber).BeginInit();
+            GAmodification.SuspendLayout();
+            selectionGroup.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)tournamentTresholdInput).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)tournamentSizeInput).BeginInit();
+            crossGroup.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)crossPoints).BeginInit();
+            mutationGroup.SuspendLayout();
+            probGen1Group.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)propGen1).BeginInit();
+            SuspendLayout();
             // 
             // matrixSizeLabel
             // 
-            this.matrixSizeLabel.AutoSize = true;
-            this.matrixSizeLabel.Location = new System.Drawing.Point(7, 33);
-            this.matrixSizeLabel.Name = "matrixSizeLabel";
-            this.matrixSizeLabel.Size = new System.Drawing.Size(121, 15);
-            this.matrixSizeLabel.TabIndex = 1;
-            this.matrixSizeLabel.Text = "Rozmiar macierzy (n) ";
+            matrixSizeLabel.AutoSize = true;
+            matrixSizeLabel.Location = new Point(7, 33);
+            matrixSizeLabel.Name = "matrixSizeLabel";
+            matrixSizeLabel.Size = new Size(121, 15);
+            matrixSizeLabel.TabIndex = 1;
+            matrixSizeLabel.Text = "Rozmiar macierzy (n) ";
             // 
             // matrixSizeInput
             // 
-            this.matrixSizeInput.Location = new System.Drawing.Point(227, 29);
-            this.matrixSizeInput.Name = "matrixSizeInput";
-            this.matrixSizeInput.Size = new System.Drawing.Size(70, 23);
-            this.matrixSizeInput.TabIndex = 4;
-            this.matrixSizeInput.Value = new decimal(new int[] {
-            12,
-            0,
-            0,
-            0});
-            this.matrixSizeInput.ValueChanged += new System.EventHandler(this.matrixSizeInput_ValueChanged);
+            matrixSizeInput.Location = new Point(227, 29);
+            matrixSizeInput.Name = "matrixSizeInput";
+            matrixSizeInput.Size = new Size(70, 23);
+            matrixSizeInput.TabIndex = 4;
+            matrixSizeInput.Value = new decimal(new int[] { 12, 0, 0, 0 });
+            matrixSizeInput.ValueChanged += matrixSizeInput_ValueChanged;
             // 
             // individualNumberInput
             // 
-            this.individualNumberInput.Location = new System.Drawing.Point(435, 29);
-            this.individualNumberInput.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
-            this.individualNumberInput.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.individualNumberInput.Name = "individualNumberInput";
-            this.individualNumberInput.Size = new System.Drawing.Size(58, 23);
-            this.individualNumberInput.TabIndex = 6;
-            this.individualNumberInput.Value = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
+            individualNumberInput.Location = new Point(435, 29);
+            individualNumberInput.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
+            individualNumberInput.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            individualNumberInput.Name = "individualNumberInput";
+            individualNumberInput.Size = new Size(58, 23);
+            individualNumberInput.TabIndex = 6;
+            individualNumberInput.Value = new decimal(new int[] { 10, 0, 0, 0 });
             // 
             // individualNumberLabel
             // 
-            this.individualNumberLabel.AutoSize = true;
-            this.individualNumberLabel.Location = new System.Drawing.Point(317, 33);
-            this.individualNumberLabel.Name = "individualNumberLabel";
-            this.individualNumberLabel.Size = new System.Drawing.Size(112, 15);
-            this.individualNumberLabel.TabIndex = 5;
-            this.individualNumberLabel.Text = "Ilość osobników (N)";
+            individualNumberLabel.AutoSize = true;
+            individualNumberLabel.Location = new Point(317, 33);
+            individualNumberLabel.Name = "individualNumberLabel";
+            individualNumberLabel.Size = new Size(112, 15);
+            individualNumberLabel.TabIndex = 5;
+            individualNumberLabel.Text = "Ilość osobników (N)";
             // 
             // precisionInput
             // 
-            this.precisionInput.FormattingEnabled = true;
-            this.precisionInput.Location = new System.Drawing.Point(435, 87);
-            this.precisionInput.Name = "precisionInput";
-            this.precisionInput.Size = new System.Drawing.Size(58, 23);
-            this.precisionInput.TabIndex = 7;
+            precisionInput.FormattingEnabled = true;
+            precisionInput.Location = new Point(435, 87);
+            precisionInput.Name = "precisionInput";
+            precisionInput.Size = new Size(58, 23);
+            precisionInput.TabIndex = 7;
             // 
             // precisionLabel
             // 
-            this.precisionLabel.AutoSize = true;
-            this.precisionLabel.Location = new System.Drawing.Point(317, 91);
-            this.precisionLabel.Name = "precisionLabel";
-            this.precisionLabel.Size = new System.Drawing.Size(87, 15);
-            this.precisionLabel.TabIndex = 8;
-            this.precisionLabel.Text = "Dokładność (d)";
+            precisionLabel.AutoSize = true;
+            precisionLabel.Location = new Point(317, 91);
+            precisionLabel.Name = "precisionLabel";
+            precisionLabel.Size = new Size(87, 15);
+            precisionLabel.TabIndex = 8;
+            precisionLabel.Text = "Dokładność (d)";
             // 
             // startButton
             // 
-            this.startButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.startButton.Location = new System.Drawing.Point(991, 12);
-            this.startButton.Name = "startButton";
-            this.startButton.Size = new System.Drawing.Size(210, 55);
-            this.startButton.TabIndex = 10;
-            this.startButton.Text = "START";
-            this.startButton.UseVisualStyleBackColor = false;
-            this.startButton.Click += new System.EventHandler(this.startButton_Click);
+            startButton.BackColor = SystemColors.ActiveCaption;
+            startButton.Location = new Point(1053, 38);
+            startButton.Name = "startButton";
+            startButton.Size = new Size(122, 26);
+            startButton.TabIndex = 10;
+            startButton.Text = "START";
+            startButton.UseVisualStyleBackColor = false;
+            startButton.Click += startButton_Click;
             // 
             // corssProbabilityLabel
             // 
-            this.corssProbabilityLabel.AutoSize = true;
-            this.corssProbabilityLabel.Location = new System.Drawing.Point(7, 62);
-            this.corssProbabilityLabel.Name = "corssProbabilityLabel";
-            this.corssProbabilityLabel.Size = new System.Drawing.Size(214, 15);
-            this.corssProbabilityLabel.TabIndex = 12;
-            this.corssProbabilityLabel.Text = "Prawdopodobieństwo krzyżowania (pk)";
+            corssProbabilityLabel.AutoSize = true;
+            corssProbabilityLabel.Location = new Point(7, 62);
+            corssProbabilityLabel.Name = "corssProbabilityLabel";
+            corssProbabilityLabel.Size = new Size(214, 15);
+            corssProbabilityLabel.TabIndex = 12;
+            corssProbabilityLabel.Text = "Prawdopodobieństwo krzyżowania (pk)";
             // 
             // crossProbabilityInput
             // 
-            this.crossProbabilityInput.DecimalPlaces = 2;
-            this.crossProbabilityInput.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            131072});
-            this.crossProbabilityInput.Location = new System.Drawing.Point(227, 58);
-            this.crossProbabilityInput.Maximum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.crossProbabilityInput.Name = "crossProbabilityInput";
-            this.crossProbabilityInput.Size = new System.Drawing.Size(70, 23);
-            this.crossProbabilityInput.TabIndex = 13;
-            this.crossProbabilityInput.Value = new decimal(new int[] {
-            75,
-            0,
-            0,
-            131072});
+            crossProbabilityInput.DecimalPlaces = 2;
+            crossProbabilityInput.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
+            crossProbabilityInput.Location = new Point(227, 58);
+            crossProbabilityInput.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            crossProbabilityInput.Name = "crossProbabilityInput";
+            crossProbabilityInput.Size = new Size(70, 23);
+            crossProbabilityInput.TabIndex = 13;
+            crossProbabilityInput.Value = new decimal(new int[] { 75, 0, 0, 131072 });
             // 
             // mutationProbabilityInput
             // 
-            this.mutationProbabilityInput.DecimalPlaces = 4;
-            this.mutationProbabilityInput.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            196608});
-            this.mutationProbabilityInput.Location = new System.Drawing.Point(227, 87);
-            this.mutationProbabilityInput.Maximum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.mutationProbabilityInput.Name = "mutationProbabilityInput";
-            this.mutationProbabilityInput.Size = new System.Drawing.Size(70, 23);
-            this.mutationProbabilityInput.TabIndex = 15;
-            this.mutationProbabilityInput.Value = new decimal(new int[] {
-            5,
-            0,
-            0,
-            196608});
+            mutationProbabilityInput.DecimalPlaces = 4;
+            mutationProbabilityInput.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
+            mutationProbabilityInput.Location = new Point(227, 87);
+            mutationProbabilityInput.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            mutationProbabilityInput.Name = "mutationProbabilityInput";
+            mutationProbabilityInput.Size = new Size(70, 23);
+            mutationProbabilityInput.TabIndex = 15;
+            mutationProbabilityInput.Value = new decimal(new int[] { 5, 0, 0, 196608 });
             // 
             // mutationProbabilityLabel
             // 
-            this.mutationProbabilityLabel.AutoSize = true;
-            this.mutationProbabilityLabel.Location = new System.Drawing.Point(7, 91);
-            this.mutationProbabilityLabel.Name = "mutationProbabilityLabel";
-            this.mutationProbabilityLabel.Size = new System.Drawing.Size(195, 15);
-            this.mutationProbabilityLabel.TabIndex = 14;
-            this.mutationProbabilityLabel.Text = "Prawdopodobieństwo mutacji (pm)";
+            mutationProbabilityLabel.AutoSize = true;
+            mutationProbabilityLabel.Location = new Point(7, 91);
+            mutationProbabilityLabel.Name = "mutationProbabilityLabel";
+            mutationProbabilityLabel.Size = new Size(195, 15);
+            mutationProbabilityLabel.TabIndex = 14;
+            mutationProbabilityLabel.Text = "Prawdopodobieństwo mutacji (pm)";
             // 
             // tabs
             // 
-            this.tabs.Controls.Add(this.tabPage1);
-            this.tabs.Controls.Add(this.tabPage2);
-            this.tabs.Controls.Add(this.tabPage3);
-            this.tabs.Location = new System.Drawing.Point(51, 230);
-            this.tabs.Name = "tabs";
-            this.tabs.SelectedIndex = 0;
-            this.tabs.Size = new System.Drawing.Size(1400, 848);
-            this.tabs.TabIndex = 16;
+            tabs.Controls.Add(tabPage1);
+            tabs.Controls.Add(tabPage2);
+            tabs.Controls.Add(tabPage3);
+            tabs.Location = new Point(12, 238);
+            tabs.Name = "tabs";
+            tabs.SelectedIndex = 0;
+            tabs.Size = new Size(1400, 848);
+            tabs.TabIndex = 16;
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.osobniki);
-            this.tabPage1.Controls.Add(this.display);
-            this.tabPage1.Location = new System.Drawing.Point(4, 24);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1392, 820);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Podsumowanie";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            tabPage1.Controls.Add(osobniki);
+            tabPage1.Controls.Add(display);
+            tabPage1.Location = new Point(4, 24);
+            tabPage1.Name = "tabPage1";
+            tabPage1.Padding = new Padding(3);
+            tabPage1.Size = new Size(1392, 820);
+            tabPage1.TabIndex = 0;
+            tabPage1.Text = "Podsumowanie";
+            tabPage1.UseVisualStyleBackColor = true;
             // 
             // osobniki
             // 
-            this.osobniki.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.osobniki.Location = new System.Drawing.Point(3, 3);
-            this.osobniki.Name = "osobniki";
-            this.osobniki.RowTemplate.Height = 25;
-            this.osobniki.Size = new System.Drawing.Size(486, 811);
-            this.osobniki.TabIndex = 11;
+            osobniki.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            osobniki.Location = new Point(3, 3);
+            osobniki.Name = "osobniki";
+            osobniki.RowTemplate.Height = 25;
+            osobniki.Size = new Size(486, 811);
+            osobniki.TabIndex = 11;
             // 
             // display
             // 
-            this.display.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.display.Location = new System.Drawing.Point(495, 3);
-            this.display.Name = "display";
-            this.display.RowTemplate.Height = 25;
-            this.display.Size = new System.Drawing.Size(891, 811);
-            this.display.TabIndex = 19;
-            this.display.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
+            display.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            display.Location = new Point(495, 3);
+            display.Name = "display";
+            display.RowTemplate.Height = 25;
+            display.Size = new Size(891, 811);
+            display.TabIndex = 19;
+            display.CellContentClick += dataGridView1_CellContentClick;
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.chart1);
-            this.tabPage2.Location = new System.Drawing.Point(4, 24);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1392, 820);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Wykresy";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            tabPage2.Controls.Add(chart1);
+            tabPage2.Location = new Point(4, 24);
+            tabPage2.Name = "tabPage2";
+            tabPage2.Padding = new Padding(3);
+            tabPage2.Size = new Size(1392, 820);
+            tabPage2.TabIndex = 1;
+            tabPage2.Text = "Wykresy";
+            tabPage2.UseVisualStyleBackColor = true;
             // 
             // chart1
             // 
-            chartArea1.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            this.chart1.Legends.Add(legend1);
-            this.chart1.Location = new System.Drawing.Point(6, 6);
-            this.chart1.Name = "chart1";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(1102, 594);
-            this.chart1.TabIndex = 0;
-            this.chart1.Text = "chart1";
+            chartArea2.Name = "ChartArea1";
+            chart1.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            chart1.Legends.Add(legend2);
+            chart1.Location = new Point(6, 6);
+            chart1.Name = "chart1";
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            chart1.Series.Add(series2);
+            chart1.Size = new Size(1102, 594);
+            chart1.TabIndex = 0;
+            chart1.Text = "chart1";
             // 
             // tabPage3
             // 
-            this.tabPage3.Controls.Add(this.groupBox1);
-            this.tabPage3.Controls.Add(this.pmgroupbox);
-            this.tabPage3.Controls.Add(this.pkgroupbox);
-            this.tabPage3.Controls.Add(this.individiualsCountGroupBox);
-            this.tabPage3.Controls.Add(this.testExperimentCountLabel);
-            this.tabPage3.Controls.Add(this.testExperimentCount);
-            this.tabPage3.Controls.Add(this.testyStart);
-            this.tabPage3.Location = new System.Drawing.Point(4, 24);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(1392, 820);
-            this.tabPage3.TabIndex = 2;
-            this.tabPage3.Text = "Testy";
-            this.tabPage3.UseVisualStyleBackColor = true;
+            tabPage3.Controls.Add(iterationCount);
+            tabPage3.Controls.Add(mutationProb);
+            tabPage3.Controls.Add(individualCount);
+            tabPage3.Controls.Add(crossProb);
+            tabPage3.Controls.Add(testCounter);
+            tabPage3.Controls.Add(groupBox1);
+            tabPage3.Controls.Add(pmgroupbox);
+            tabPage3.Controls.Add(pkgroupbox);
+            tabPage3.Controls.Add(individiualsCountGroupBox);
+            tabPage3.Controls.Add(testExperimentCountLabel);
+            tabPage3.Controls.Add(testExperimentCount);
+            tabPage3.Controls.Add(testyStart);
+            tabPage3.Location = new Point(4, 24);
+            tabPage3.Name = "tabPage3";
+            tabPage3.Size = new Size(1392, 820);
+            tabPage3.TabIndex = 2;
+            tabPage3.Text = "Testy";
+            tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // testCounter
+            // 
+            testCounter.AutoSize = true;
+            testCounter.Location = new Point(33, 238);
+            testCounter.Name = "testCounter";
+            testCounter.Size = new Size(28, 15);
+            testCounter.TabIndex = 32;
+            testCounter.Text = "Test";
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.TstepILabel);
-            this.groupBox1.Controls.Add(this.TstepInput);
-            this.groupBox1.Controls.Add(this.TbLabel);
-            this.groupBox1.Controls.Add(this.TbInput);
-            this.groupBox1.Controls.Add(this.TaLabel);
-            this.groupBox1.Controls.Add(this.TaInput);
-            this.groupBox1.Location = new System.Drawing.Point(320, 229);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(528, 64);
-            this.groupBox1.TabIndex = 31;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Zakresy iteracji (T)";
+            groupBox1.Controls.Add(TstepILabel);
+            groupBox1.Controls.Add(TstepInput);
+            groupBox1.Controls.Add(TbLabel);
+            groupBox1.Controls.Add(TbInput);
+            groupBox1.Controls.Add(TaLabel);
+            groupBox1.Controls.Add(TaInput);
+            groupBox1.Location = new Point(320, 229);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(528, 64);
+            groupBox1.TabIndex = 31;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Zakresy iteracji (T)";
             // 
             // TstepILabel
             // 
-            this.TstepILabel.AutoSize = true;
-            this.TstepILabel.Location = new System.Drawing.Point(349, 24);
-            this.TstepILabel.Name = "TstepILabel";
-            this.TstepILabel.Size = new System.Drawing.Size(41, 15);
-            this.TstepILabel.TabIndex = 28;
-            this.TstepILabel.Text = "T_step";
+            TstepILabel.AutoSize = true;
+            TstepILabel.Location = new Point(349, 24);
+            TstepILabel.Name = "TstepILabel";
+            TstepILabel.Size = new Size(41, 15);
+            TstepILabel.TabIndex = 28;
+            TstepILabel.Text = "T_step";
             // 
             // TstepInput
             // 
-            this.TstepInput.AccessibleDescription = "PmstepInput";
-            this.TstepInput.Location = new System.Drawing.Point(402, 22);
-            this.TstepInput.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.TstepInput.Name = "TstepInput";
-            this.TstepInput.Size = new System.Drawing.Size(120, 23);
-            this.TstepInput.TabIndex = 27;
+            TstepInput.AccessibleDescription = "PmstepInput";
+            TstepInput.Location = new Point(402, 22);
+            TstepInput.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
+            TstepInput.Name = "TstepInput";
+            TstepInput.Size = new Size(120, 23);
+            TstepInput.TabIndex = 27;
+            TstepInput.Value = new decimal(new int[] { 100, 0, 0, 0 });
             // 
             // TbLabel
             // 
-            this.TbLabel.AutoSize = true;
-            this.TbLabel.Location = new System.Drawing.Point(174, 26);
-            this.TbLabel.Name = "TbLabel";
-            this.TbLabel.Size = new System.Drawing.Size(26, 15);
-            this.TbLabel.TabIndex = 26;
-            this.TbLabel.Text = "T_b";
+            TbLabel.AutoSize = true;
+            TbLabel.Location = new Point(174, 26);
+            TbLabel.Name = "TbLabel";
+            TbLabel.Size = new Size(26, 15);
+            TbLabel.TabIndex = 26;
+            TbLabel.Text = "T_b";
             // 
             // TbInput
             // 
-            this.TbInput.AccessibleDescription = "TbInput";
-            this.TbInput.Location = new System.Drawing.Point(224, 22);
-            this.TbInput.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
-            this.TbInput.Name = "TbInput";
-            this.TbInput.Size = new System.Drawing.Size(120, 23);
-            this.TbInput.TabIndex = 25;
+            TbInput.AccessibleDescription = "TbInput";
+            TbInput.Location = new Point(224, 22);
+            TbInput.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
+            TbInput.Name = "TbInput";
+            TbInput.Size = new Size(120, 23);
+            TbInput.TabIndex = 25;
+            TbInput.Value = new decimal(new int[] { 500, 0, 0, 0 });
             // 
             // TaLabel
             // 
-            this.TaLabel.AutoSize = true;
-            this.TaLabel.Location = new System.Drawing.Point(7, 26);
-            this.TaLabel.Name = "TaLabel";
-            this.TaLabel.Size = new System.Drawing.Size(25, 15);
-            this.TaLabel.TabIndex = 24;
-            this.TaLabel.Text = "T_a";
+            TaLabel.AutoSize = true;
+            TaLabel.Location = new Point(7, 26);
+            TaLabel.Name = "TaLabel";
+            TaLabel.Size = new Size(25, 15);
+            TaLabel.TabIndex = 24;
+            TaLabel.Text = "T_a";
             // 
             // TaInput
             // 
-            this.TaInput.AccessibleDescription = "TaInput";
-            this.TaInput.Location = new System.Drawing.Point(48, 22);
-            this.TaInput.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
-            this.TaInput.Name = "TaInput";
-            this.TaInput.Size = new System.Drawing.Size(120, 23);
-            this.TaInput.TabIndex = 23;
+            TaInput.AccessibleDescription = "TaInput";
+            TaInput.Location = new Point(48, 22);
+            TaInput.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
+            TaInput.Name = "TaInput";
+            TaInput.Size = new Size(120, 23);
+            TaInput.TabIndex = 23;
+            TaInput.Value = new decimal(new int[] { 100, 0, 0, 0 });
             // 
             // pmgroupbox
             // 
-            this.pmgroupbox.Controls.Add(this.pmbsizeLabel);
-            this.pmgroupbox.Controls.Add(this.PmstepInput);
-            this.pmgroupbox.Controls.Add(this.pmblabel);
-            this.pmgroupbox.Controls.Add(this.PmbInput);
-            this.pmgroupbox.Controls.Add(this.PmaLabel);
-            this.pmgroupbox.Controls.Add(this.pmaInput);
-            this.pmgroupbox.Location = new System.Drawing.Point(320, 159);
-            this.pmgroupbox.Name = "pmgroupbox";
-            this.pmgroupbox.Size = new System.Drawing.Size(528, 64);
-            this.pmgroupbox.TabIndex = 30;
-            this.pmgroupbox.TabStop = false;
-            this.pmgroupbox.Text = "Zakresy prawdopodobieństwa mutacji";
+            pmgroupbox.Controls.Add(pmbsizeLabel);
+            pmgroupbox.Controls.Add(PmstepInput);
+            pmgroupbox.Controls.Add(pmblabel);
+            pmgroupbox.Controls.Add(PmbInput);
+            pmgroupbox.Controls.Add(PmaLabel);
+            pmgroupbox.Controls.Add(pmaInput);
+            pmgroupbox.Location = new Point(320, 159);
+            pmgroupbox.Name = "pmgroupbox";
+            pmgroupbox.Size = new Size(528, 64);
+            pmgroupbox.TabIndex = 30;
+            pmgroupbox.TabStop = false;
+            pmgroupbox.Text = "Zakresy prawdopodobieństwa mutacji";
             // 
             // pmbsizeLabel
             // 
-            this.pmbsizeLabel.AutoSize = true;
-            this.pmbsizeLabel.Location = new System.Drawing.Point(349, 24);
-            this.pmbsizeLabel.Name = "pmbsizeLabel";
-            this.pmbsizeLabel.Size = new System.Drawing.Size(52, 15);
-            this.pmbsizeLabel.TabIndex = 28;
-            this.pmbsizeLabel.Text = "Pm_step";
+            pmbsizeLabel.AutoSize = true;
+            pmbsizeLabel.Location = new Point(349, 24);
+            pmbsizeLabel.Name = "pmbsizeLabel";
+            pmbsizeLabel.Size = new Size(52, 15);
+            pmbsizeLabel.TabIndex = 28;
+            pmbsizeLabel.Text = "Pm_step";
             // 
             // PmstepInput
             // 
-            this.PmstepInput.AccessibleDescription = "PmstepInput";
-            this.PmstepInput.DecimalPlaces = 4;
-            this.PmstepInput.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            262144});
-            this.PmstepInput.Location = new System.Drawing.Point(402, 22);
-            this.PmstepInput.Maximum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.PmstepInput.Name = "PmstepInput";
-            this.PmstepInput.Size = new System.Drawing.Size(120, 23);
-            this.PmstepInput.TabIndex = 27;
+            PmstepInput.AccessibleDescription = "PmstepInput";
+            PmstepInput.DecimalPlaces = 4;
+            PmstepInput.Increment = new decimal(new int[] { 1, 0, 0, 262144 });
+            PmstepInput.Location = new Point(402, 22);
+            PmstepInput.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            PmstepInput.Name = "PmstepInput";
+            PmstepInput.Size = new Size(120, 23);
+            PmstepInput.TabIndex = 27;
+            PmstepInput.Value = new decimal(new int[] { 10, 0, 0, 262144 });
             // 
             // pmblabel
             // 
-            this.pmblabel.AutoSize = true;
-            this.pmblabel.Location = new System.Drawing.Point(174, 26);
-            this.pmblabel.Name = "pmblabel";
-            this.pmblabel.Size = new System.Drawing.Size(44, 15);
-            this.pmblabel.TabIndex = 26;
-            this.pmblabel.Text = "Pmb_b";
+            pmblabel.AutoSize = true;
+            pmblabel.Location = new Point(174, 26);
+            pmblabel.Name = "pmblabel";
+            pmblabel.Size = new Size(44, 15);
+            pmblabel.TabIndex = 26;
+            pmblabel.Text = "Pmb_b";
             // 
             // PmbInput
             // 
-            this.PmbInput.AccessibleDescription = "PmbInput";
-            this.PmbInput.DecimalPlaces = 4;
-            this.PmbInput.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            262144});
-            this.PmbInput.Location = new System.Drawing.Point(224, 22);
-            this.PmbInput.Maximum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.PmbInput.Name = "PmbInput";
-            this.PmbInput.Size = new System.Drawing.Size(120, 23);
-            this.PmbInput.TabIndex = 25;
+            PmbInput.AccessibleDescription = "PmbInput";
+            PmbInput.DecimalPlaces = 4;
+            PmbInput.Increment = new decimal(new int[] { 1, 0, 0, 262144 });
+            PmbInput.Location = new Point(224, 22);
+            PmbInput.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            PmbInput.Name = "PmbInput";
+            PmbInput.Size = new Size(120, 23);
+            PmbInput.TabIndex = 25;
+            PmbInput.Value = new decimal(new int[] { 60, 0, 0, 262144 });
             // 
             // PmaLabel
             // 
-            this.PmaLabel.AutoSize = true;
-            this.PmaLabel.Location = new System.Drawing.Point(7, 26);
-            this.PmaLabel.Name = "PmaLabel";
-            this.PmaLabel.Size = new System.Drawing.Size(36, 15);
-            this.PmaLabel.TabIndex = 24;
-            this.PmaLabel.Text = "Pm_a";
+            PmaLabel.AutoSize = true;
+            PmaLabel.Location = new Point(7, 26);
+            PmaLabel.Name = "PmaLabel";
+            PmaLabel.Size = new Size(36, 15);
+            PmaLabel.TabIndex = 24;
+            PmaLabel.Text = "Pm_a";
             // 
             // pmaInput
             // 
-            this.pmaInput.AccessibleDescription = "pmaInput";
-            this.pmaInput.DecimalPlaces = 4;
-            this.pmaInput.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            262144});
-            this.pmaInput.Location = new System.Drawing.Point(48, 22);
-            this.pmaInput.Maximum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.pmaInput.Name = "pmaInput";
-            this.pmaInput.Size = new System.Drawing.Size(120, 23);
-            this.pmaInput.TabIndex = 23;
+            pmaInput.AccessibleDescription = "pmaInput";
+            pmaInput.DecimalPlaces = 4;
+            pmaInput.Increment = new decimal(new int[] { 1, 0, 0, 262144 });
+            pmaInput.Location = new Point(48, 22);
+            pmaInput.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            pmaInput.Name = "pmaInput";
+            pmaInput.Size = new Size(120, 23);
+            pmaInput.TabIndex = 23;
+            pmaInput.Value = new decimal(new int[] { 40, 0, 0, 262144 });
             // 
             // pkgroupbox
             // 
-            this.pkgroupbox.Controls.Add(this.PkSizeLabel);
-            this.pkgroupbox.Controls.Add(this.PkstepInput);
-            this.pkgroupbox.Controls.Add(this.pkbLabel);
-            this.pkgroupbox.Controls.Add(this.PkbbInput);
-            this.pkgroupbox.Controls.Add(this.pka);
-            this.pkgroupbox.Controls.Add(this.pkaInput);
-            this.pkgroupbox.Location = new System.Drawing.Point(320, 89);
-            this.pkgroupbox.Name = "pkgroupbox";
-            this.pkgroupbox.Size = new System.Drawing.Size(528, 64);
-            this.pkgroupbox.TabIndex = 29;
-            this.pkgroupbox.TabStop = false;
-            this.pkgroupbox.Text = "Zakresy prawdopodobieństwa krzyżowania";
+            pkgroupbox.Controls.Add(PkSizeLabel);
+            pkgroupbox.Controls.Add(PkstepInput);
+            pkgroupbox.Controls.Add(pkbLabel);
+            pkgroupbox.Controls.Add(PkbbInput);
+            pkgroupbox.Controls.Add(pka);
+            pkgroupbox.Controls.Add(pkaInput);
+            pkgroupbox.Location = new Point(320, 89);
+            pkgroupbox.Name = "pkgroupbox";
+            pkgroupbox.Size = new Size(528, 64);
+            pkgroupbox.TabIndex = 29;
+            pkgroupbox.TabStop = false;
+            pkgroupbox.Text = "Zakresy prawdopodobieństwa krzyżowania";
             // 
             // PkSizeLabel
             // 
-            this.PkSizeLabel.AutoSize = true;
-            this.PkSizeLabel.Location = new System.Drawing.Point(352, 26);
-            this.PkSizeLabel.Name = "PkSizeLabel";
-            this.PkSizeLabel.Size = new System.Drawing.Size(47, 15);
-            this.PkSizeLabel.TabIndex = 28;
-            this.PkSizeLabel.Text = "Pk_step";
+            PkSizeLabel.AutoSize = true;
+            PkSizeLabel.Location = new Point(352, 26);
+            PkSizeLabel.Name = "PkSizeLabel";
+            PkSizeLabel.Size = new Size(47, 15);
+            PkSizeLabel.TabIndex = 28;
+            PkSizeLabel.Text = "Pk_step";
             // 
             // PkstepInput
             // 
-            this.PkstepInput.AccessibleDescription = "PkstepInput";
-            this.PkstepInput.DecimalPlaces = 2;
-            this.PkstepInput.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            131072});
-            this.PkstepInput.Location = new System.Drawing.Point(402, 22);
-            this.PkstepInput.Maximum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.PkstepInput.Name = "PkstepInput";
-            this.PkstepInput.Size = new System.Drawing.Size(120, 23);
-            this.PkstepInput.TabIndex = 27;
+            PkstepInput.AccessibleDescription = "PkstepInput";
+            PkstepInput.DecimalPlaces = 2;
+            PkstepInput.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
+            PkstepInput.Location = new Point(402, 22);
+            PkstepInput.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            PkstepInput.Name = "PkstepInput";
+            PkstepInput.Size = new Size(120, 23);
+            PkstepInput.TabIndex = 27;
+            PkstepInput.Value = new decimal(new int[] { 5, 0, 0, 131072 });
             // 
             // pkbLabel
             // 
-            this.pkbLabel.AutoSize = true;
-            this.pkbLabel.Location = new System.Drawing.Point(177, 26);
-            this.pkbLabel.Name = "pkbLabel";
-            this.pkbLabel.Size = new System.Drawing.Size(39, 15);
-            this.pkbLabel.TabIndex = 26;
-            this.pkbLabel.Text = "Pkb_b";
+            pkbLabel.AutoSize = true;
+            pkbLabel.Location = new Point(177, 26);
+            pkbLabel.Name = "pkbLabel";
+            pkbLabel.Size = new Size(39, 15);
+            pkbLabel.TabIndex = 26;
+            pkbLabel.Text = "Pkb_b";
             // 
             // PkbbInput
             // 
-            this.PkbbInput.AccessibleDescription = "PkbbInput";
-            this.PkbbInput.DecimalPlaces = 2;
-            this.PkbbInput.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            131072});
-            this.PkbbInput.Location = new System.Drawing.Point(224, 22);
-            this.PkbbInput.Maximum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.PkbbInput.Name = "PkbbInput";
-            this.PkbbInput.Size = new System.Drawing.Size(120, 23);
-            this.PkbbInput.TabIndex = 25;
+            PkbbInput.AccessibleDescription = "PkbbInput";
+            PkbbInput.DecimalPlaces = 2;
+            PkbbInput.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
+            PkbbInput.Location = new Point(224, 22);
+            PkbbInput.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            PkbbInput.Name = "PkbbInput";
+            PkbbInput.Size = new Size(120, 23);
+            PkbbInput.TabIndex = 25;
+            PkbbInput.Value = new decimal(new int[] { 8, 0, 0, 65536 });
             // 
             // pka
             // 
-            this.pka.AutoSize = true;
-            this.pka.Location = new System.Drawing.Point(10, 26);
-            this.pka.Name = "pka";
-            this.pka.Size = new System.Drawing.Size(31, 15);
-            this.pka.TabIndex = 24;
-            this.pka.Text = "Pk_a";
+            pka.AutoSize = true;
+            pka.Location = new Point(10, 26);
+            pka.Name = "pka";
+            pka.Size = new Size(31, 15);
+            pka.TabIndex = 24;
+            pka.Text = "Pk_a";
             // 
             // pkaInput
             // 
-            this.pkaInput.AccessibleDescription = "pkaInput";
-            this.pkaInput.DecimalPlaces = 2;
-            this.pkaInput.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            131072});
-            this.pkaInput.Location = new System.Drawing.Point(48, 22);
-            this.pkaInput.Maximum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.pkaInput.Name = "pkaInput";
-            this.pkaInput.Size = new System.Drawing.Size(120, 23);
-            this.pkaInput.TabIndex = 23;
+            pkaInput.AccessibleDescription = "pkaInput";
+            pkaInput.DecimalPlaces = 2;
+            pkaInput.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
+            pkaInput.Location = new Point(48, 22);
+            pkaInput.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            pkaInput.Name = "pkaInput";
+            pkaInput.Size = new Size(120, 23);
+            pkaInput.TabIndex = 23;
+            pkaInput.Value = new decimal(new int[] { 7, 0, 0, 65536 });
             // 
             // individiualsCountGroupBox
             // 
-            this.individiualsCountGroupBox.Controls.Add(this.NstepLabel);
-            this.individiualsCountGroupBox.Controls.Add(this.NstepInput);
-            this.individiualsCountGroupBox.Controls.Add(this.NbLabel);
-            this.individiualsCountGroupBox.Controls.Add(this.NbInput);
-            this.individiualsCountGroupBox.Controls.Add(this.NaLabel);
-            this.individiualsCountGroupBox.Controls.Add(this.NaInput);
-            this.individiualsCountGroupBox.Location = new System.Drawing.Point(320, 19);
-            this.individiualsCountGroupBox.Name = "individiualsCountGroupBox";
-            this.individiualsCountGroupBox.Size = new System.Drawing.Size(528, 64);
-            this.individiualsCountGroupBox.TabIndex = 22;
-            this.individiualsCountGroupBox.TabStop = false;
-            this.individiualsCountGroupBox.Text = "Zakresy ilości osobników";
+            individiualsCountGroupBox.Controls.Add(NstepLabel);
+            individiualsCountGroupBox.Controls.Add(NstepInput);
+            individiualsCountGroupBox.Controls.Add(NbLabel);
+            individiualsCountGroupBox.Controls.Add(NbInput);
+            individiualsCountGroupBox.Controls.Add(NaLabel);
+            individiualsCountGroupBox.Controls.Add(NaInput);
+            individiualsCountGroupBox.Location = new Point(320, 19);
+            individiualsCountGroupBox.Name = "individiualsCountGroupBox";
+            individiualsCountGroupBox.Size = new Size(528, 64);
+            individiualsCountGroupBox.TabIndex = 22;
+            individiualsCountGroupBox.TabStop = false;
+            individiualsCountGroupBox.Text = "Zakresy ilości osobników";
             // 
             // NstepLabel
             // 
-            this.NstepLabel.AutoSize = true;
-            this.NstepLabel.Location = new System.Drawing.Point(354, 26);
-            this.NstepLabel.Name = "NstepLabel";
-            this.NstepLabel.Size = new System.Drawing.Size(43, 15);
-            this.NstepLabel.TabIndex = 28;
-            this.NstepLabel.Text = "N_step";
+            NstepLabel.AutoSize = true;
+            NstepLabel.Location = new Point(354, 26);
+            NstepLabel.Name = "NstepLabel";
+            NstepLabel.Size = new Size(43, 15);
+            NstepLabel.TabIndex = 28;
+            NstepLabel.Text = "N_step";
             // 
             // NstepInput
             // 
-            this.NstepInput.AccessibleDescription = "NstepInput";
-            this.NstepInput.Location = new System.Drawing.Point(402, 22);
-            this.NstepInput.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.NstepInput.Name = "NstepInput";
-            this.NstepInput.Size = new System.Drawing.Size(120, 23);
-            this.NstepInput.TabIndex = 27;
+            NstepInput.AccessibleDescription = "NstepInput";
+            NstepInput.Location = new Point(402, 22);
+            NstepInput.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
+            NstepInput.Name = "NstepInput";
+            NstepInput.Size = new Size(120, 23);
+            NstepInput.TabIndex = 27;
+            NstepInput.Value = new decimal(new int[] { 100, 0, 0, 0 });
             // 
             // NbLabel
             // 
-            this.NbLabel.AutoSize = true;
-            this.NbLabel.Location = new System.Drawing.Point(182, 26);
-            this.NbLabel.Name = "NbLabel";
-            this.NbLabel.Size = new System.Drawing.Size(28, 15);
-            this.NbLabel.TabIndex = 26;
-            this.NbLabel.Text = "N_b";
+            NbLabel.AutoSize = true;
+            NbLabel.Location = new Point(182, 26);
+            NbLabel.Name = "NbLabel";
+            NbLabel.Size = new Size(28, 15);
+            NbLabel.TabIndex = 26;
+            NbLabel.Text = "N_b";
             // 
             // NbInput
             // 
-            this.NbInput.AccessibleDescription = "NbInput";
-            this.NbInput.Location = new System.Drawing.Point(224, 22);
-            this.NbInput.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
-            this.NbInput.Name = "NbInput";
-            this.NbInput.Size = new System.Drawing.Size(120, 23);
-            this.NbInput.TabIndex = 25;
+            NbInput.AccessibleDescription = "NbInput";
+            NbInput.Location = new Point(224, 22);
+            NbInput.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
+            NbInput.Name = "NbInput";
+            NbInput.Size = new Size(120, 23);
+            NbInput.TabIndex = 25;
+            NbInput.Value = new decimal(new int[] { 1000, 0, 0, 0 });
             // 
             // NaLabel
             // 
-            this.NaLabel.AutoSize = true;
-            this.NaLabel.Location = new System.Drawing.Point(12, 26);
-            this.NaLabel.Name = "NaLabel";
-            this.NaLabel.Size = new System.Drawing.Size(27, 15);
-            this.NaLabel.TabIndex = 24;
-            this.NaLabel.Text = "N_a";
+            NaLabel.AutoSize = true;
+            NaLabel.Location = new Point(12, 26);
+            NaLabel.Name = "NaLabel";
+            NaLabel.Size = new Size(27, 15);
+            NaLabel.TabIndex = 24;
+            NaLabel.Text = "N_a";
             // 
             // NaInput
             // 
-            this.NaInput.AccessibleDescription = "NaInput";
-            this.NaInput.Location = new System.Drawing.Point(48, 22);
-            this.NaInput.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
-            this.NaInput.Name = "NaInput";
-            this.NaInput.Size = new System.Drawing.Size(120, 23);
-            this.NaInput.TabIndex = 23;
+            NaInput.AccessibleDescription = "NaInput";
+            NaInput.Location = new Point(48, 22);
+            NaInput.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
+            NaInput.Name = "NaInput";
+            NaInput.Size = new Size(120, 23);
+            NaInput.TabIndex = 23;
+            NaInput.Value = new decimal(new int[] { 500, 0, 0, 0 });
             // 
             // testExperimentCountLabel
             // 
-            this.testExperimentCountLabel.AutoSize = true;
-            this.testExperimentCountLabel.Location = new System.Drawing.Point(24, 23);
-            this.testExperimentCountLabel.Name = "testExperimentCountLabel";
-            this.testExperimentCountLabel.Size = new System.Drawing.Size(127, 15);
-            this.testExperimentCountLabel.TabIndex = 21;
-            this.testExperimentCountLabel.Text = "Liczba eksperymentów";
+            testExperimentCountLabel.AutoSize = true;
+            testExperimentCountLabel.Location = new Point(24, 23);
+            testExperimentCountLabel.Name = "testExperimentCountLabel";
+            testExperimentCountLabel.Size = new Size(127, 15);
+            testExperimentCountLabel.TabIndex = 21;
+            testExperimentCountLabel.Text = "Liczba eksperymentów";
             // 
             // testExperimentCount
             // 
-            this.testExperimentCount.Location = new System.Drawing.Point(157, 19);
-            this.testExperimentCount.Name = "testExperimentCount";
-            this.testExperimentCount.Size = new System.Drawing.Size(120, 23);
-            this.testExperimentCount.TabIndex = 20;
+            testExperimentCount.Location = new Point(157, 19);
+            testExperimentCount.Name = "testExperimentCount";
+            testExperimentCount.Size = new Size(120, 23);
+            testExperimentCount.TabIndex = 20;
+            testExperimentCount.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // testyStart
             // 
-            this.testyStart.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.testyStart.Location = new System.Drawing.Point(33, 60);
-            this.testyStart.Name = "testyStart";
-            this.testyStart.Size = new System.Drawing.Size(244, 163);
-            this.testyStart.TabIndex = 19;
-            this.testyStart.Text = "START TESTY";
-            this.testyStart.UseVisualStyleBackColor = false;
-            this.testyStart.Click += new System.EventHandler(this.testyStart_Click);
+            testyStart.BackColor = SystemColors.ActiveCaption;
+            testyStart.Location = new Point(33, 60);
+            testyStart.Name = "testyStart";
+            testyStart.Size = new Size(244, 163);
+            testyStart.TabIndex = 19;
+            testyStart.Text = "START TESTY";
+            testyStart.UseVisualStyleBackColor = false;
+            testyStart.Click += testyStart_Click;
             // 
             // iterationNumberInput
             // 
-            this.iterationNumberInput.Location = new System.Drawing.Point(435, 58);
-            this.iterationNumberInput.Maximum = new decimal(new int[] {
-            1000000,
-            0,
-            0,
-            0});
-            this.iterationNumberInput.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.iterationNumberInput.Name = "iterationNumberInput";
-            this.iterationNumberInput.Size = new System.Drawing.Size(58, 23);
-            this.iterationNumberInput.TabIndex = 18;
-            this.iterationNumberInput.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+            iterationNumberInput.Location = new Point(435, 58);
+            iterationNumberInput.Maximum = new decimal(new int[] { 1000000, 0, 0, 0 });
+            iterationNumberInput.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            iterationNumberInput.Name = "iterationNumberInput";
+            iterationNumberInput.Size = new Size(58, 23);
+            iterationNumberInput.TabIndex = 18;
+            iterationNumberInput.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // iterationNumberLabel
             // 
-            this.iterationNumberLabel.AutoSize = true;
-            this.iterationNumberLabel.Location = new System.Drawing.Point(317, 62);
-            this.iterationNumberLabel.Name = "iterationNumberLabel";
-            this.iterationNumberLabel.Size = new System.Drawing.Size(87, 15);
-            this.iterationNumberLabel.TabIndex = 17;
-            this.iterationNumberLabel.Text = "Ilość iteracji (T)";
+            iterationNumberLabel.AutoSize = true;
+            iterationNumberLabel.Location = new Point(317, 62);
+            iterationNumberLabel.Name = "iterationNumberLabel";
+            iterationNumberLabel.Size = new Size(87, 15);
+            iterationNumberLabel.TabIndex = 17;
+            iterationNumberLabel.Text = "Ilość iteracji (T)";
             // 
             // additioanlDataButton
             // 
-            this.additioanlDataButton.Location = new System.Drawing.Point(499, 27);
-            this.additioanlDataButton.Name = "additioanlDataButton";
-            this.additioanlDataButton.Size = new System.Drawing.Size(94, 81);
-            this.additioanlDataButton.TabIndex = 20;
-            this.additioanlDataButton.Text = "Wybór macierzy referencyjnej";
-            this.additioanlDataButton.UseVisualStyleBackColor = true;
-            this.additioanlDataButton.Click += new System.EventHandler(this.additioanlDataButton_Click);
+            additioanlDataButton.Location = new Point(499, 27);
+            additioanlDataButton.Name = "additioanlDataButton";
+            additioanlDataButton.Size = new Size(94, 81);
+            additioanlDataButton.TabIndex = 20;
+            additioanlDataButton.Text = "Wybór macierzy referencyjnej";
+            additioanlDataButton.UseVisualStyleBackColor = true;
+            additioanlDataButton.Click += additioanlDataButton_Click;
             // 
             // algorithmTypeGroupBox
             // 
-            this.algorithmTypeGroupBox.Controls.Add(this.unsupervisedTypeRadioButton);
-            this.algorithmTypeGroupBox.Controls.Add(this.supervisedTypedRadioButton);
-            this.algorithmTypeGroupBox.Location = new System.Drawing.Point(51, 12);
-            this.algorithmTypeGroupBox.Name = "algorithmTypeGroupBox";
-            this.algorithmTypeGroupBox.Size = new System.Drawing.Size(237, 48);
-            this.algorithmTypeGroupBox.TabIndex = 22;
-            this.algorithmTypeGroupBox.TabStop = false;
-            this.algorithmTypeGroupBox.Text = "Typ algorytmu";
+            algorithmTypeGroupBox.Controls.Add(unsupervisedTypeRadioButton);
+            algorithmTypeGroupBox.Controls.Add(supervisedTypedRadioButton);
+            algorithmTypeGroupBox.Location = new Point(12, 12);
+            algorithmTypeGroupBox.Name = "algorithmTypeGroupBox";
+            algorithmTypeGroupBox.Size = new Size(237, 48);
+            algorithmTypeGroupBox.TabIndex = 22;
+            algorithmTypeGroupBox.TabStop = false;
+            algorithmTypeGroupBox.Text = "Typ algorytmu";
             // 
             // unsupervisedTypeRadioButton
             // 
-            this.unsupervisedTypeRadioButton.AutoSize = true;
-            this.unsupervisedTypeRadioButton.Location = new System.Drawing.Point(113, 19);
-            this.unsupervisedTypeRadioButton.Name = "unsupervisedTypeRadioButton";
-            this.unsupervisedTypeRadioButton.Size = new System.Drawing.Size(112, 19);
-            this.unsupervisedTypeRadioButton.TabIndex = 1;
-            this.unsupervisedTypeRadioButton.TabStop = true;
-            this.unsupervisedTypeRadioButton.Text = "nienadzorowany";
-            this.unsupervisedTypeRadioButton.UseVisualStyleBackColor = true;
-            this.unsupervisedTypeRadioButton.CheckedChanged += new System.EventHandler(this.unsupervisedTypeRadioButton_CheckedChanged);
+            unsupervisedTypeRadioButton.AutoSize = true;
+            unsupervisedTypeRadioButton.Location = new Point(113, 19);
+            unsupervisedTypeRadioButton.Name = "unsupervisedTypeRadioButton";
+            unsupervisedTypeRadioButton.Size = new Size(112, 19);
+            unsupervisedTypeRadioButton.TabIndex = 1;
+            unsupervisedTypeRadioButton.TabStop = true;
+            unsupervisedTypeRadioButton.Text = "nienadzorowany";
+            unsupervisedTypeRadioButton.UseVisualStyleBackColor = true;
+            unsupervisedTypeRadioButton.CheckedChanged += unsupervisedTypeRadioButton_CheckedChanged;
             // 
             // supervisedTypedRadioButton
             // 
-            this.supervisedTypedRadioButton.AutoSize = true;
-            this.supervisedTypedRadioButton.Location = new System.Drawing.Point(11, 19);
-            this.supervisedTypedRadioButton.Name = "supervisedTypedRadioButton";
-            this.supervisedTypedRadioButton.Size = new System.Drawing.Size(96, 19);
-            this.supervisedTypedRadioButton.TabIndex = 0;
-            this.supervisedTypedRadioButton.TabStop = true;
-            this.supervisedTypedRadioButton.Text = "nazdorowany";
-            this.supervisedTypedRadioButton.UseVisualStyleBackColor = true;
-            this.supervisedTypedRadioButton.CheckedChanged += new System.EventHandler(this.supervisedTypedRadioButton_CheckedChanged);
+            supervisedTypedRadioButton.AutoSize = true;
+            supervisedTypedRadioButton.Location = new Point(11, 19);
+            supervisedTypedRadioButton.Name = "supervisedTypedRadioButton";
+            supervisedTypedRadioButton.Size = new Size(96, 19);
+            supervisedTypedRadioButton.TabIndex = 0;
+            supervisedTypedRadioButton.TabStop = true;
+            supervisedTypedRadioButton.Text = "nazdorowany";
+            supervisedTypedRadioButton.UseVisualStyleBackColor = true;
+            supervisedTypedRadioButton.CheckedChanged += supervisedTypedRadioButton_CheckedChanged;
             // 
             // inputDataGroupBox
             // 
-            this.inputDataGroupBox.Controls.Add(this.seed);
-            this.inputDataGroupBox.Controls.Add(this.useSeed);
-            this.inputDataGroupBox.Controls.Add(this.experimentNumberLabel);
-            this.inputDataGroupBox.Controls.Add(this.experimentNumber);
-            this.inputDataGroupBox.Controls.Add(this.matrixSizeLabel);
-            this.inputDataGroupBox.Controls.Add(this.matrixSizeInput);
-            this.inputDataGroupBox.Controls.Add(this.additioanlDataButton);
-            this.inputDataGroupBox.Controls.Add(this.individualNumberLabel);
-            this.inputDataGroupBox.Controls.Add(this.individualNumberInput);
-            this.inputDataGroupBox.Controls.Add(this.iterationNumberInput);
-            this.inputDataGroupBox.Controls.Add(this.precisionInput);
-            this.inputDataGroupBox.Controls.Add(this.iterationNumberLabel);
-            this.inputDataGroupBox.Controls.Add(this.precisionLabel);
-            this.inputDataGroupBox.Controls.Add(this.corssProbabilityLabel);
-            this.inputDataGroupBox.Controls.Add(this.mutationProbabilityInput);
-            this.inputDataGroupBox.Controls.Add(this.crossProbabilityInput);
-            this.inputDataGroupBox.Controls.Add(this.mutationProbabilityLabel);
-            this.inputDataGroupBox.Location = new System.Drawing.Point(51, 79);
-            this.inputDataGroupBox.Name = "inputDataGroupBox";
-            this.inputDataGroupBox.Size = new System.Drawing.Size(783, 126);
-            this.inputDataGroupBox.TabIndex = 23;
-            this.inputDataGroupBox.TabStop = false;
-            this.inputDataGroupBox.Text = "Dane wejściowe";
+            inputDataGroupBox.Controls.Add(seed);
+            inputDataGroupBox.Controls.Add(useSeed);
+            inputDataGroupBox.Controls.Add(experimentNumberLabel);
+            inputDataGroupBox.Controls.Add(experimentNumber);
+            inputDataGroupBox.Controls.Add(matrixSizeLabel);
+            inputDataGroupBox.Controls.Add(matrixSizeInput);
+            inputDataGroupBox.Controls.Add(additioanlDataButton);
+            inputDataGroupBox.Controls.Add(individualNumberLabel);
+            inputDataGroupBox.Controls.Add(individualNumberInput);
+            inputDataGroupBox.Controls.Add(iterationNumberInput);
+            inputDataGroupBox.Controls.Add(precisionInput);
+            inputDataGroupBox.Controls.Add(iterationNumberLabel);
+            inputDataGroupBox.Controls.Add(precisionLabel);
+            inputDataGroupBox.Controls.Add(corssProbabilityLabel);
+            inputDataGroupBox.Controls.Add(mutationProbabilityInput);
+            inputDataGroupBox.Controls.Add(crossProbabilityInput);
+            inputDataGroupBox.Controls.Add(mutationProbabilityLabel);
+            inputDataGroupBox.Location = new Point(12, 79);
+            inputDataGroupBox.Name = "inputDataGroupBox";
+            inputDataGroupBox.Size = new Size(783, 153);
+            inputDataGroupBox.TabIndex = 23;
+            inputDataGroupBox.TabStop = false;
+            inputDataGroupBox.Text = "Dane wejściowe";
             // 
             // seed
             // 
-            this.seed.Location = new System.Drawing.Point(604, 83);
-            this.seed.Name = "seed";
-            this.seed.Size = new System.Drawing.Size(171, 23);
-            this.seed.TabIndex = 26;
+            seed.Location = new Point(604, 83);
+            seed.Name = "seed";
+            seed.Size = new Size(171, 23);
+            seed.TabIndex = 26;
             // 
             // useSeed
             // 
-            this.useSeed.AutoSize = true;
-            this.useSeed.Location = new System.Drawing.Point(604, 60);
-            this.useSeed.Name = "useSeed";
-            this.useSeed.Size = new System.Drawing.Size(82, 19);
-            this.useSeed.TabIndex = 25;
-            this.useSeed.Text = "Użyj ziarna";
-            this.useSeed.UseVisualStyleBackColor = true;
-            this.useSeed.CheckedChanged += new System.EventHandler(this.useSeed_CheckedChanged);
+            useSeed.AutoSize = true;
+            useSeed.Location = new Point(604, 60);
+            useSeed.Name = "useSeed";
+            useSeed.Size = new Size(82, 19);
+            useSeed.TabIndex = 25;
+            useSeed.Text = "Użyj ziarna";
+            useSeed.UseVisualStyleBackColor = true;
+            useSeed.CheckedChanged += useSeed_CheckedChanged;
             // 
             // experimentNumberLabel
             // 
-            this.experimentNumberLabel.AutoSize = true;
-            this.experimentNumberLabel.Location = new System.Drawing.Point(599, 33);
-            this.experimentNumberLabel.Name = "experimentNumberLabel";
-            this.experimentNumberLabel.Size = new System.Drawing.Size(118, 15);
-            this.experimentNumberLabel.TabIndex = 21;
-            this.experimentNumberLabel.Text = "Ilość eksperymentów";
+            experimentNumberLabel.AutoSize = true;
+            experimentNumberLabel.Location = new Point(599, 33);
+            experimentNumberLabel.Name = "experimentNumberLabel";
+            experimentNumberLabel.Size = new Size(118, 15);
+            experimentNumberLabel.TabIndex = 21;
+            experimentNumberLabel.Text = "Ilość eksperymentów";
             // 
             // experimentNumber
             // 
-            this.experimentNumber.Location = new System.Drawing.Point(717, 29);
-            this.experimentNumber.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
-            this.experimentNumber.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.experimentNumber.Name = "experimentNumber";
-            this.experimentNumber.Size = new System.Drawing.Size(58, 23);
-            this.experimentNumber.TabIndex = 22;
-            this.experimentNumber.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+            experimentNumber.Location = new Point(717, 29);
+            experimentNumber.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
+            experimentNumber.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            experimentNumber.Name = "experimentNumber";
+            experimentNumber.Size = new Size(58, 23);
+            experimentNumber.TabIndex = 22;
+            experimentNumber.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // runProgressBar
             // 
-            this.runProgressBar.Location = new System.Drawing.Point(1220, 27);
-            this.runProgressBar.Name = "runProgressBar";
-            this.runProgressBar.Size = new System.Drawing.Size(210, 23);
-            this.runProgressBar.TabIndex = 24;
+            runProgressBar.Location = new Point(1181, 27);
+            runProgressBar.Name = "runProgressBar";
+            runProgressBar.Size = new Size(210, 23);
+            runProgressBar.TabIndex = 24;
             // 
             // GAmodification
             // 
-            this.GAmodification.Controls.Add(this.modifiedGARadio);
-            this.GAmodification.Controls.Add(this.classicalGARadio);
-            this.GAmodification.Location = new System.Drawing.Point(840, 79);
-            this.GAmodification.Name = "GAmodification";
-            this.GAmodification.Size = new System.Drawing.Size(138, 126);
-            this.GAmodification.TabIndex = 23;
-            this.GAmodification.TabStop = false;
-            this.GAmodification.Text = "Opcje algorytmu";
+            GAmodification.Controls.Add(modifiedGARadio);
+            GAmodification.Controls.Add(classicalGARadio);
+            GAmodification.Location = new Point(801, 79);
+            GAmodification.Name = "GAmodification";
+            GAmodification.Size = new Size(138, 153);
+            GAmodification.TabIndex = 23;
+            GAmodification.TabStop = false;
+            GAmodification.Text = "Opcje algorytmu";
             // 
             // modifiedGARadio
             // 
-            this.modifiedGARadio.AutoSize = true;
-            this.modifiedGARadio.Location = new System.Drawing.Point(6, 47);
-            this.modifiedGARadio.Name = "modifiedGARadio";
-            this.modifiedGARadio.Size = new System.Drawing.Size(130, 19);
-            this.modifiedGARadio.TabIndex = 1;
-            this.modifiedGARadio.TabStop = true;
-            this.modifiedGARadio.Text = "Zmodyfikowany GA";
-            this.modifiedGARadio.UseVisualStyleBackColor = true;
-            this.modifiedGARadio.CheckedChanged += new System.EventHandler(this.modifiedGARadio_CheckedChanged);
+            modifiedGARadio.AutoSize = true;
+            modifiedGARadio.Location = new Point(6, 47);
+            modifiedGARadio.Name = "modifiedGARadio";
+            modifiedGARadio.Size = new Size(130, 19);
+            modifiedGARadio.TabIndex = 1;
+            modifiedGARadio.TabStop = true;
+            modifiedGARadio.Text = "Zmodyfikowany GA";
+            modifiedGARadio.UseVisualStyleBackColor = true;
+            modifiedGARadio.CheckedChanged += modifiedGARadio_CheckedChanged;
             // 
             // classicalGARadio
             // 
-            this.classicalGARadio.AutoSize = true;
-            this.classicalGARadio.Location = new System.Drawing.Point(6, 22);
-            this.classicalGARadio.Name = "classicalGARadio";
-            this.classicalGARadio.Size = new System.Drawing.Size(95, 19);
-            this.classicalGARadio.TabIndex = 0;
-            this.classicalGARadio.TabStop = true;
-            this.classicalGARadio.Text = "Klasyczny GA";
-            this.classicalGARadio.UseVisualStyleBackColor = true;
-            this.classicalGARadio.CheckedChanged += new System.EventHandler(this.classicalGA_CheckedChanged);
+            classicalGARadio.AutoSize = true;
+            classicalGARadio.Location = new Point(6, 22);
+            classicalGARadio.Name = "classicalGARadio";
+            classicalGARadio.Size = new Size(95, 19);
+            classicalGARadio.TabIndex = 0;
+            classicalGARadio.TabStop = true;
+            classicalGARadio.Text = "Klasyczny GA";
+            classicalGARadio.UseVisualStyleBackColor = true;
+            classicalGARadio.CheckedChanged += classicalGA_CheckedChanged;
             // 
             // selectionGroup
             // 
-            this.selectionGroup.Controls.Add(this.tournamentRadio);
-            this.selectionGroup.Controls.Add(this.ruletteRadio);
-            this.selectionGroup.Location = new System.Drawing.Point(984, 79);
-            this.selectionGroup.Name = "selectionGroup";
-            this.selectionGroup.Size = new System.Drawing.Size(80, 126);
-            this.selectionGroup.TabIndex = 2;
-            this.selectionGroup.TabStop = false;
-            this.selectionGroup.Text = "Selekcja";
+            selectionGroup.Controls.Add(tournamentTresholdLabel);
+            selectionGroup.Controls.Add(tournamentTresholdInput);
+            selectionGroup.Controls.Add(torunamentSizeLabel);
+            selectionGroup.Controls.Add(tournamentSizeInput);
+            selectionGroup.Controls.Add(tournamentSoftRadio);
+            selectionGroup.Controls.Add(tournamentHardRadio);
+            selectionGroup.Controls.Add(ruletteRadio);
+            selectionGroup.Location = new Point(945, 79);
+            selectionGroup.Name = "selectionGroup";
+            selectionGroup.Size = new Size(205, 153);
+            selectionGroup.TabIndex = 2;
+            selectionGroup.TabStop = false;
+            selectionGroup.Text = "Selekcja";
             // 
-            // tournamentRadio
+            // tournamentTresholdLabel
             // 
-            this.tournamentRadio.AutoSize = true;
-            this.tournamentRadio.Location = new System.Drawing.Point(7, 47);
-            this.tournamentRadio.Name = "tournamentRadio";
-            this.tournamentRadio.Size = new System.Drawing.Size(59, 19);
-            this.tournamentRadio.TabIndex = 1;
-            this.tournamentRadio.TabStop = true;
-            this.tournamentRadio.Text = "turniej";
-            this.tournamentRadio.UseVisualStyleBackColor = true;
-            this.tournamentRadio.CheckedChanged += new System.EventHandler(this.tournamentRadio_CheckedChanged);
+            tournamentTresholdLabel.AutoSize = true;
+            tournamentTresholdLabel.Location = new Point(7, 125);
+            tournamentTresholdLabel.Name = "tournamentTresholdLabel";
+            tournamentTresholdLabel.Size = new Size(73, 15);
+            tournamentTresholdLabel.TabIndex = 28;
+            tournamentTresholdLabel.Text = "Próg selekcji";
+            // 
+            // tournamentTresholdInput
+            // 
+            tournamentTresholdInput.DecimalPlaces = 2;
+            tournamentTresholdInput.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
+            tournamentTresholdInput.Location = new Point(116, 121);
+            tournamentTresholdInput.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            tournamentTresholdInput.Name = "tournamentTresholdInput";
+            tournamentTresholdInput.Size = new Size(70, 23);
+            tournamentTresholdInput.TabIndex = 29;
+            tournamentTresholdInput.Value = new decimal(new int[] { 75, 0, 0, 131072 });
+            // 
+            // torunamentSizeLabel
+            // 
+            torunamentSizeLabel.AutoSize = true;
+            torunamentSizeLabel.Location = new Point(7, 96);
+            torunamentSizeLabel.Name = "torunamentSizeLabel";
+            torunamentSizeLabel.Size = new Size(94, 15);
+            torunamentSizeLabel.TabIndex = 27;
+            torunamentSizeLabel.Text = "Rozmiar turnieju";
+            // 
+            // tournamentSizeInput
+            // 
+            tournamentSizeInput.Location = new Point(116, 92);
+            tournamentSizeInput.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
+            tournamentSizeInput.Name = "tournamentSizeInput";
+            tournamentSizeInput.Size = new Size(70, 23);
+            tournamentSizeInput.TabIndex = 27;
+            tournamentSizeInput.Value = new decimal(new int[] { 3, 0, 0, 0 });
+            // 
+            // tournamentSoftRadio
+            // 
+            tournamentSoftRadio.AutoSize = true;
+            tournamentSoftRadio.Location = new Point(7, 72);
+            tournamentSoftRadio.Name = "tournamentSoftRadio";
+            tournamentSoftRadio.Size = new Size(97, 19);
+            tournamentSoftRadio.TabIndex = 2;
+            tournamentSoftRadio.TabStop = true;
+            tournamentSoftRadio.Text = "turniej miekki";
+            tournamentSoftRadio.UseVisualStyleBackColor = true;
+            tournamentSoftRadio.CheckedChanged += tournamentSoftRadio_CheckedChanged;
+            // 
+            // tournamentHardRadio
+            // 
+            tournamentHardRadio.AutoSize = true;
+            tournamentHardRadio.Location = new Point(7, 47);
+            tournamentHardRadio.Name = "tournamentHardRadio";
+            tournamentHardRadio.Size = new Size(98, 19);
+            tournamentHardRadio.TabIndex = 1;
+            tournamentHardRadio.TabStop = true;
+            tournamentHardRadio.Text = "turniej twardy";
+            tournamentHardRadio.UseVisualStyleBackColor = true;
+            tournamentHardRadio.CheckedChanged += tournamentHardRadio_CheckedChanged;
             // 
             // ruletteRadio
             // 
-            this.ruletteRadio.AutoSize = true;
-            this.ruletteRadio.Location = new System.Drawing.Point(7, 22);
-            this.ruletteRadio.Name = "ruletteRadio";
-            this.ruletteRadio.Size = new System.Drawing.Size(61, 19);
-            this.ruletteRadio.TabIndex = 0;
-            this.ruletteRadio.TabStop = true;
-            this.ruletteRadio.Text = "ruletka";
-            this.ruletteRadio.UseVisualStyleBackColor = true;
-            this.ruletteRadio.CheckedChanged += new System.EventHandler(this.ruletteRadio_CheckedChanged);
+            ruletteRadio.AutoSize = true;
+            ruletteRadio.Location = new Point(7, 22);
+            ruletteRadio.Name = "ruletteRadio";
+            ruletteRadio.Size = new Size(61, 19);
+            ruletteRadio.TabIndex = 0;
+            ruletteRadio.TabStop = true;
+            ruletteRadio.Text = "ruletka";
+            ruletteRadio.UseVisualStyleBackColor = true;
+            ruletteRadio.CheckedChanged += ruletteRadio_CheckedChanged;
             // 
             // crossGroup
             // 
-            this.crossGroup.Controls.Add(this.crossPoints);
-            this.crossGroup.Controls.Add(this.multiPointRadio);
-            this.crossGroup.Controls.Add(this.singlePointRadio);
-            this.crossGroup.Location = new System.Drawing.Point(1070, 79);
-            this.crossGroup.Name = "crossGroup";
-            this.crossGroup.Size = new System.Drawing.Size(110, 126);
-            this.crossGroup.TabIndex = 3;
-            this.crossGroup.TabStop = false;
-            this.crossGroup.Text = "Krzyżowanie";
+            crossGroup.Controls.Add(crossPoints);
+            crossGroup.Controls.Add(multiPointRadio);
+            crossGroup.Controls.Add(singlePointRadio);
+            crossGroup.Location = new Point(1156, 79);
+            crossGroup.Name = "crossGroup";
+            crossGroup.Size = new Size(110, 153);
+            crossGroup.TabIndex = 3;
+            crossGroup.TabStop = false;
+            crossGroup.Text = "Krzyżowanie";
             // 
             // crossPoints
             // 
-            this.crossPoints.Location = new System.Drawing.Point(25, 72);
-            this.crossPoints.Maximum = new decimal(new int[] {
-            1000000,
-            0,
-            0,
-            0});
-            this.crossPoints.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.crossPoints.Name = "crossPoints";
-            this.crossPoints.Size = new System.Drawing.Size(51, 23);
-            this.crossPoints.TabIndex = 23;
-            this.crossPoints.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+            crossPoints.Location = new Point(25, 72);
+            crossPoints.Maximum = new decimal(new int[] { 1000000, 0, 0, 0 });
+            crossPoints.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            crossPoints.Name = "crossPoints";
+            crossPoints.Size = new Size(51, 23);
+            crossPoints.TabIndex = 23;
+            crossPoints.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // multiPointRadio
             // 
-            this.multiPointRadio.AutoSize = true;
-            this.multiPointRadio.Location = new System.Drawing.Point(7, 47);
-            this.multiPointRadio.Name = "multiPointRadio";
-            this.multiPointRadio.Size = new System.Drawing.Size(90, 19);
-            this.multiPointRadio.TabIndex = 1;
-            this.multiPointRadio.TabStop = true;
-            this.multiPointRadio.Text = "n-punktowe";
-            this.multiPointRadio.UseVisualStyleBackColor = true;
-            this.multiPointRadio.CheckedChanged += new System.EventHandler(this.multiPointRadio_CheckedChanged);
+            multiPointRadio.AutoSize = true;
+            multiPointRadio.Location = new Point(7, 47);
+            multiPointRadio.Name = "multiPointRadio";
+            multiPointRadio.Size = new Size(90, 19);
+            multiPointRadio.TabIndex = 1;
+            multiPointRadio.TabStop = true;
+            multiPointRadio.Text = "n-punktowe";
+            multiPointRadio.UseVisualStyleBackColor = true;
+            multiPointRadio.CheckedChanged += multiPointRadio_CheckedChanged;
             // 
             // singlePointRadio
             // 
-            this.singlePointRadio.AutoSize = true;
-            this.singlePointRadio.Location = new System.Drawing.Point(7, 22);
-            this.singlePointRadio.Name = "singlePointRadio";
-            this.singlePointRadio.Size = new System.Drawing.Size(89, 19);
-            this.singlePointRadio.TabIndex = 0;
-            this.singlePointRadio.TabStop = true;
-            this.singlePointRadio.Text = "1-punktowe";
-            this.singlePointRadio.UseVisualStyleBackColor = true;
-            this.singlePointRadio.CheckedChanged += new System.EventHandler(this.singlePointRadio_CheckedChanged);
+            singlePointRadio.AutoSize = true;
+            singlePointRadio.Location = new Point(7, 22);
+            singlePointRadio.Name = "singlePointRadio";
+            singlePointRadio.Size = new Size(89, 19);
+            singlePointRadio.TabIndex = 0;
+            singlePointRadio.TabStop = true;
+            singlePointRadio.Text = "1-punktowe";
+            singlePointRadio.UseVisualStyleBackColor = true;
+            singlePointRadio.CheckedChanged += singlePointRadio_CheckedChanged;
             // 
             // mutationGroup
             // 
-            this.mutationGroup.Controls.Add(this.bitSwapingRadio);
-            this.mutationGroup.Controls.Add(this.evenlyRadio);
-            this.mutationGroup.Location = new System.Drawing.Point(1186, 79);
-            this.mutationGroup.Name = "mutationGroup";
-            this.mutationGroup.Size = new System.Drawing.Size(123, 126);
-            this.mutationGroup.TabIndex = 3;
-            this.mutationGroup.TabStop = false;
-            this.mutationGroup.Text = "Mutacja";
+            mutationGroup.Controls.Add(randomMutationInput);
+            mutationGroup.Controls.Add(smashingRadio);
+            mutationGroup.Controls.Add(bitSwapingRadio);
+            mutationGroup.Controls.Add(evenlyRadio);
+            mutationGroup.Location = new Point(1272, 79);
+            mutationGroup.Name = "mutationGroup";
+            mutationGroup.Size = new Size(147, 153);
+            mutationGroup.TabIndex = 3;
+            mutationGroup.TabStop = false;
+            mutationGroup.Text = "Mutacja";
+            // 
+            // randomMutationInput
+            // 
+            randomMutationInput.AutoSize = true;
+            randomMutationInput.Location = new Point(7, 97);
+            randomMutationInput.Name = "randomMutationInput";
+            randomMutationInput.Size = new Size(131, 19);
+            randomMutationInput.TabIndex = 3;
+            randomMutationInput.TabStop = true;
+            randomMutationInput.Text = "losowe wspolrzedne";
+            randomMutationInput.UseVisualStyleBackColor = true;
+            randomMutationInput.CheckedChanged += randomMutationInput_CheckedChanged;
+            // 
+            // smashingRadio
+            // 
+            smashingRadio.AutoSize = true;
+            smashingRadio.Location = new Point(7, 72);
+            smashingRadio.Name = "smashingRadio";
+            smashingRadio.Size = new Size(101, 19);
+            smashingRadio.TabIndex = 2;
+            smashingRadio.TabStop = true;
+            smashingRadio.Text = "rozbijąca bloki";
+            smashingRadio.UseVisualStyleBackColor = true;
+            smashingRadio.CheckedChanged += smashingRadio_CheckedChanged;
             // 
             // bitSwapingRadio
             // 
-            this.bitSwapingRadio.AutoSize = true;
-            this.bitSwapingRadio.Location = new System.Drawing.Point(7, 47);
-            this.bitSwapingRadio.Name = "bitSwapingRadio";
-            this.bitSwapingRadio.Size = new System.Drawing.Size(110, 19);
-            this.bitSwapingRadio.TabIndex = 1;
-            this.bitSwapingRadio.TabStop = true;
-            this.bitSwapingRadio.Text = "zmieniająca bity";
-            this.bitSwapingRadio.UseVisualStyleBackColor = true;
-            this.bitSwapingRadio.CheckedChanged += new System.EventHandler(this.bitSwapingRadio_CheckedChanged);
+            bitSwapingRadio.AutoSize = true;
+            bitSwapingRadio.Location = new Point(7, 47);
+            bitSwapingRadio.Name = "bitSwapingRadio";
+            bitSwapingRadio.Size = new Size(110, 19);
+            bitSwapingRadio.TabIndex = 1;
+            bitSwapingRadio.TabStop = true;
+            bitSwapingRadio.Text = "zmieniająca bity";
+            bitSwapingRadio.UseVisualStyleBackColor = true;
+            bitSwapingRadio.CheckedChanged += bitSwapingRadio_CheckedChanged;
             // 
             // evenlyRadio
             // 
-            this.evenlyRadio.AutoSize = true;
-            this.evenlyRadio.Location = new System.Drawing.Point(7, 22);
-            this.evenlyRadio.Name = "evenlyRadio";
-            this.evenlyRadio.Size = new System.Drawing.Size(96, 19);
-            this.evenlyRadio.TabIndex = 0;
-            this.evenlyRadio.TabStop = true;
-            this.evenlyRadio.Text = "równomierna";
-            this.evenlyRadio.UseVisualStyleBackColor = true;
-            this.evenlyRadio.CheckedChanged += new System.EventHandler(this.evenlyRadio_CheckedChanged);
+            evenlyRadio.AutoSize = true;
+            evenlyRadio.Location = new Point(7, 22);
+            evenlyRadio.Name = "evenlyRadio";
+            evenlyRadio.Size = new Size(96, 19);
+            evenlyRadio.TabIndex = 0;
+            evenlyRadio.TabStop = true;
+            evenlyRadio.Text = "równomierna";
+            evenlyRadio.UseVisualStyleBackColor = true;
+            evenlyRadio.CheckedChanged += evenlyRadio_CheckedChanged;
             // 
             // probGen1Group
             // 
-            this.probGen1Group.Controls.Add(this.propGen1);
-            this.probGen1Group.Location = new System.Drawing.Point(324, 12);
-            this.probGen1Group.Name = "probGen1Group";
-            this.probGen1Group.Size = new System.Drawing.Size(88, 48);
-            this.probGen1Group.TabIndex = 23;
-            this.probGen1Group.TabStop = false;
-            this.probGen1Group.Text = "prob_gen_1";
+            probGen1Group.Controls.Add(propGen1);
+            probGen1Group.Location = new Point(285, 12);
+            probGen1Group.Name = "probGen1Group";
+            probGen1Group.Size = new Size(88, 48);
+            probGen1Group.TabIndex = 23;
+            probGen1Group.TabStop = false;
+            probGen1Group.Text = "prob_gen_1";
             // 
             // propGen1
             // 
-            this.propGen1.DecimalPlaces = 2;
-            this.propGen1.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            131072});
-            this.propGen1.Location = new System.Drawing.Point(6, 18);
-            this.propGen1.Maximum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.propGen1.Name = "propGen1";
-            this.propGen1.Size = new System.Drawing.Size(70, 23);
-            this.propGen1.TabIndex = 14;
-            this.propGen1.Value = new decimal(new int[] {
-            5,
-            0,
-            0,
-            65536});
+            propGen1.DecimalPlaces = 2;
+            propGen1.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
+            propGen1.Location = new Point(6, 18);
+            propGen1.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            propGen1.Name = "propGen1";
+            propGen1.Size = new Size(70, 23);
+            propGen1.TabIndex = 14;
+            propGen1.Value = new decimal(new int[] { 5, 0, 0, 65536 });
+            // 
+            // historyViewButton
+            // 
+            historyViewButton.BackColor = SystemColors.ActiveCaption;
+            historyViewButton.Location = new Point(1053, 12);
+            historyViewButton.Name = "historyViewButton";
+            historyViewButton.Size = new Size(122, 29);
+            historyViewButton.TabIndex = 25;
+            historyViewButton.Text = "Podgląd historii";
+            historyViewButton.UseVisualStyleBackColor = false;
+            historyViewButton.Click += historyViewButton_Click;
+            // 
+            // crossProb
+            // 
+            crossProb.AutoSize = true;
+            crossProb.Location = new Point(33, 272);
+            crossProb.Name = "crossProb";
+            crossProb.Size = new Size(190, 15);
+            crossProb.TabIndex = 33;
+            crossProb.Text = "Prawdopodobieństwo krzyżowania";
+            // 
+            // individualCount
+            // 
+            individualCount.AutoSize = true;
+            individualCount.Location = new Point(33, 255);
+            individualCount.Name = "individualCount";
+            individualCount.Size = new Size(92, 15);
+            individualCount.TabIndex = 34;
+            individualCount.Text = "Ilość osobników";
+            // 
+            // mutationProb
+            // 
+            mutationProb.AutoSize = true;
+            mutationProb.Location = new Point(33, 289);
+            mutationProb.Name = "mutationProb";
+            mutationProb.Size = new Size(159, 15);
+            mutationProb.TabIndex = 35;
+            mutationProb.Text = "Prawdopodbieństwo mutacji";
+            // 
+            // iterationCount
+            // 
+            iterationCount.AutoSize = true;
+            iterationCount.Location = new Point(33, 306);
+            iterationCount.Name = "iterationCount";
+            iterationCount.Size = new Size(69, 15);
+            iterationCount.TabIndex = 36;
+            iterationCount.Text = "Ilość iteracji";
             // 
             // MainWindow
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1464, 1094);
-            this.Controls.Add(this.probGen1Group);
-            this.Controls.Add(this.mutationGroup);
-            this.Controls.Add(this.crossGroup);
-            this.Controls.Add(this.selectionGroup);
-            this.Controls.Add(this.GAmodification);
-            this.Controls.Add(this.runProgressBar);
-            this.Controls.Add(this.inputDataGroupBox);
-            this.Controls.Add(this.algorithmTypeGroupBox);
-            this.Controls.Add(this.tabs);
-            this.Controls.Add(this.startButton);
-            this.Name = "MainWindow";
-            this.Text = "Lab 2";
-            this.Load += new System.EventHandler(this.Form1_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.matrixSizeInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.individualNumberInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.crossProbabilityInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.mutationProbabilityInput)).EndInit();
-            this.tabs.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.osobniki)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.display)).EndInit();
-            this.tabPage2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
-            this.tabPage3.ResumeLayout(false);
-            this.tabPage3.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.TstepInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.TbInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.TaInput)).EndInit();
-            this.pmgroupbox.ResumeLayout(false);
-            this.pmgroupbox.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.PmstepInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PmbInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pmaInput)).EndInit();
-            this.pkgroupbox.ResumeLayout(false);
-            this.pkgroupbox.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.PkstepInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PkbbInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pkaInput)).EndInit();
-            this.individiualsCountGroupBox.ResumeLayout(false);
-            this.individiualsCountGroupBox.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.NstepInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.NbInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.NaInput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.testExperimentCount)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.iterationNumberInput)).EndInit();
-            this.algorithmTypeGroupBox.ResumeLayout(false);
-            this.algorithmTypeGroupBox.PerformLayout();
-            this.inputDataGroupBox.ResumeLayout(false);
-            this.inputDataGroupBox.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.experimentNumber)).EndInit();
-            this.GAmodification.ResumeLayout(false);
-            this.GAmodification.PerformLayout();
-            this.selectionGroup.ResumeLayout(false);
-            this.selectionGroup.PerformLayout();
-            this.crossGroup.ResumeLayout(false);
-            this.crossGroup.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.crossPoints)).EndInit();
-            this.mutationGroup.ResumeLayout(false);
-            this.mutationGroup.PerformLayout();
-            this.probGen1Group.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.propGen1)).EndInit();
-            this.ResumeLayout(false);
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(1460, 1094);
+            Controls.Add(historyViewButton);
+            Controls.Add(probGen1Group);
+            Controls.Add(mutationGroup);
+            Controls.Add(crossGroup);
+            Controls.Add(selectionGroup);
+            Controls.Add(GAmodification);
+            Controls.Add(runProgressBar);
+            Controls.Add(inputDataGroupBox);
+            Controls.Add(algorithmTypeGroupBox);
+            Controls.Add(tabs);
+            Controls.Add(startButton);
+            Name = "MainWindow";
+            Text = "Lab 2";
+            Load += Form1_Load;
+            ((System.ComponentModel.ISupportInitialize)matrixSizeInput).EndInit();
+            ((System.ComponentModel.ISupportInitialize)individualNumberInput).EndInit();
+            ((System.ComponentModel.ISupportInitialize)crossProbabilityInput).EndInit();
+            ((System.ComponentModel.ISupportInitialize)mutationProbabilityInput).EndInit();
+            tabs.ResumeLayout(false);
+            tabPage1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)osobniki).EndInit();
+            ((System.ComponentModel.ISupportInitialize)display).EndInit();
+            tabPage2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)chart1).EndInit();
+            tabPage3.ResumeLayout(false);
+            tabPage3.PerformLayout();
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)TstepInput).EndInit();
+            ((System.ComponentModel.ISupportInitialize)TbInput).EndInit();
+            ((System.ComponentModel.ISupportInitialize)TaInput).EndInit();
+            pmgroupbox.ResumeLayout(false);
+            pmgroupbox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)PmstepInput).EndInit();
+            ((System.ComponentModel.ISupportInitialize)PmbInput).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pmaInput).EndInit();
+            pkgroupbox.ResumeLayout(false);
+            pkgroupbox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)PkstepInput).EndInit();
+            ((System.ComponentModel.ISupportInitialize)PkbbInput).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pkaInput).EndInit();
+            individiualsCountGroupBox.ResumeLayout(false);
+            individiualsCountGroupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)NstepInput).EndInit();
+            ((System.ComponentModel.ISupportInitialize)NbInput).EndInit();
+            ((System.ComponentModel.ISupportInitialize)NaInput).EndInit();
+            ((System.ComponentModel.ISupportInitialize)testExperimentCount).EndInit();
+            ((System.ComponentModel.ISupportInitialize)iterationNumberInput).EndInit();
+            algorithmTypeGroupBox.ResumeLayout(false);
+            algorithmTypeGroupBox.PerformLayout();
+            inputDataGroupBox.ResumeLayout(false);
+            inputDataGroupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)experimentNumber).EndInit();
+            GAmodification.ResumeLayout(false);
+            GAmodification.PerformLayout();
+            selectionGroup.ResumeLayout(false);
+            selectionGroup.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)tournamentTresholdInput).EndInit();
+            ((System.ComponentModel.ISupportInitialize)tournamentSizeInput).EndInit();
+            crossGroup.ResumeLayout(false);
+            crossGroup.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)crossPoints).EndInit();
+            mutationGroup.ResumeLayout(false);
+            mutationGroup.PerformLayout();
+            probGen1Group.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)propGen1).EndInit();
+            ResumeLayout(false);
 
         }
 
@@ -1257,7 +1270,7 @@
         private RadioButton modifiedGARadio;
         private RadioButton classicalGARadio;
         private GroupBox selectionGroup;
-        private RadioButton tournamentRadio;
+        private RadioButton tournamentHardRadio;
         private RadioButton ruletteRadio;
         private GroupBox crossGroup;
         private NumericUpDown crossPoints;
@@ -1270,5 +1283,18 @@
         private TextBox seed;
         private GroupBox probGen1Group;
         private NumericUpDown propGen1;
+        private RadioButton tournamentSoftRadio;
+        private Label torunamentSizeLabel;
+        private NumericUpDown tournamentSizeInput;
+        private Label tournamentTresholdLabel;
+        private NumericUpDown tournamentTresholdInput;
+        private RadioButton smashingRadio;
+        private RadioButton randomMutationInput;
+        private Button historyViewButton;
+        private Label testCounter;
+        private Label iterationCount;
+        private Label mutationProb;
+        private Label individualCount;
+        private Label crossProb;
     }
 }

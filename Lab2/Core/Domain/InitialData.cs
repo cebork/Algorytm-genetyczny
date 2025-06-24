@@ -21,6 +21,8 @@ namespace Lab2.Core.Domain
         public decimal NumberOfExperiments { get; set; }
         public AlgorithmOption AlgorithmOption { get; set; }
         public SelectionType SelectionType { get; set; }
+        public decimal TournamentSelectionSize { get; set; }
+        public decimal TournamentSoftSelectionTreshold { get; set; }
         public CrossType CrossType { get; set; }
         public decimal CrossCount { get; set; }
         public MutationType MutationType { get; set; }

@@ -55,10 +55,9 @@ namespace Lab2.Utils
         }
 
 
-        internal static void SetUpNewOsobnikAfterSelectionTournament(List<Individual> individuals)
+        internal static void SetUpNewOsobnikAfterSelectionTournamentHard(List<Individual> individuals, decimal tournamentSize)
         {
             var random = RandomSingleton.Instance;
-            int tournamentSize = Math.Min(10, individuals.Count);
 
 
             for (int i = 0; i < individuals.Count; i++)
@@ -76,11 +75,60 @@ namespace Lab2.Utils
                     }
                 }
 
-                var winner = competitors.OrderByDescending(ind => ind.FitValue).First();
+                var winner = competitors.OrderByDescending(ind => ind.Mark).First();
 
                 individuals[i].MatrixAfterSelection = winner.IndividualMatrix;
             }
         }
+
+        internal static void SetUpNewOsobnikAfterSelectionTournamentSoft(List<Individual> individuals, decimal tournamentSize, decimal tournamentThreshold)
+        {
+            var random = RandomSingleton.Instance;
+
+            for (int i = 0; i < individuals.Count; i++)
+            {
+                var competitors = new List<Individual>();
+                while (competitors.Count < tournamentSize)
+                {
+                    int randomIndex = random.Next(individuals.Count);
+                    if (randomIndex != i && !competitors.Contains(individuals[randomIndex]))
+                    {
+                        competitors.Add(individuals[randomIndex]);
+                    }
+                }
+
+                var remaining = competitors.OrderByDescending(ind => ind.Mark).ToList();
+                Individual selected = null;
+
+                while (remaining.Count > 1)
+                {
+                    var best = remaining[0];
+                    decimal randomValue = (decimal)random.NextDouble();
+
+                    if (randomValue >= tournamentThreshold)
+                    {
+                        selected = best;
+                        break;
+                    }
+                    else
+                    {
+                        remaining.RemoveAt(0);
+                    }
+                }
+
+                if (selected == null)
+                {
+                    selected = remaining[0];
+                }
+
+                individuals[i].RandomValueToCheck = -1;
+                individuals[i].MatrixAfterSelection = selected.IndividualMatrix;
+            }
+        }
+
+
+
+
 
 
         private static int BinarySearchDistrib(List<decimal> distribList, decimal target)
