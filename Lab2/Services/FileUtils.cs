@@ -390,6 +390,7 @@ namespace Lab2.Services
                         }
                     }
                 }
+                writer.WriteLine($"\n# Ziarno losowości: {RandomSingleton.GetUsedSeed()}");
                 writer.WriteLine("# Wyniki badania");
                 writer.WriteLine("#   1                 2                     3                  4                 5            6              7");
                 writer.WriteLine("# iter         f_min_C_corr_N       f_avg_C_corr_N       f_max_C_corr_N       f_min_C      f_avg_C       f_max_C");

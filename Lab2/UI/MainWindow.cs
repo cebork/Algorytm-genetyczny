@@ -73,8 +73,11 @@ namespace Lab2
             try
             {
                 new ValidationService(InitialData);
+                iterations.Visible = true;
                 for (int i = 0; i < InitialData.NumberOfExperiments; i++)
                 {
+                    iterations.Text = i + 1 + " / " + experimentNumber.Value;
+                    RandomSingleton.Reset();
                     historyOfIndividuals.Clear();
                     runProgressBar.Visible = true;
                     runProgressBar.Value = 0;
@@ -99,9 +102,10 @@ namespace Lab2
                             FileUtils.SaveMaxFCCorr(historyOfIndividuals, InitialData, false);
                         else
                             FileUtils.SaveMaxFCCorr(historyOfIndividuals, InitialData, true);
+                        seed.Text = RandomSingleton.GetUsedSeed().ToString();
                     }
                 }
-
+                iterations.Visible = false;
 
                 List<Individual> lastGeneration = historyOfIndividuals.Last();
                 int totalCount = lastGeneration.Count;
@@ -278,7 +282,7 @@ namespace Lab2
                 return;
             }
 
-            if (ipk_b_input.Value <= matrixSizeInput.Value - 2)
+            if (ipk_b_input.Value > matrixSizeInput.Value - 2)
             {
                 MessageBox.Show("Maksymalna iloœæ ciêæ to rozmiar macierzy - 2", "");
                 return;
@@ -295,7 +299,7 @@ namespace Lab2
             var rtValues = GenerateDecimalRange(Rt_a_Input.Value, rt_b_input.Value, rt_step_input.Value);
             var psValues = GenerateDecimalRange(Ps_b_Input.Value, Ps_b_Input.Value, Ps_step.Value);
             var ipkValues = GenerateDecimalRange(ipk_input.Value, ipk_b_input.Value, ipk_step_input.Value);
-            int maxCount = NValues.Count * pkValues.Count * pmValues.Count * tValues.Count;
+            int maxCount = NValues.Count * pkValues.Count * pmValues.Count * tValues.Count * psValues.Count * rtValues.Count * ipkValues.Count;
             int currentCount = 0;
             decimal iter = 1;
 

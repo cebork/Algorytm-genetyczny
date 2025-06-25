@@ -145,6 +145,7 @@
             propGen1 = new NumericUpDown();
             historyViewButton = new Button();
             uniformBlock = new CheckBox();
+            iterations = new Label();
             ((System.ComponentModel.ISupportInitialize)matrixSizeInput).BeginInit();
             ((System.ComponentModel.ISupportInitialize)individualNumberInput).BeginInit();
             ((System.ComponentModel.ISupportInitialize)crossProbabilityInput).BeginInit();
@@ -1416,11 +1417,20 @@
             uniformBlock.UseVisualStyleBackColor = true;
             uniformBlock.CheckedChanged += uniformBlock_CheckedChanged;
             // 
+            // iterations
+            // 
+            iterations.AutoSize = true;
+            iterations.Location = new Point(1397, 32);
+            iterations.Name = "iterations";
+            iterations.Size = new Size(0, 15);
+            iterations.TabIndex = 27;
+            // 
             // MainWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1554, 1094);
+            Controls.Add(iterations);
             Controls.Add(uniformBlock);
             Controls.Add(historyViewButton);
             Controls.Add(probGen1Group);
@@ -1623,5 +1633,6 @@
         private Label ipk_a_label;
         private NumericUpDown ipk_input;
         private Label ipkLabelTesty;
+        private Label iterations;
     }
 }
