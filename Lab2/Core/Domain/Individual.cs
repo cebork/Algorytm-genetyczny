@@ -399,40 +399,28 @@ namespace Lab2.Core.Domain
             int rows = MatrixAfterCross.GetLength(0);
             int cols = MatrixAfterCross.GetLength(1);
 
-            bool[,] afterMutation = null;
-            var sourceMatrix = MatrixAfterCross;
+            bool[,] afterMutation = (bool[,])MatrixAfterCross.Clone();
 
-            for (int i = 1; i < rows - 1; i++)
+            for (int i = 2; i < rows - 2; i++)
             {
-                for (int j = 1; j < cols - 1; j++)
+                for (int j = 2; j < cols - 2; j++)
                 {
-                    bool centerValue = sourceMatrix[i, j];
+                    bool centerValue = afterMutation[i, j];
                     bool isUniform = true;
 
                     for (int di = -1; di <= 1 && isUniform; di++)
                     {
                         for (int dj = -1; dj <= 1 && isUniform; dj++)
                         {
-                            if (sourceMatrix[i + di, j + dj] != centerValue)
+                            if (afterMutation[i + di, j + dj] != centerValue)
                                 isUniform = false;
                         }
                     }
 
                     if (isUniform)
                     {
-                        if (afterMutation == null)
-                            afterMutation = (bool[,])MatrixAfterCross.Clone();
-
-                        for (int di = -1; di <= 1; di++)
-                        {
-                            for (int dj = -1; dj <= 1; dj++)
-                            {
-                                int x = i + di;
-                                int y = j + dj;
-                                afterMutation[x, y] = !centerValue;
-                                MutationPosition += $"[{x}, {y}]b,";
-                            }
-                        }
+                        afterMutation[i, j] = !centerValue;
+                        MutationPosition += $"[{i}, {j}]b,";
                     }
                 }
             }
@@ -440,7 +428,9 @@ namespace Lab2.Core.Domain
             MatrixAfterMutation = afterMutation ?? MatrixAfterCross;
         }
 
-        public void MutateByRandomCoordinates()
+
+
+        public void MutateByNarrowing(int iterationCount, int maxIterations)
         {
             if (MatrixAfterCross == null)
             {
@@ -455,7 +445,11 @@ namespace Lab2.Core.Domain
             int validHeight = rows - 2;
             int validWidth = cols - 2;
 
-            int mutationTargetCount = (int)Math.Round(mutationPorbability * validHeight * validWidth);
+            decimal multiplier = Math.Max(0.0m, (maxIterations - iterationCount) / (decimal)maxIterations);
+            int mutationTargetCount = (int)Math.Round(
+                mutationPorbability * validHeight * validWidth * 2 * multiplier
+            );
+
             if (mutationTargetCount <= 0)
             {
                 MatrixAfterMutation = MatrixAfterCross;
@@ -469,7 +463,7 @@ namespace Lab2.Core.Domain
             int attempts = 0;
             while (usedCoords.Count < mutationTargetCount && attempts < mutationTargetCount * 10)
             {
-                int i = rand.Next(1, rows - 1); 
+                int i = rand.Next(1, rows - 1);
                 int j = rand.Next(1, cols - 1);
 
                 if (usedCoords.Add((i, j)))
@@ -483,6 +477,8 @@ namespace Lab2.Core.Domain
 
             MatrixAfterMutation = afterMutation;
         }
+
+
 
     }
 }

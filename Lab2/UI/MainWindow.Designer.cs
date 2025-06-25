@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             matrixSizeLabel = new Label();
             matrixSizeInput = new NumericUpDown();
             individualNumberInput = new NumericUpDown();
@@ -50,6 +50,34 @@
             tabPage2 = new TabPage();
             chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             tabPage3 = new TabPage();
+            ipkLabelTesty = new Label();
+            crossCountGroupbox = new GroupBox();
+            ipk_step_label = new Label();
+            ipk_step_input = new NumericUpDown();
+            Ipk_b_label = new Label();
+            ipk_b_input = new NumericUpDown();
+            ipk_a_label = new Label();
+            ipk_input = new NumericUpDown();
+            tournamentSizeLabelTesty = new Label();
+            tournamentSizeGroupBox = new GroupBox();
+            rt_step_label = new Label();
+            rt_step_input = new NumericUpDown();
+            rt_b_label = new Label();
+            rt_b_input = new NumericUpDown();
+            rt_a_label = new Label();
+            Rt_a_Input = new NumericUpDown();
+            selectionTresholLabelTesty = new Label();
+            selectionThresholdGroupBox = new GroupBox();
+            Ps_step_label = new Label();
+            Ps_step = new NumericUpDown();
+            Ps_b_label = new Label();
+            Ps_b_Input = new NumericUpDown();
+            Ps_a_label = new Label();
+            Ps_a = new NumericUpDown();
+            iterationCount = new Label();
+            mutationProb = new Label();
+            individualCount = new Label();
+            crossProb = new Label();
             testCounter = new Label();
             groupBox1 = new GroupBox();
             TstepILabel = new Label();
@@ -98,7 +126,7 @@
             modifiedGARadio = new RadioButton();
             classicalGARadio = new RadioButton();
             selectionGroup = new GroupBox();
-            tournamentTresholdLabel = new Label();
+            selectionTresholdALabel = new Label();
             tournamentTresholdInput = new NumericUpDown();
             torunamentSizeLabel = new Label();
             tournamentSizeInput = new NumericUpDown();
@@ -111,16 +139,12 @@
             singlePointRadio = new RadioButton();
             mutationGroup = new GroupBox();
             randomMutationInput = new RadioButton();
-            smashingRadio = new RadioButton();
             bitSwapingRadio = new RadioButton();
             evenlyRadio = new RadioButton();
             probGen1Group = new GroupBox();
             propGen1 = new NumericUpDown();
             historyViewButton = new Button();
-            crossProb = new Label();
-            individualCount = new Label();
-            mutationProb = new Label();
-            iterationCount = new Label();
+            uniformBlock = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)matrixSizeInput).BeginInit();
             ((System.ComponentModel.ISupportInitialize)individualNumberInput).BeginInit();
             ((System.ComponentModel.ISupportInitialize)crossProbabilityInput).BeginInit();
@@ -132,6 +156,18 @@
             tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)chart1).BeginInit();
             tabPage3.SuspendLayout();
+            crossCountGroupbox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)ipk_step_input).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)ipk_b_input).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)ipk_input).BeginInit();
+            tournamentSizeGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)rt_step_input).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)rt_b_input).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)Rt_a_Input).BeginInit();
+            selectionThresholdGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)Ps_step).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)Ps_b_Input).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)Ps_a).BeginInit();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)TstepInput).BeginInit();
             ((System.ComponentModel.ISupportInitialize)TbInput).BeginInit();
@@ -277,7 +313,7 @@
             tabs.Location = new Point(12, 238);
             tabs.Name = "tabs";
             tabs.SelectedIndex = 0;
-            tabs.Size = new Size(1400, 848);
+            tabs.Size = new Size(1530, 848);
             tabs.TabIndex = 16;
             // 
             // tabPage1
@@ -287,7 +323,7 @@
             tabPage1.Location = new Point(4, 24);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(1392, 820);
+            tabPage1.Size = new Size(1522, 820);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "Podsumowanie";
             tabPage1.UseVisualStyleBackColor = true;
@@ -307,7 +343,7 @@
             display.Location = new Point(495, 3);
             display.Name = "display";
             display.RowTemplate.Height = 25;
-            display.Size = new Size(891, 811);
+            display.Size = new Size(1021, 811);
             display.TabIndex = 19;
             display.CellContentClick += dataGridView1_CellContentClick;
             // 
@@ -317,29 +353,35 @@
             tabPage2.Location = new Point(4, 24);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(1392, 820);
+            tabPage2.Size = new Size(1522, 820);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "Wykresy";
             tabPage2.UseVisualStyleBackColor = true;
             // 
             // chart1
             // 
-            chartArea2.Name = "ChartArea1";
-            chart1.ChartAreas.Add(chartArea2);
-            legend2.Name = "Legend1";
-            chart1.Legends.Add(legend2);
+            chartArea1.Name = "ChartArea1";
+            chart1.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            chart1.Legends.Add(legend1);
             chart1.Location = new Point(6, 6);
             chart1.Name = "chart1";
-            series2.ChartArea = "ChartArea1";
-            series2.Legend = "Legend1";
-            series2.Name = "Series1";
-            chart1.Series.Add(series2);
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            chart1.Series.Add(series1);
             chart1.Size = new Size(1102, 594);
             chart1.TabIndex = 0;
             chart1.Text = "chart1";
             // 
             // tabPage3
             // 
+            tabPage3.Controls.Add(ipkLabelTesty);
+            tabPage3.Controls.Add(crossCountGroupbox);
+            tabPage3.Controls.Add(tournamentSizeLabelTesty);
+            tabPage3.Controls.Add(tournamentSizeGroupBox);
+            tabPage3.Controls.Add(selectionTresholLabelTesty);
+            tabPage3.Controls.Add(selectionThresholdGroupBox);
             tabPage3.Controls.Add(iterationCount);
             tabPage3.Controls.Add(mutationProb);
             tabPage3.Controls.Add(individualCount);
@@ -354,10 +396,292 @@
             tabPage3.Controls.Add(testyStart);
             tabPage3.Location = new Point(4, 24);
             tabPage3.Name = "tabPage3";
-            tabPage3.Size = new Size(1392, 820);
+            tabPage3.Size = new Size(1522, 820);
             tabPage3.TabIndex = 2;
             tabPage3.Text = "Testy";
             tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // ipkLabelTesty
+            // 
+            ipkLabelTesty.AutoSize = true;
+            ipkLabelTesty.Location = new Point(34, 364);
+            ipkLabelTesty.Name = "ipkLabelTesty";
+            ipkLabelTesty.Size = new Size(139, 15);
+            ipkLabelTesty.TabIndex = 39;
+            ipkLabelTesty.Text = "Ilość punktów krzyżowań";
+            // 
+            // crossCountGroupbox
+            // 
+            crossCountGroupbox.Controls.Add(ipk_step_label);
+            crossCountGroupbox.Controls.Add(ipk_step_input);
+            crossCountGroupbox.Controls.Add(Ipk_b_label);
+            crossCountGroupbox.Controls.Add(ipk_b_input);
+            crossCountGroupbox.Controls.Add(ipk_a_label);
+            crossCountGroupbox.Controls.Add(ipk_input);
+            crossCountGroupbox.Location = new Point(320, 439);
+            crossCountGroupbox.Name = "crossCountGroupbox";
+            crossCountGroupbox.Size = new Size(528, 64);
+            crossCountGroupbox.TabIndex = 34;
+            crossCountGroupbox.TabStop = false;
+            crossCountGroupbox.Text = "Zakresy ilości punktów krzyżowań (Ipk)";
+            // 
+            // ipk_step_label
+            // 
+            ipk_step_label.AutoSize = true;
+            ipk_step_label.Location = new Point(349, 24);
+            ipk_step_label.Name = "ipk_step_label";
+            ipk_step_label.Size = new Size(50, 15);
+            ipk_step_label.TabIndex = 28;
+            ipk_step_label.Text = "Ipk_step";
+            // 
+            // ipk_step_input
+            // 
+            ipk_step_input.AccessibleDescription = "PmstepInput";
+            ipk_step_input.Location = new Point(402, 22);
+            ipk_step_input.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
+            ipk_step_input.Name = "ipk_step_input";
+            ipk_step_input.Size = new Size(120, 23);
+            ipk_step_input.TabIndex = 27;
+            ipk_step_input.Value = new decimal(new int[] { 20, 0, 0, 0 });
+            // 
+            // Ipk_b_label
+            // 
+            Ipk_b_label.AutoSize = true;
+            Ipk_b_label.Location = new Point(174, 26);
+            Ipk_b_label.Name = "Ipk_b_label";
+            Ipk_b_label.Size = new Size(35, 15);
+            Ipk_b_label.TabIndex = 26;
+            Ipk_b_label.Text = "Ipk_b";
+            // 
+            // ipk_b_input
+            // 
+            ipk_b_input.AccessibleDescription = "TbInput";
+            ipk_b_input.Location = new Point(224, 22);
+            ipk_b_input.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
+            ipk_b_input.Name = "ipk_b_input";
+            ipk_b_input.Size = new Size(120, 23);
+            ipk_b_input.TabIndex = 25;
+            ipk_b_input.Value = new decimal(new int[] { 10, 0, 0, 0 });
+            // 
+            // ipk_a_label
+            // 
+            ipk_a_label.AutoSize = true;
+            ipk_a_label.Location = new Point(7, 26);
+            ipk_a_label.Name = "ipk_a_label";
+            ipk_a_label.Size = new Size(34, 15);
+            ipk_a_label.TabIndex = 24;
+            ipk_a_label.Text = "Ipk_a";
+            // 
+            // ipk_input
+            // 
+            ipk_input.AccessibleDescription = "PaInput";
+            ipk_input.Location = new Point(48, 22);
+            ipk_input.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
+            ipk_input.Name = "ipk_input";
+            ipk_input.Size = new Size(120, 23);
+            ipk_input.TabIndex = 23;
+            // 
+            // tournamentSizeLabelTesty
+            // 
+            tournamentSizeLabelTesty.AutoSize = true;
+            tournamentSizeLabelTesty.Location = new Point(34, 346);
+            tournamentSizeLabelTesty.Name = "tournamentSizeLabelTesty";
+            tournamentSizeLabelTesty.Size = new Size(94, 15);
+            tournamentSizeLabelTesty.TabIndex = 38;
+            tournamentSizeLabelTesty.Text = "Rozmiar turnieju";
+            // 
+            // tournamentSizeGroupBox
+            // 
+            tournamentSizeGroupBox.Controls.Add(rt_step_label);
+            tournamentSizeGroupBox.Controls.Add(rt_step_input);
+            tournamentSizeGroupBox.Controls.Add(rt_b_label);
+            tournamentSizeGroupBox.Controls.Add(rt_b_input);
+            tournamentSizeGroupBox.Controls.Add(rt_a_label);
+            tournamentSizeGroupBox.Controls.Add(Rt_a_Input);
+            tournamentSizeGroupBox.Location = new Point(320, 299);
+            tournamentSizeGroupBox.Name = "tournamentSizeGroupBox";
+            tournamentSizeGroupBox.Size = new Size(528, 64);
+            tournamentSizeGroupBox.TabIndex = 33;
+            tournamentSizeGroupBox.TabStop = false;
+            tournamentSizeGroupBox.Text = "Zakresy rozmiaru turnieju (Rt)";
+            // 
+            // rt_step_label
+            // 
+            rt_step_label.AutoSize = true;
+            rt_step_label.Location = new Point(349, 24);
+            rt_step_label.Name = "rt_step_label";
+            rt_step_label.Size = new Size(45, 15);
+            rt_step_label.TabIndex = 28;
+            rt_step_label.Text = "Rt_step";
+            // 
+            // rt_step_input
+            // 
+            rt_step_input.AccessibleDescription = "PmstepInput";
+            rt_step_input.Location = new Point(402, 22);
+            rt_step_input.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
+            rt_step_input.Name = "rt_step_input";
+            rt_step_input.Size = new Size(120, 23);
+            rt_step_input.TabIndex = 27;
+            rt_step_input.Value = new decimal(new int[] { 120, 0, 0, 0 });
+            // 
+            // rt_b_label
+            // 
+            rt_b_label.AutoSize = true;
+            rt_b_label.Location = new Point(174, 26);
+            rt_b_label.Name = "rt_b_label";
+            rt_b_label.Size = new Size(30, 15);
+            rt_b_label.TabIndex = 26;
+            rt_b_label.Text = "Rt_b";
+            // 
+            // rt_b_input
+            // 
+            rt_b_input.AccessibleDescription = "TbInput";
+            rt_b_input.Location = new Point(224, 22);
+            rt_b_input.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
+            rt_b_input.Name = "rt_b_input";
+            rt_b_input.Size = new Size(120, 23);
+            rt_b_input.TabIndex = 25;
+            rt_b_input.Value = new decimal(new int[] { 100, 0, 0, 0 });
+            // 
+            // rt_a_label
+            // 
+            rt_a_label.AutoSize = true;
+            rt_a_label.Location = new Point(7, 26);
+            rt_a_label.Name = "rt_a_label";
+            rt_a_label.Size = new Size(29, 15);
+            rt_a_label.TabIndex = 24;
+            rt_a_label.Text = "Rt_a";
+            // 
+            // Rt_a_Input
+            // 
+            Rt_a_Input.AccessibleDescription = "PaInput";
+            Rt_a_Input.Location = new Point(48, 22);
+            Rt_a_Input.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
+            Rt_a_Input.Name = "Rt_a_Input";
+            Rt_a_Input.Size = new Size(120, 23);
+            Rt_a_Input.TabIndex = 23;
+            // 
+            // selectionTresholLabelTesty
+            // 
+            selectionTresholLabelTesty.AutoSize = true;
+            selectionTresholLabelTesty.Location = new Point(34, 328);
+            selectionTresholLabelTesty.Name = "selectionTresholLabelTesty";
+            selectionTresholLabelTesty.Size = new Size(73, 15);
+            selectionTresholLabelTesty.TabIndex = 37;
+            selectionTresholLabelTesty.Text = "Próg selekcji";
+            // 
+            // selectionThresholdGroupBox
+            // 
+            selectionThresholdGroupBox.Controls.Add(Ps_step_label);
+            selectionThresholdGroupBox.Controls.Add(Ps_step);
+            selectionThresholdGroupBox.Controls.Add(Ps_b_label);
+            selectionThresholdGroupBox.Controls.Add(Ps_b_Input);
+            selectionThresholdGroupBox.Controls.Add(Ps_a_label);
+            selectionThresholdGroupBox.Controls.Add(Ps_a);
+            selectionThresholdGroupBox.Location = new Point(320, 369);
+            selectionThresholdGroupBox.Name = "selectionThresholdGroupBox";
+            selectionThresholdGroupBox.Size = new Size(528, 64);
+            selectionThresholdGroupBox.TabIndex = 32;
+            selectionThresholdGroupBox.TabStop = false;
+            selectionThresholdGroupBox.Text = "Zakresy progu selekcji (Ps)";
+            // 
+            // Ps_step_label
+            // 
+            Ps_step_label.AutoSize = true;
+            Ps_step_label.Location = new Point(349, 24);
+            Ps_step_label.Name = "Ps_step_label";
+            Ps_step_label.Size = new Size(46, 15);
+            Ps_step_label.TabIndex = 28;
+            Ps_step_label.Text = "Ps_step";
+            // 
+            // Ps_step
+            // 
+            Ps_step.AccessibleDescription = "PmstepInput";
+            Ps_step.DecimalPlaces = 2;
+            Ps_step.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
+            Ps_step.Location = new Point(402, 22);
+            Ps_step.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            Ps_step.Name = "Ps_step";
+            Ps_step.Size = new Size(120, 23);
+            Ps_step.TabIndex = 27;
+            Ps_step.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            // 
+            // Ps_b_label
+            // 
+            Ps_b_label.AutoSize = true;
+            Ps_b_label.Location = new Point(174, 26);
+            Ps_b_label.Name = "Ps_b_label";
+            Ps_b_label.Size = new Size(31, 15);
+            Ps_b_label.TabIndex = 26;
+            Ps_b_label.Text = "Ps_b";
+            // 
+            // Ps_b_Input
+            // 
+            Ps_b_Input.AccessibleDescription = "TbInput";
+            Ps_b_Input.DecimalPlaces = 2;
+            Ps_b_Input.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
+            Ps_b_Input.Location = new Point(224, 22);
+            Ps_b_Input.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            Ps_b_Input.Name = "Ps_b_Input";
+            Ps_b_Input.Size = new Size(120, 23);
+            Ps_b_Input.TabIndex = 25;
+            Ps_b_Input.Value = new decimal(new int[] { 50, 0, 0, 131072 });
+            // 
+            // Ps_a_label
+            // 
+            Ps_a_label.AutoSize = true;
+            Ps_a_label.Location = new Point(7, 26);
+            Ps_a_label.Name = "Ps_a_label";
+            Ps_a_label.Size = new Size(30, 15);
+            Ps_a_label.TabIndex = 24;
+            Ps_a_label.Text = "Ps_a";
+            // 
+            // Ps_a
+            // 
+            Ps_a.AccessibleDescription = "PaInput";
+            Ps_a.DecimalPlaces = 2;
+            Ps_a.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
+            Ps_a.Location = new Point(48, 22);
+            Ps_a.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            Ps_a.Name = "Ps_a";
+            Ps_a.Size = new Size(120, 23);
+            Ps_a.TabIndex = 23;
+            // 
+            // iterationCount
+            // 
+            iterationCount.AutoSize = true;
+            iterationCount.Location = new Point(33, 310);
+            iterationCount.Name = "iterationCount";
+            iterationCount.Size = new Size(69, 15);
+            iterationCount.TabIndex = 36;
+            iterationCount.Text = "Ilość iteracji";
+            // 
+            // mutationProb
+            // 
+            mutationProb.AutoSize = true;
+            mutationProb.Location = new Point(33, 292);
+            mutationProb.Name = "mutationProb";
+            mutationProb.Size = new Size(159, 15);
+            mutationProb.TabIndex = 35;
+            mutationProb.Text = "Prawdopodbieństwo mutacji";
+            // 
+            // individualCount
+            // 
+            individualCount.AutoSize = true;
+            individualCount.Location = new Point(33, 256);
+            individualCount.Name = "individualCount";
+            individualCount.Size = new Size(92, 15);
+            individualCount.TabIndex = 34;
+            individualCount.Text = "Ilość osobników";
+            // 
+            // crossProb
+            // 
+            crossProb.AutoSize = true;
+            crossProb.Location = new Point(33, 274);
+            crossProb.Name = "crossProb";
+            crossProb.Size = new Size(190, 15);
+            crossProb.TabIndex = 33;
+            crossProb.Text = "Prawdopodobieństwo krzyżowania";
             // 
             // testCounter
             // 
@@ -453,7 +777,7 @@
             pmgroupbox.Size = new Size(528, 64);
             pmgroupbox.TabIndex = 30;
             pmgroupbox.TabStop = false;
-            pmgroupbox.Text = "Zakresy prawdopodobieństwa mutacji";
+            pmgroupbox.Text = "Zakresy prawdopodobieństwa mutacji (Pm)";
             // 
             // pmbsizeLabel
             // 
@@ -531,7 +855,7 @@
             pkgroupbox.Size = new Size(528, 64);
             pkgroupbox.TabIndex = 29;
             pkgroupbox.TabStop = false;
-            pkgroupbox.Text = "Zakresy prawdopodobieństwa krzyżowania";
+            pkgroupbox.Text = "Zakresy prawdopodobieństwa krzyżowania (Pk)";
             // 
             // PkSizeLabel
             // 
@@ -609,7 +933,7 @@
             individiualsCountGroupBox.Size = new Size(528, 64);
             individiualsCountGroupBox.TabIndex = 22;
             individiualsCountGroupBox.TabStop = false;
-            individiualsCountGroupBox.Text = "Zakresy ilości osobników";
+            individiualsCountGroupBox.Text = "Zakresy ilości osobników (N)";
             // 
             // NstepLabel
             // 
@@ -867,7 +1191,7 @@
             // 
             // selectionGroup
             // 
-            selectionGroup.Controls.Add(tournamentTresholdLabel);
+            selectionGroup.Controls.Add(selectionTresholdALabel);
             selectionGroup.Controls.Add(tournamentTresholdInput);
             selectionGroup.Controls.Add(torunamentSizeLabel);
             selectionGroup.Controls.Add(tournamentSizeInput);
@@ -881,20 +1205,20 @@
             selectionGroup.TabStop = false;
             selectionGroup.Text = "Selekcja";
             // 
-            // tournamentTresholdLabel
+            // selectionTresholdALabel
             // 
-            tournamentTresholdLabel.AutoSize = true;
-            tournamentTresholdLabel.Location = new Point(7, 125);
-            tournamentTresholdLabel.Name = "tournamentTresholdLabel";
-            tournamentTresholdLabel.Size = new Size(73, 15);
-            tournamentTresholdLabel.TabIndex = 28;
-            tournamentTresholdLabel.Text = "Próg selekcji";
+            selectionTresholdALabel.AutoSize = true;
+            selectionTresholdALabel.Location = new Point(7, 125);
+            selectionTresholdALabel.Name = "selectionTresholdALabel";
+            selectionTresholdALabel.Size = new Size(96, 15);
+            selectionTresholdALabel.TabIndex = 28;
+            selectionTresholdALabel.Text = "Próg selekcji (Ps)";
             // 
             // tournamentTresholdInput
             // 
             tournamentTresholdInput.DecimalPlaces = 2;
             tournamentTresholdInput.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
-            tournamentTresholdInput.Location = new Point(116, 121);
+            tournamentTresholdInput.Location = new Point(128, 120);
             tournamentTresholdInput.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             tournamentTresholdInput.Name = "tournamentTresholdInput";
             tournamentTresholdInput.Size = new Size(70, 23);
@@ -904,15 +1228,15 @@
             // torunamentSizeLabel
             // 
             torunamentSizeLabel.AutoSize = true;
-            torunamentSizeLabel.Location = new Point(7, 96);
+            torunamentSizeLabel.Location = new Point(6, 95);
             torunamentSizeLabel.Name = "torunamentSizeLabel";
-            torunamentSizeLabel.Size = new Size(94, 15);
+            torunamentSizeLabel.Size = new Size(116, 15);
             torunamentSizeLabel.TabIndex = 27;
-            torunamentSizeLabel.Text = "Rozmiar turnieju";
+            torunamentSizeLabel.Text = "Rozmiar turnieju (Rt)";
             // 
             // tournamentSizeInput
             // 
-            tournamentSizeInput.Location = new Point(116, 92);
+            tournamentSizeInput.Location = new Point(128, 91);
             tournamentSizeInput.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
             tournamentSizeInput.Name = "tournamentSizeInput";
             tournamentSizeInput.Size = new Size(70, 23);
@@ -1004,7 +1328,6 @@
             // mutationGroup
             // 
             mutationGroup.Controls.Add(randomMutationInput);
-            mutationGroup.Controls.Add(smashingRadio);
             mutationGroup.Controls.Add(bitSwapingRadio);
             mutationGroup.Controls.Add(evenlyRadio);
             mutationGroup.Location = new Point(1272, 79);
@@ -1017,31 +1340,19 @@
             // randomMutationInput
             // 
             randomMutationInput.AutoSize = true;
-            randomMutationInput.Location = new Point(7, 97);
+            randomMutationInput.Location = new Point(7, 76);
             randomMutationInput.Name = "randomMutationInput";
-            randomMutationInput.Size = new Size(131, 19);
+            randomMutationInput.Size = new Size(77, 19);
             randomMutationInput.TabIndex = 3;
             randomMutationInput.TabStop = true;
-            randomMutationInput.Text = "losowe wspolrzedne";
+            randomMutationInput.Text = "zwężająca";
             randomMutationInput.UseVisualStyleBackColor = true;
             randomMutationInput.CheckedChanged += randomMutationInput_CheckedChanged;
-            // 
-            // smashingRadio
-            // 
-            smashingRadio.AutoSize = true;
-            smashingRadio.Location = new Point(7, 72);
-            smashingRadio.Name = "smashingRadio";
-            smashingRadio.Size = new Size(101, 19);
-            smashingRadio.TabIndex = 2;
-            smashingRadio.TabStop = true;
-            smashingRadio.Text = "rozbijąca bloki";
-            smashingRadio.UseVisualStyleBackColor = true;
-            smashingRadio.CheckedChanged += smashingRadio_CheckedChanged;
             // 
             // bitSwapingRadio
             // 
             bitSwapingRadio.AutoSize = true;
-            bitSwapingRadio.Location = new Point(7, 47);
+            bitSwapingRadio.Location = new Point(7, 49);
             bitSwapingRadio.Name = "bitSwapingRadio";
             bitSwapingRadio.Size = new Size(110, 19);
             bitSwapingRadio.TabIndex = 1;
@@ -1094,47 +1405,23 @@
             historyViewButton.UseVisualStyleBackColor = false;
             historyViewButton.Click += historyViewButton_Click;
             // 
-            // crossProb
+            // uniformBlock
             // 
-            crossProb.AutoSize = true;
-            crossProb.Location = new Point(33, 272);
-            crossProb.Name = "crossProb";
-            crossProb.Size = new Size(190, 15);
-            crossProb.TabIndex = 33;
-            crossProb.Text = "Prawdopodobieństwo krzyżowania";
-            // 
-            // individualCount
-            // 
-            individualCount.AutoSize = true;
-            individualCount.Location = new Point(33, 255);
-            individualCount.Name = "individualCount";
-            individualCount.Size = new Size(92, 15);
-            individualCount.TabIndex = 34;
-            individualCount.Text = "Ilość osobników";
-            // 
-            // mutationProb
-            // 
-            mutationProb.AutoSize = true;
-            mutationProb.Location = new Point(33, 289);
-            mutationProb.Name = "mutationProb";
-            mutationProb.Size = new Size(159, 15);
-            mutationProb.TabIndex = 35;
-            mutationProb.Text = "Prawdopodbieństwo mutacji";
-            // 
-            // iterationCount
-            // 
-            iterationCount.AutoSize = true;
-            iterationCount.Location = new Point(33, 306);
-            iterationCount.Name = "iterationCount";
-            iterationCount.Size = new Size(69, 15);
-            iterationCount.TabIndex = 36;
-            iterationCount.Text = "Ilość iteracji";
+            uniformBlock.AutoSize = true;
+            uniformBlock.Location = new Point(1425, 101);
+            uniformBlock.Name = "uniformBlock";
+            uniformBlock.Size = new Size(122, 19);
+            uniformBlock.TabIndex = 26;
+            uniformBlock.Text = "Rozbijanie bloków";
+            uniformBlock.UseVisualStyleBackColor = true;
+            uniformBlock.CheckedChanged += uniformBlock_CheckedChanged;
             // 
             // MainWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1460, 1094);
+            ClientSize = new Size(1554, 1094);
+            Controls.Add(uniformBlock);
             Controls.Add(historyViewButton);
             Controls.Add(probGen1Group);
             Controls.Add(mutationGroup);
@@ -1161,6 +1448,21 @@
             ((System.ComponentModel.ISupportInitialize)chart1).EndInit();
             tabPage3.ResumeLayout(false);
             tabPage3.PerformLayout();
+            crossCountGroupbox.ResumeLayout(false);
+            crossCountGroupbox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)ipk_step_input).EndInit();
+            ((System.ComponentModel.ISupportInitialize)ipk_b_input).EndInit();
+            ((System.ComponentModel.ISupportInitialize)ipk_input).EndInit();
+            tournamentSizeGroupBox.ResumeLayout(false);
+            tournamentSizeGroupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)rt_step_input).EndInit();
+            ((System.ComponentModel.ISupportInitialize)rt_b_input).EndInit();
+            ((System.ComponentModel.ISupportInitialize)Rt_a_Input).EndInit();
+            selectionThresholdGroupBox.ResumeLayout(false);
+            selectionThresholdGroupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)Ps_step).EndInit();
+            ((System.ComponentModel.ISupportInitialize)Ps_b_Input).EndInit();
+            ((System.ComponentModel.ISupportInitialize)Ps_a).EndInit();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)TstepInput).EndInit();
@@ -1202,6 +1504,7 @@
             probGen1Group.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)propGen1).EndInit();
             ResumeLayout(false);
+            PerformLayout();
 
         }
 
@@ -1286,9 +1589,8 @@
         private RadioButton tournamentSoftRadio;
         private Label torunamentSizeLabel;
         private NumericUpDown tournamentSizeInput;
-        private Label tournamentTresholdLabel;
+        private Label selectionTresholdALabel;
         private NumericUpDown tournamentTresholdInput;
-        private RadioButton smashingRadio;
         private RadioButton randomMutationInput;
         private Button historyViewButton;
         private Label testCounter;
@@ -1296,5 +1598,30 @@
         private Label mutationProb;
         private Label individualCount;
         private Label crossProb;
+        private CheckBox uniformBlock;
+        private GroupBox selectionThresholdGroupBox;
+        private Label Ps_step_label;
+        private NumericUpDown Ps_step;
+        private Label Ps_b_label;
+        private NumericUpDown Ps_b_Input;
+        private Label Ps_a_label;
+        private NumericUpDown Ps_a;
+        private Label tournamentSizeLabelTesty;
+        private GroupBox tournamentSizeGroupBox;
+        private Label rt_step_label;
+        private NumericUpDown rt_step_input;
+        private Label rt_b_label;
+        private NumericUpDown rt_b_input;
+        private Label rt_a_label;
+        private NumericUpDown Rt_a_Input;
+        private Label selectionTresholLabelTesty;
+        private GroupBox crossCountGroupbox;
+        private Label ipk_step_label;
+        private NumericUpDown ipk_step_input;
+        private Label Ipk_b_label;
+        private NumericUpDown ipk_b_input;
+        private Label ipk_a_label;
+        private NumericUpDown ipk_input;
+        private Label ipkLabelTesty;
     }
 }

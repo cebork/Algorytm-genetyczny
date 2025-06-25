@@ -14,21 +14,21 @@ namespace Lab2.Utils
         {
             int newCutPoint = RandomSingleton.Instance.Next(1, individuals[0].getL() - 2);
             int iter = 0;
-            foreach (var individual in individuals)
+            for (int i = 0; i < individuals.Count; i++)
             {
-                if (individual.MatrixParents != null)
+                if (individuals[i].MatrixParents != null)
                 {
                     if (iter == 2)
                     {
                         newCutPoint = RandomSingleton.Instance.Next(1, individuals[0].getL() - 2);
                         iter = 0;
                     }
-                    individual.CutPoint = newCutPoint;
+                    individuals[i].CutPoint = newCutPoint;
                     iter++;
                 }
                 else
                 {
-                    individual.CutPoint = -1;
+                    individuals[i].CutPoint = -1;
                 }
             }
         }
@@ -37,21 +37,21 @@ namespace Lab2.Utils
         {
             Individual fParent = null;
 
-            foreach (var individual in individuals)
+            for (int i = 0; i < individuals.Count; i++)
             {
-                if (individual.MatrixParents == null)
+                if (individuals[i].MatrixParents == null)
                 {
-                    individual.xBinChild = "-";
+                    individuals[i].xBinChild = "-";
                     continue;
                 }
 
                 if (fParent == null)
                 {
-                    fParent = individual;
+                    fParent = individuals[i];
                     continue;
                 }
 
-                Individual sParent = individual;
+                Individual sParent = individuals[i];
 
                 if (IsValidCutPoint(fParent) && IsValidCutPoint(sParent))
                 {
@@ -104,15 +104,15 @@ namespace Lab2.Utils
 
         public static void CreatePopulationAfterCrossing(List<Individual> individuals)
         {
-            foreach (var individual in individuals)
+            for (int i = 0; i < individuals.Count; i++)
             {
-                if (individual.MatrixChild != null)
+                if (individuals[i].MatrixChild != null)
                 {
-                    individual.MatrixAfterCross = individual.MatrixChild;
+                    individuals[i].MatrixAfterCross = individuals[i].MatrixChild;
                 }
                 else
                 {
-                    individual.MatrixAfterCross = individual.MatrixAfterSelection;
+                    individuals[i].MatrixAfterCross = individuals[i].MatrixAfterSelection;
                 }
             }
         }
@@ -170,22 +170,22 @@ namespace Lab2.Utils
             var random = RandomSingleton.Instance;
             Individual fParent = null;
 
-            foreach (var individual in individuals)
+            for (int i = 0; i < individuals.Count; i++)
             {
-                if (individual.MatrixParents == null)
+                if (individuals[i].MatrixParents == null)
                 {
-                    individual.xBinChild = "-";
-                    individual.MatrixAfterCross = individual.MatrixAfterSelection;
+                    individuals[i].xBinChild = "-";
+                    individuals[i].MatrixAfterCross = individuals[i].MatrixAfterSelection;
                     continue;
                 }
 
                 if (fParent == null)
                 {
-                    fParent = individual;
+                    fParent = individuals[i];
                     continue;
                 }
 
-                Individual sParent = individual;
+                Individual sParent = individuals[i];
 
                 if (fParent.MatrixAfterSelection != null && sParent.MatrixAfterSelection != null)
                 {

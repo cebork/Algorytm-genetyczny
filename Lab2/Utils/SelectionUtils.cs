@@ -13,9 +13,9 @@ namespace Lab2.Utils
         public static void SetUpFitValue(List<Individual> individuals)
         {
             decimal minValue = individuals.Min(o => o.Mark);
-            foreach (var individual in individuals)
+            for (int i = 0; i < individuals.Count; i++)
             {
-                individual.SetFitValue(minValue);
+                individuals[i].SetFitValue(minValue);
             }
 
         }

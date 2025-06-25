@@ -26,7 +26,7 @@ namespace Lab2.Core.Domain
         public CrossType CrossType { get; set; }
         public decimal CrossCount { get; set; }
         public MutationType MutationType { get; set; }
-
+        public bool UniformBlock { get; set; }
         public decimal ProbGen1 { get; set; }
         public InitialData() { }
 
