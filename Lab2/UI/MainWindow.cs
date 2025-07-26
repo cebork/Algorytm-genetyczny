@@ -177,7 +177,7 @@ namespace Lab2
 
                 var series2 = new Series
                 {
-                    Name = "Œrednia",
+                    Name = "Average",
                     Color = Color.Red,
                     ChartType = SeriesChartType.Line
                 };
@@ -201,13 +201,16 @@ namespace Lab2
                 chart1.Series.Add(series3);
 
                 var chartArea = new ChartArea();
-                chartArea.AxisX.Title = "Pokolenia";
-                chartArea.AxisY.Title = "Oceny";
+                chartArea.AxisX.Title = "Generations";
+                chartArea.AxisY.Title = "Marks";
+                chartArea.AxisX.TitleFont = new Font("Arial", 15);
+                chartArea.AxisY.TitleFont = new Font("Arial", 15);
                 chart1.ChartAreas.Clear();
                 chart1.ChartAreas.Add(chartArea);
-
-                chart1.ChartAreas[0].BackColor = Color.LightYellow;
-
+                chart1.Legends[0].Font = new Font("Arial", 15);
+                chart1.ChartAreas[0].BackColor = Color.White;
+                chart1.ChartAreas[0].AxisX.LabelStyle.Font = new Font("Arial", 14);
+                chart1.ChartAreas[0].AxisY.LabelStyle.Font = new Font("Arial", 14);
                 seed.Text = RandomSingleton.GetUsedSeed().ToString();
 
             }
