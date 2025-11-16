@@ -146,6 +146,15 @@
             historyViewButton = new Button();
             uniformBlock = new CheckBox();
             iterations = new Label();
+            unformBlocksGroupBox = new GroupBox();
+            uniformProbWhite = new NumericUpDown();
+            uniformProbWhiteLabel = new Label();
+            uniformProbRed = new NumericUpDown();
+            uniformProbRedLabel = new Label();
+            eliteGroupBox = new GroupBox();
+            eliteOn = new CheckBox();
+            eliteToMove = new NumericUpDown();
+            eliteToMoveLabel = new Label();
             ((System.ComponentModel.ISupportInitialize)matrixSizeInput).BeginInit();
             ((System.ComponentModel.ISupportInitialize)individualNumberInput).BeginInit();
             ((System.ComponentModel.ISupportInitialize)crossProbabilityInput).BeginInit();
@@ -199,6 +208,11 @@
             mutationGroup.SuspendLayout();
             probGen1Group.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)propGen1).BeginInit();
+            unformBlocksGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)uniformProbWhite).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)uniformProbRed).BeginInit();
+            eliteGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)eliteToMove).BeginInit();
             SuspendLayout();
             // 
             // matrixSizeLabel
@@ -314,7 +328,7 @@
             tabs.Location = new Point(12, 238);
             tabs.Name = "tabs";
             tabs.SelectedIndex = 0;
-            tabs.Size = new Size(1530, 848);
+            tabs.Size = new Size(1626, 848);
             tabs.TabIndex = 16;
             // 
             // tabPage1
@@ -324,7 +338,7 @@
             tabPage1.Location = new Point(4, 24);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(1522, 820);
+            tabPage1.Size = new Size(1618, 820);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "Podsumowanie";
             tabPage1.UseVisualStyleBackColor = true;
@@ -341,12 +355,11 @@
             // display
             // 
             display.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            display.Location = new Point(495, 3);
+            display.Location = new Point(495, 6);
             display.Name = "display";
             display.RowTemplate.Height = 25;
-            display.Size = new Size(1021, 811);
+            display.Size = new Size(1117, 808);
             display.TabIndex = 19;
-            display.CellContentClick += dataGridView1_CellContentClick;
             // 
             // tabPage2
             // 
@@ -354,7 +367,7 @@
             tabPage2.Location = new Point(4, 24);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(1522, 820);
+            tabPage2.Size = new Size(1618, 820);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "Wykresy";
             tabPage2.UseVisualStyleBackColor = true;
@@ -397,7 +410,7 @@
             tabPage3.Controls.Add(testyStart);
             tabPage3.Location = new Point(4, 24);
             tabPage3.Name = "tabPage3";
-            tabPage3.Size = new Size(1522, 820);
+            tabPage3.Size = new Size(1618, 820);
             tabPage3.TabIndex = 2;
             tabPage3.Text = "Testy";
             tabPage3.UseVisualStyleBackColor = true;
@@ -1287,7 +1300,7 @@
             crossGroup.Controls.Add(singlePointRadio);
             crossGroup.Location = new Point(1156, 79);
             crossGroup.Name = "crossGroup";
-            crossGroup.Size = new Size(110, 153);
+            crossGroup.Size = new Size(100, 153);
             crossGroup.TabIndex = 3;
             crossGroup.TabStop = false;
             crossGroup.Text = "Krzyżowanie";
@@ -1333,7 +1346,7 @@
             mutationGroup.Controls.Add(evenlyRadio);
             mutationGroup.Location = new Point(1272, 79);
             mutationGroup.Name = "mutationGroup";
-            mutationGroup.Size = new Size(147, 153);
+            mutationGroup.Size = new Size(119, 153);
             mutationGroup.TabIndex = 3;
             mutationGroup.TabStop = false;
             mutationGroup.Text = "Mutacja";
@@ -1409,11 +1422,11 @@
             // uniformBlock
             // 
             uniformBlock.AutoSize = true;
-            uniformBlock.Location = new Point(1425, 101);
+            uniformBlock.Location = new Point(6, 22);
             uniformBlock.Name = "uniformBlock";
-            uniformBlock.Size = new Size(122, 19);
+            uniformBlock.Size = new Size(57, 19);
             uniformBlock.TabIndex = 26;
-            uniformBlock.Text = "Rozbijanie bloków";
+            uniformBlock.Text = "Włącz";
             uniformBlock.UseVisualStyleBackColor = true;
             uniformBlock.CheckedChanged += uniformBlock_CheckedChanged;
             // 
@@ -1425,13 +1438,109 @@
             iterations.Size = new Size(0, 15);
             iterations.TabIndex = 27;
             // 
+            // unformBlocksGroupBox
+            // 
+            unformBlocksGroupBox.Controls.Add(uniformProbWhite);
+            unformBlocksGroupBox.Controls.Add(uniformProbWhiteLabel);
+            unformBlocksGroupBox.Controls.Add(uniformProbRed);
+            unformBlocksGroupBox.Controls.Add(uniformProbRedLabel);
+            unformBlocksGroupBox.Controls.Add(uniformBlock);
+            unformBlocksGroupBox.Location = new Point(1397, 79);
+            unformBlocksGroupBox.Name = "unformBlocksGroupBox";
+            unformBlocksGroupBox.Size = new Size(241, 153);
+            unformBlocksGroupBox.TabIndex = 28;
+            unformBlocksGroupBox.TabStop = false;
+            unformBlocksGroupBox.Text = "Rozbijanie bloków";
+            // 
+            // uniformProbWhite
+            // 
+            uniformProbWhite.DecimalPlaces = 2;
+            uniformProbWhite.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
+            uniformProbWhite.Location = new Point(6, 100);
+            uniformProbWhite.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            uniformProbWhite.Name = "uniformProbWhite";
+            uniformProbWhite.Size = new Size(120, 23);
+            uniformProbWhite.TabIndex = 30;
+            uniformProbWhite.Value = new decimal(new int[] { 15, 0, 0, 131072 });
+            // 
+            // uniformProbWhiteLabel
+            // 
+            uniformProbWhiteLabel.AutoSize = true;
+            uniformProbWhiteLabel.Location = new Point(6, 85);
+            uniformProbWhiteLabel.Name = "uniformProbWhiteLabel";
+            uniformProbWhiteLabel.Size = new Size(208, 15);
+            uniformProbWhiteLabel.TabIndex = 29;
+            uniformProbWhiteLabel.Text = "Prawdopodobieństwo rozbicia białych";
+            // 
+            // uniformProbRed
+            // 
+            uniformProbRed.DecimalPlaces = 2;
+            uniformProbRed.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
+            uniformProbRed.Location = new Point(6, 59);
+            uniformProbRed.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            uniformProbRed.Name = "uniformProbRed";
+            uniformProbRed.Size = new Size(120, 23);
+            uniformProbRed.TabIndex = 28;
+            uniformProbRed.Value = new decimal(new int[] { 85, 0, 0, 131072 });
+            // 
+            // uniformProbRedLabel
+            // 
+            uniformProbRedLabel.AutoSize = true;
+            uniformProbRedLabel.Location = new Point(6, 44);
+            uniformProbRedLabel.Name = "uniformProbRedLabel";
+            uniformProbRedLabel.Size = new Size(233, 15);
+            uniformProbRedLabel.TabIndex = 27;
+            uniformProbRedLabel.Text = "Prawdopodobieństwo rozbicia czerwonych";
+            // 
+            // eliteGroupBox
+            // 
+            eliteGroupBox.Controls.Add(eliteToMove);
+            eliteGroupBox.Controls.Add(eliteOn);
+            eliteGroupBox.Controls.Add(eliteToMoveLabel);
+            eliteGroupBox.Location = new Point(1644, 79);
+            eliteGroupBox.Name = "eliteGroupBox";
+            eliteGroupBox.Size = new Size(200, 153);
+            eliteGroupBox.TabIndex = 29;
+            eliteGroupBox.TabStop = false;
+            eliteGroupBox.Text = "Elita";
+            // 
+            // eliteOn
+            // 
+            eliteOn.AutoSize = true;
+            eliteOn.Location = new Point(6, 22);
+            eliteOn.Name = "eliteOn";
+            eliteOn.Size = new Size(57, 19);
+            eliteOn.TabIndex = 27;
+            eliteOn.Text = "Włącz";
+            eliteOn.UseVisualStyleBackColor = true;
+            // 
+            // eliteToMove
+            // 
+            eliteToMove.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
+            eliteToMove.Location = new Point(6, 59);
+            eliteToMove.Maximum = new decimal(new int[] { 10000000, 0, 0, 0 });
+            eliteToMove.Name = "eliteToMove";
+            eliteToMove.Size = new Size(138, 23);
+            eliteToMove.TabIndex = 32;
+            eliteToMove.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            // 
+            // eliteToMoveLabel
+            // 
+            eliteToMoveLabel.AutoSize = true;
+            eliteToMoveLabel.Location = new Point(6, 44);
+            eliteToMoveLabel.Name = "eliteToMoveLabel";
+            eliteToMoveLabel.Size = new Size(138, 15);
+            eliteToMoveLabel.TabIndex = 31;
+            eliteToMoveLabel.Text = "Ilość elit do przeniesienia";
+            // 
             // MainWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1554, 1094);
+            ClientSize = new Size(1866, 1094);
+            Controls.Add(eliteGroupBox);
+            Controls.Add(unformBlocksGroupBox);
             Controls.Add(iterations);
-            Controls.Add(uniformBlock);
             Controls.Add(historyViewButton);
             Controls.Add(probGen1Group);
             Controls.Add(mutationGroup);
@@ -1513,6 +1622,13 @@
             mutationGroup.PerformLayout();
             probGen1Group.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)propGen1).EndInit();
+            unformBlocksGroupBox.ResumeLayout(false);
+            unformBlocksGroupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)uniformProbWhite).EndInit();
+            ((System.ComponentModel.ISupportInitialize)uniformProbRed).EndInit();
+            eliteGroupBox.ResumeLayout(false);
+            eliteGroupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)eliteToMove).EndInit();
             ResumeLayout(false);
             PerformLayout();
 
@@ -1634,5 +1750,14 @@
         private NumericUpDown ipk_input;
         private Label ipkLabelTesty;
         private Label iterations;
+        private GroupBox unformBlocksGroupBox;
+        private Label uniformProbRedLabel;
+        private NumericUpDown uniformProbRed;
+        private NumericUpDown uniformProbWhite;
+        private Label uniformProbWhiteLabel;
+        private GroupBox eliteGroupBox;
+        private NumericUpDown eliteToMove;
+        private CheckBox eliteOn;
+        private Label eliteToMoveLabel;
     }
 }

@@ -416,5 +416,42 @@ namespace Lab2.Services
                 
             }
         }
+
+
+        internal static void SaveStandardDeviationAtTheEndOfMaxFCCorr(
+            List<decimal> bestValuesAcrossExperiments,
+            InitialData initialData,
+            bool append
+        ) {
+            if (bestValuesAcrossExperiments == null || bestValuesAcrossExperiments.Count == 0)
+                return;
+
+            Directory.CreateDirectory(ResultDirectory);
+
+            int n = bestValuesAcrossExperiments.Count;
+            decimal mean = bestValuesAcrossExperiments.Average();
+
+            decimal sumOfSquares = 0m;
+            foreach (var x in bestValuesAcrossExperiments)
+            {
+                decimal diff = x - mean;
+                sumOfSquares += diff * diff;
+            }
+
+            decimal variance = sumOfSquares / n;
+
+            decimal stdDev = (decimal)Math.Sqrt((double)variance);
+
+            using (var writer = new StreamWriter(maxFCCorr, true, Encoding.UTF8))
+            {
+                writer.WriteLine();
+                writer.WriteLine("####################################################################################");
+                writer.WriteLine("# Odchylenie standardowe najlepszych wyników");
+                writer.WriteLine($"std_dev_all_experiments = {stdDev:F6}");
+                writer.WriteLine("####################################################################################");
+                writer.WriteLine();
+            }
+        }
+
     }
 }

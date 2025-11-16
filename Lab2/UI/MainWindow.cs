@@ -1,14 +1,15 @@
+using Lab2.Core.Domain;
+using Lab2.Core.Enums;
 using Lab2.objects;
+using Lab2.Services;
+using Lab2.UI;
 using Lab2.Utils;
+using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using Lab2.Core.Enums;
-using Lab2.UI;
-using Lab2.Services;
-using Lab2.Core.Domain;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using System;
 
 namespace Lab2
 {
@@ -68,12 +69,18 @@ namespace Lab2
             InitialData.ProbGen1 = propGen1.Value;
             InitialData.TournamentSelectionSize = tournamentSizeInput.Value;
             InitialData.TournamentSoftSelectionTreshold = tournamentTresholdInput.Value;
+            InitialData.UniformBlockMutationProbRed = uniformProbRed.Value;
+            InitialData.UniformBlockMutationProbWhite = uniformProbWhite.Value;
+            InitialData.EliteOn = eliteOn.Checked;
+            InitialData.EliteToMove = eliteToMove.Value;
             historyOfIndividuals.Clear();
 
             try
             {
                 new ValidationService(InitialData);
                 iterations.Visible = true;
+                var stopwatchExperiments = System.Diagnostics.Stopwatch.StartNew();
+                List<decimal> bestValuesAcrossExperiments = new List<decimal>();
                 for (int i = 0; i < InitialData.NumberOfExperiments; i++)
                 {
                     iterations.Text = i + 1 + " / " + experimentNumber.Value;
@@ -92,7 +99,17 @@ namespace Lab2
                     {
                         decimal precision = 0.001m;
                         this.Invoke((MethodInvoker)(() => precision = (decimal)precisionInput.SelectedItem));
+                        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
                         await Task.Run(() => AlgorithmRun(progress, precision));
+                        var elapsedLocal = stopwatch.Elapsed;
+
+                        if (InitialData.NumberOfExperiments == 1)
+                            MessageBox.Show(
+                                $"Experiment {i + 1} finished in {elapsedLocal.TotalSeconds:F2} seconds " +
+                                $"({elapsedLocal.Minutes:D2}:{elapsedLocal.Seconds:D2}.{elapsedLocal.Milliseconds:D3}).",
+                                "Execution Time"
+                            );
                     }
                     finally
                     {
@@ -102,9 +119,23 @@ namespace Lab2
                             FileUtils.SaveMaxFCCorr(historyOfIndividuals, InitialData, false);
                         else
                             FileUtils.SaveMaxFCCorr(historyOfIndividuals, InitialData, true);
+                        decimal bestThisExperiment = historyOfIndividuals
+                            .Last()
+                            .Max(ind => ind.MarkAfterMutation);
+
+                        bestValuesAcrossExperiments.Add(bestThisExperiment);
                         seed.Text = RandomSingleton.GetUsedSeed().ToString();
                     }
                 }
+                FileUtils.SaveStandardDeviationAtTheEndOfMaxFCCorr(bestValuesAcrossExperiments, InitialData, false);
+                var elapsed = stopwatchExperiments.Elapsed;
+
+
+                MessageBox.Show(
+                    $"Finished in {elapsed.TotalSeconds:F2} seconds " +
+                    $"({elapsed.Minutes:D2}:{elapsed.Seconds:D2}.{elapsed.Milliseconds:D3}).",
+                    "Execution Time"
+                );
                 iterations.Visible = false;
 
                 List<Individual> lastGeneration = historyOfIndividuals.Last();
@@ -205,6 +236,12 @@ namespace Lab2
                 chartArea.AxisY.Title = "Marks";
                 chartArea.AxisX.TitleFont = new Font("Arial", 15);
                 chartArea.AxisY.TitleFont = new Font("Arial", 15);
+
+                chartArea.AxisX.Minimum = 0;
+                chartArea.AxisX.IsMarginVisible = false;
+                chartArea.AxisY.Minimum = 0.1;
+                chartArea.AxisY.Maximum = 1.0;
+
                 chart1.ChartAreas.Clear();
                 chart1.ChartAreas.Add(chartArea);
                 chart1.Legends[0].Font = new Font("Arial", 15);
@@ -318,7 +355,7 @@ namespace Lab2
                         {
                             foreach (var rt in rtValues)
                             {
-                                foreach(var ps in psValues)
+                                foreach (var ps in psValues)
                                 {
                                     foreach (var ipk in ipkValues)
                                     {
@@ -341,7 +378,19 @@ namespace Lab2
                                         for (int x = 0; x < testExperimentCount.Value; x++)
                                         {
                                             var individuals = Enumerable.Range(1, (int)n)
-                                                .Select(i => new Individual(i, matrixSizeInput.Value, 0.001m, pk, pm, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes, InitialData.ProbGen1))
+                                                .Select(i => new Individual(
+                                                    i,
+                                                    matrixSizeInput.Value, 
+                                                    0.001m,
+                                                    pk,
+                                                    pm,
+                                                    InitialData.SupervisedReferenceMatrix, 
+                                                    InitialData.AlgorithmType,
+                                                    InitialData.UnsupervisedPatternMatrixes,
+                                                    InitialData.ProbGen1,
+                                                    InitialData.UniformBlockMutationProbWhite,
+                                                    InitialData.UniformBlockMutationProbRed
+                                                ))
                                                 .ToList();
 
                                             for (int t2 = 0; t2 < t; t2++)
@@ -397,14 +446,52 @@ namespace Lab2
                                                     individuals[i].MarkAfterMutation = individuals[i].SetOcena(individuals[i].MatrixAfterMutation);
                                                 }
 
-                                                //historyOfIndividuals.Add(individuals);
                                                 var copiedIndividuals = individuals.ToList();
-                                                individuals = new();
+
+                                                individuals = new List<Individual>();
+
+                                                int eliteCount = InitialData.EliteOn ? (int)InitialData.EliteToMove : 0;
+
+                                                eliteCount = Math.Min(eliteCount, copiedIndividuals.Count);
+
+                                                var elites = copiedIndividuals
+                                                    .OrderByDescending(ind => ind.MarkAfterMutation)
+                                                    .Take(eliteCount)
+                                                    .ToList();
 
                                                 int idx = 1;
-                                                for (int i = 0; i < copiedIndividuals.Count; i++)
+                                                foreach (var elite in elites)
                                                 {
-                                                    individuals.Add(new Individual(idx++, matrixSizeInput.Value, 0.003m, crossProbabilityInput.Value, mutationProbabilityInput.Value, copiedIndividuals[i].MatrixAfterMutation, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes));
+                                                    individuals.Add(new Individual(
+                                                        idx++,
+                                                        matrixSizeInput.Value,
+                                                        0.003m,
+                                                        crossProbabilityInput.Value,
+                                                        mutationProbabilityInput.Value,
+                                                        elite.MatrixAfterMutation,
+                                                        InitialData.SupervisedReferenceMatrix,
+                                                        InitialData.AlgorithmType,
+                                                        InitialData.UnsupervisedPatternMatrixes,
+                                                        InitialData.UniformBlockMutationProbWhite,
+                                                        InitialData.UniformBlockMutationProbRed
+                                                    ));
+                                                }
+
+                                                foreach (var ind in copiedIndividuals.Skip(eliteCount))
+                                                {
+                                                    individuals.Add(new Individual(
+                                                        idx++,
+                                                        matrixSizeInput.Value,
+                                                        0.003m,
+                                                        crossProbabilityInput.Value,
+                                                        mutationProbabilityInput.Value,
+                                                        ind.MatrixAfterMutation,
+                                                        InitialData.SupervisedReferenceMatrix,
+                                                        InitialData.AlgorithmType,
+                                                        InitialData.UnsupervisedPatternMatrixes,
+                                                        InitialData.UniformBlockMutationProbWhite,
+                                                        InitialData.UniformBlockMutationProbRed
+                                                    ));
                                                 }
                                             }
 
@@ -466,12 +553,6 @@ namespace Lab2
             //globalHistory.Clear();
             list.Clear();
             GC.Collect();
-        }
-
-
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
         }
 
 
@@ -577,7 +658,19 @@ namespace Lab2
             List<Individual> individuals = new List<Individual>();
             for (int i = 1; i <= individualNumberInput.Value; i++)
             {
-                individuals.Add(new Individual(i, matrixSizeInput.Value, precision, crossProbabilityInput.Value, mutationProbabilityInput.Value, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes, InitialData.ProbGen1));
+                individuals.Add(new Individual(
+                    i,
+                    matrixSizeInput.Value, 
+                    precision, 
+                    crossProbabilityInput.Value,
+                    mutationProbabilityInput.Value, 
+                    InitialData.SupervisedReferenceMatrix, 
+                    InitialData.AlgorithmType, 
+                    InitialData.UnsupervisedPatternMatrixes, 
+                    InitialData.ProbGen1,
+                    InitialData.UniformBlockMutationProbWhite,
+                    InitialData.UniformBlockMutationProbRed
+                ));
             }
             for (int t = 0; t < iterationNumberInput.Value; t++)
             {
@@ -640,11 +733,44 @@ namespace Lab2
                 historyOfIndividuals.Add(individuals);
                 List<Individual> coppiedIndividuals = individuals.ToList();
                 individuals = new List<Individual>();
+                int eliteCount = InitialData.EliteOn ? (int)InitialData.EliteToMove : 0;
+                eliteCount = Math.Min(eliteCount, coppiedIndividuals.Count);
+                var elites = coppiedIndividuals
+                    .OrderByDescending(ind => ind.MarkAfterMutation)
+                    .Take(eliteCount)
+                    .ToList();
                 int idx = 1;
-                for (int i = 0; i < coppiedIndividuals.Count; i++)
+                foreach (var elite in elites)
                 {
-                    individuals.Add(new Individual(idx, matrixSizeInput.Value, precision, crossProbabilityInput.Value, mutationProbabilityInput.Value, coppiedIndividuals[i].MatrixAfterMutation, InitialData.SupervisedReferenceMatrix, InitialData.AlgorithmType, InitialData.UnsupervisedPatternMatrixes));
-                    idx++;
+                    individuals.Add(new Individual(
+                        idx++,
+                        matrixSizeInput.Value,
+                        precision,
+                        crossProbabilityInput.Value,
+                        mutationProbabilityInput.Value,
+                        elite.MatrixAfterMutation,
+                        InitialData.SupervisedReferenceMatrix,
+                        InitialData.AlgorithmType,
+                        InitialData.UnsupervisedPatternMatrixes,
+                        InitialData.UniformBlockMutationProbWhite,
+                        InitialData.UniformBlockMutationProbRed
+                    ));
+                }
+                foreach (var ind in coppiedIndividuals.Skip(eliteCount))
+                {
+                    individuals.Add(new Individual(
+                        idx++,
+                        matrixSizeInput.Value,
+                        precision,
+                        crossProbabilityInput.Value,
+                        mutationProbabilityInput.Value,
+                        ind.MatrixAfterMutation,
+                        InitialData.SupervisedReferenceMatrix,
+                        InitialData.AlgorithmType,
+                        InitialData.UnsupervisedPatternMatrixes,
+                        InitialData.UniformBlockMutationProbWhite,
+                        InitialData.UniformBlockMutationProbRed
+                    ));
                 }
 
                 progress?.Report(t + 1);
@@ -694,6 +820,8 @@ namespace Lab2
                 selectionGroup.Enabled = true;
                 crossGroup.Enabled = true;
                 mutationGroup.Enabled = true;
+                unformBlocksGroupBox.Enabled = true;
+                eliteGroupBox.Enabled = true;
             }
         }
 
@@ -704,10 +832,14 @@ namespace Lab2
             ruletteRadio.Checked = true;
             singlePointRadio.Checked = true;
             evenlyRadio.Checked = true;
+            uniformBlock.Checked = false;
+            eliteOn.Checked = false;
 
             selectionGroup.Enabled = false;
             crossGroup.Enabled = false;
             mutationGroup.Enabled = false;
+            unformBlocksGroupBox.Enabled = false;
+            eliteGroupBox.Enabled = false;
         }
 
         private void ruletteRadio_CheckedChanged(object sender, EventArgs e)
@@ -732,8 +864,8 @@ namespace Lab2
                 InitialData.SelectionType = SelectionType.TOURNAMENT_HARD;
                 tournamentSizeInput.Enabled = true;
                 tournamentTresholdInput.Enabled = false;
-                
-                
+
+
                 tournamentSizeGroupBox.Enabled = true;
                 selectionThresholdGroupBox.Enabled = false;
             }
@@ -838,6 +970,5 @@ namespace Lab2
                 InitialData.UniformBlock = checkbox.Checked;
             }
         }
-
     }
 }

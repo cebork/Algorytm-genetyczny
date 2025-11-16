@@ -28,6 +28,10 @@ namespace Lab2.Core.Domain
         public MutationType MutationType { get; set; }
         public bool UniformBlock { get; set; }
         public decimal ProbGen1 { get; set; }
+        public decimal UniformBlockMutationProbWhite { get; set; }
+        public decimal UniformBlockMutationProbRed { get; set; }
+        public bool EliteOn { get; set; }
+        public decimal EliteToMove { get; set; }
         public InitialData() { }
 
         public InitialData(

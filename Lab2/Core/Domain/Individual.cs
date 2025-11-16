@@ -48,8 +48,22 @@ namespace Lab2.Core.Domain
         public decimal MarkAfterMutation { get; set; }
         public decimal NotNormalizedMarkAfterMutation { get; set; }
         public decimal ProbGen1 { get; set; }
-        public Individual(decimal orderNumber, decimal matrixSize, decimal precision, decimal crossProbability, decimal mutationProbability, bool[,] referenceMatrix, AlgorithmType algorithmType, bool[][,] patternMatrixes, decimal probGen1)
-        {
+        public decimal UniformBlockMutationProbWhite { get; set; }
+        public decimal UniformBlockMutationProbRed { get; set; }
+
+        public Individual(
+            decimal orderNumber, 
+            decimal matrixSize, 
+            decimal precision, 
+            decimal crossProbability, 
+            decimal mutationProbability,
+            bool[,] referenceMatrix, 
+            AlgorithmType algorithmType, 
+            bool[][,] patternMatrixes,
+            decimal probGen1,
+            decimal uniformBlockMutationProbWhite,
+            decimal uniformBlockMutationProbRed
+        ) {
 
             AlgorithmType = algorithmType;
             OrderNumber = orderNumber;
@@ -60,14 +74,27 @@ namespace Lab2.Core.Domain
             ReferenceMatrix = referenceMatrix;
             PatternMatrixes = patternMatrixes;
             ProbGen1 = probGen1;
+            UniformBlockMutationProbWhite = uniformBlockMutationProbWhite;
+            UniformBlockMutationProbRed = uniformBlockMutationProbRed;
             precisionDigits = GetPrecisionDigits(precision);
             InitOsobnikMatrix();
             SetOcena();
             ProbGen1 = probGen1;
         }
 
-        public Individual(decimal orderNumber, decimal matrixSize, decimal precision, decimal crossProbability, decimal mutationProbability, bool[,] nextMatrix, bool[,] referenceMatrix, AlgorithmType algorithmType, bool[][,] patternMatrixes)
-        {
+        public Individual(
+            decimal orderNumber, 
+            decimal matrixSize,
+            decimal precision, 
+            decimal crossProbability,
+            decimal mutationProbability,
+            bool[,] nextMatrix,
+            bool[,] referenceMatrix,
+            AlgorithmType algorithmType, 
+            bool[][,] patternMatrixes,
+            decimal uniformBlockMutationProbWhite,
+            decimal uniformBlockMutationProbRed
+        ) {
             AlgorithmType = algorithmType;
             OrderNumber = orderNumber;
             MatrixSize = (int)matrixSize;
@@ -77,6 +104,8 @@ namespace Lab2.Core.Domain
             IndividualMatrix = nextMatrix;
             ReferenceMatrix = referenceMatrix;
             PatternMatrixes = patternMatrixes;
+            UniformBlockMutationProbWhite = uniformBlockMutationProbWhite;
+            UniformBlockMutationProbRed = uniformBlockMutationProbRed;
             precisionDigits = GetPrecisionDigits(precision);
             SetOcena();
         }
@@ -400,6 +429,7 @@ namespace Lab2.Core.Domain
             int cols = MatrixAfterCross.GetLength(1);
 
             bool[,] afterMutation = (bool[,])MatrixAfterCross.Clone();
+            var rng = RandomSingleton.Instance;
 
             for (int i = 2; i < rows - 2; i++)
             {
@@ -417,7 +447,15 @@ namespace Lab2.Core.Domain
                         }
                     }
 
-                    if (isUniform)
+                    if (!isUniform)
+                        continue;
+
+                    decimal prob = centerValue
+                        ? UniformBlockMutationProbRed
+                        : UniformBlockMutationProbWhite;
+                    double r = rng.NextDouble();
+
+                    if ((decimal)r <= prob)
                     {
                         afterMutation[i, j] = !centerValue;
                         MutationPosition += $"[{i}, {j}]b,";
@@ -442,37 +480,29 @@ namespace Lab2.Core.Domain
             int rows = MatrixAfterCross.GetLength(0);
             int cols = MatrixAfterCross.GetLength(1);
 
-            int validHeight = rows - 2;
-            int validWidth = cols - 2;
-
             decimal multiplier = Math.Max(0.0m, (maxIterations - iterationCount) / (decimal)maxIterations);
-            int mutationTargetCount = (int)Math.Round(
-                mutationPorbability * validHeight * validWidth * 2 * multiplier
-            );
+            decimal effectiveMutationProb = mutationPorbability * multiplier;
 
-            if (mutationTargetCount <= 0)
+            if (effectiveMutationProb <= 0)
             {
                 MatrixAfterMutation = MatrixAfterCross;
                 return;
             }
 
             bool[,] afterMutation = (bool[,])MatrixAfterCross.Clone();
-            var usedCoords = new HashSet<(int, int)>();
             var rand = RandomSingleton.Instance;
 
-            int attempts = 0;
-            while (usedCoords.Count < mutationTargetCount && attempts < mutationTargetCount * 10)
+            for (int i = 1; i < rows - 1; i++)
             {
-                int i = rand.Next(1, rows - 1);
-                int j = rand.Next(1, cols - 1);
-
-                if (usedCoords.Add((i, j)))
+                for (int j = 1; j < cols - 1; j++)
                 {
-                    afterMutation[i, j] = !MatrixAfterCross[i, j];
-                    MutationPosition += $"[{i}, {j}],";
+                    double r = rand.NextDouble();
+                    if ((decimal)r <= effectiveMutationProb)
+                    {
+                        afterMutation[i, j] = !afterMutation[i, j];
+                        MutationPosition += $"[{i}, {j}],";
+                    }
                 }
-
-                attempts++;
             }
 
             MatrixAfterMutation = afterMutation;
