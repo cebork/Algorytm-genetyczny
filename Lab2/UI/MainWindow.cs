@@ -18,7 +18,7 @@ namespace Lab2
         InitialData InitialData;
 
         List<List<Individual>> historyOfIndividuals = new List<List<Individual>>();
-
+        List<int> cumlatiiveArrayBase = new List<int>();
         public MainWindow()
         {
             InitialData = new InitialData();
@@ -45,6 +45,7 @@ namespace Lab2
 
         private async void startButton_Click(object sender, EventArgs e)
         {
+            cumlatiiveArrayBase = new List<int>();
             if (!useSeed.Checked)
                 RandomSingleton.Reset();
             else
@@ -73,6 +74,7 @@ namespace Lab2
             InitialData.UniformBlockMutationProbWhite = uniformProbWhite.Value;
             InitialData.EliteOn = eliteOn.Checked;
             InitialData.EliteToMove = eliteToMove.Value;
+            InitialData.StopAtFirstCorrect = stopAtFirstCorrect.Checked;
             historyOfIndividuals.Clear();
 
             try
@@ -250,6 +252,52 @@ namespace Lab2
                 chart1.ChartAreas[0].AxisY.LabelStyle.Font = new Font("Arial", 14);
                 seed.Text = RandomSingleton.GetUsedSeed().ToString();
 
+
+
+                // ============================================
+                // CUMULATIVE CHART SETUP (NO EXCEPTIONS)
+                // ============================================
+
+                // 1. Build cumulative array
+                List<int> cumulative = new List<int>();
+                int sum = 0;
+
+                foreach (var value in cumlatiiveArrayBase)
+                {
+                    sum += value;
+                    cumulative.Add(sum);
+                }
+
+                // 2. Prepare chart area
+                cumulativeChart.Series.Clear();
+
+                if (cumulativeChart.ChartAreas.Count == 0)
+                    cumulativeChart.ChartAreas.Add(new ChartArea("Default"));
+
+                ChartArea cumulativeArea = cumulativeChart.ChartAreas[0];
+                cumulativeArea.AxisX.Title = "Generation";
+                cumulativeArea.AxisY.Title = "Cumulative number of correct solutions";
+                cumulativeArea.BackColor = Color.White;
+
+                // 3. Create series
+                Series cumulativeSeries = new Series("Cumulative");
+                cumulativeSeries.ChartType = SeriesChartType.Line;
+                cumulativeSeries.BorderWidth = 3;
+
+                // 4. FIXED: materialize X-values to avoid NotSupportedException
+                var xValues = Enumerable.Range(1, cumulative.Count).ToList();
+
+                // 5. Bind to chart
+                cumulativeSeries.Points.DataBindXY(xValues, cumulative);
+
+                // 6. Add series
+                cumulativeChart.Series.Add(cumulativeSeries);
+
+                // 7. Title
+                cumulativeChart.Titles.Clear();
+                cumulativeChart.Titles.Add("Cumulative Correct Solutions");
+
+
             }
             catch (Exception ex)
             {
@@ -261,7 +309,7 @@ namespace Lab2
 
 
 
-        }
+}
 
 
 
@@ -729,8 +777,12 @@ namespace Lab2
 
 
 
+                const decimal Threshold = 0.95m;
 
+                int correctCount = individuals.Any(i => i.MarkAfterMutation >= Threshold) ? 1 : 0;
+                cumlatiiveArrayBase.Add(correctCount);
                 historyOfIndividuals.Add(individuals);
+
                 List<Individual> coppiedIndividuals = individuals.ToList();
                 individuals = new List<Individual>();
                 int eliteCount = InitialData.EliteOn ? (int)InitialData.EliteToMove : 0;
@@ -773,6 +825,7 @@ namespace Lab2
                     ));
                 }
 
+                
                 progress?.Report(t + 1);
 
 

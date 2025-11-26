@@ -28,9 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            TabPage cumulativeChartPage;
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
             matrixSizeLabel = new Label();
             matrixSizeInput = new NumericUpDown();
             individualNumberInput = new NumericUpDown();
@@ -152,9 +156,12 @@
             uniformProbRed = new NumericUpDown();
             uniformProbRedLabel = new Label();
             eliteGroupBox = new GroupBox();
-            eliteOn = new CheckBox();
             eliteToMove = new NumericUpDown();
+            eliteOn = new CheckBox();
             eliteToMoveLabel = new Label();
+            stopAtFirstCorrect = new CheckBox();
+            cumulativeChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            cumulativeChartPage = new TabPage();
             ((System.ComponentModel.ISupportInitialize)matrixSizeInput).BeginInit();
             ((System.ComponentModel.ISupportInitialize)individualNumberInput).BeginInit();
             ((System.ComponentModel.ISupportInitialize)crossProbabilityInput).BeginInit();
@@ -213,6 +220,8 @@
             ((System.ComponentModel.ISupportInitialize)uniformProbRed).BeginInit();
             eliteGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)eliteToMove).BeginInit();
+            cumulativeChartPage.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)cumulativeChart).BeginInit();
             SuspendLayout();
             // 
             // matrixSizeLabel
@@ -325,6 +334,7 @@
             tabs.Controls.Add(tabPage1);
             tabs.Controls.Add(tabPage2);
             tabs.Controls.Add(tabPage3);
+            tabs.Controls.Add(cumulativeChartPage);
             tabs.Location = new Point(12, 238);
             tabs.Name = "tabs";
             tabs.SelectedIndex = 0;
@@ -374,16 +384,16 @@
             // 
             // chart1
             // 
-            chartArea1.Name = "ChartArea1";
-            chart1.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            chart1.Legends.Add(legend1);
+            chartArea3.Name = "ChartArea1";
+            chart1.ChartAreas.Add(chartArea3);
+            legend3.Name = "Legend1";
+            chart1.Legends.Add(legend3);
             chart1.Location = new Point(6, 6);
             chart1.Name = "chart1";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            chart1.Series.Add(series1);
+            series3.ChartArea = "ChartArea1";
+            series3.Legend = "Legend1";
+            series3.Name = "Series1";
+            chart1.Series.Add(series3);
             chart1.Size = new Size(1510, 808);
             chart1.TabIndex = 0;
             chart1.Text = "chart1";
@@ -1264,7 +1274,6 @@
             tournamentSoftRadio.Name = "tournamentSoftRadio";
             tournamentSoftRadio.Size = new Size(97, 19);
             tournamentSoftRadio.TabIndex = 2;
-            tournamentSoftRadio.TabStop = true;
             tournamentSoftRadio.Text = "turniej miekki";
             tournamentSoftRadio.UseVisualStyleBackColor = true;
             tournamentSoftRadio.CheckedChanged += tournamentSoftRadio_CheckedChanged;
@@ -1276,7 +1285,6 @@
             tournamentHardRadio.Name = "tournamentHardRadio";
             tournamentHardRadio.Size = new Size(98, 19);
             tournamentHardRadio.TabIndex = 1;
-            tournamentHardRadio.TabStop = true;
             tournamentHardRadio.Text = "turniej twardy";
             tournamentHardRadio.UseVisualStyleBackColor = true;
             tournamentHardRadio.CheckedChanged += tournamentHardRadio_CheckedChanged;
@@ -1284,6 +1292,7 @@
             // ruletteRadio
             // 
             ruletteRadio.AutoSize = true;
+            ruletteRadio.Checked = true;
             ruletteRadio.Location = new Point(7, 22);
             ruletteRadio.Name = "ruletteRadio";
             ruletteRadio.Size = new Size(61, 19);
@@ -1504,16 +1513,6 @@
             eliteGroupBox.TabStop = false;
             eliteGroupBox.Text = "Elita";
             // 
-            // eliteOn
-            // 
-            eliteOn.AutoSize = true;
-            eliteOn.Location = new Point(6, 22);
-            eliteOn.Name = "eliteOn";
-            eliteOn.Size = new Size(57, 19);
-            eliteOn.TabIndex = 27;
-            eliteOn.Text = "Włącz";
-            eliteOn.UseVisualStyleBackColor = true;
-            // 
             // eliteToMove
             // 
             eliteToMove.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
@@ -1524,6 +1523,16 @@
             eliteToMove.TabIndex = 32;
             eliteToMove.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
+            // eliteOn
+            // 
+            eliteOn.AutoSize = true;
+            eliteOn.Location = new Point(6, 22);
+            eliteOn.Name = "eliteOn";
+            eliteOn.Size = new Size(57, 19);
+            eliteOn.TabIndex = 27;
+            eliteOn.Text = "Włącz";
+            eliteOn.UseVisualStyleBackColor = true;
+            // 
             // eliteToMoveLabel
             // 
             eliteToMoveLabel.AutoSize = true;
@@ -1533,11 +1542,49 @@
             eliteToMoveLabel.TabIndex = 31;
             eliteToMoveLabel.Text = "Ilość elit do przeniesienia";
             // 
+            // stopAtFirstCorrect
+            // 
+            stopAtFirstCorrect.AutoSize = true;
+            stopAtFirstCorrect.Location = new Point(379, 30);
+            stopAtFirstCorrect.Name = "stopAtFirstCorrect";
+            stopAtFirstCorrect.Size = new Size(212, 19);
+            stopAtFirstCorrect.TabIndex = 30;
+            stopAtFirstCorrect.Text = "Zakończ na pierwszym poprawnym";
+            stopAtFirstCorrect.UseVisualStyleBackColor = true;
+            // 
+            // cumulativeChartPage
+            // 
+            cumulativeChartPage.Controls.Add(cumulativeChart);
+            cumulativeChartPage.Location = new Point(4, 24);
+            cumulativeChartPage.Name = "cumulativeChartPage";
+            cumulativeChartPage.Padding = new Padding(3);
+            cumulativeChartPage.Size = new Size(1618, 820);
+            cumulativeChartPage.TabIndex = 3;
+            cumulativeChartPage.Text = "Wykres akumulacyjny";
+            cumulativeChartPage.UseVisualStyleBackColor = true;
+            // 
+            // cumulativeChart
+            // 
+            chartArea4.Name = "ChartArea1";
+            cumulativeChart.ChartAreas.Add(chartArea4);
+            legend4.Name = "Legend1";
+            cumulativeChart.Legends.Add(legend4);
+            cumulativeChart.Location = new Point(7, 6);
+            cumulativeChart.Name = "cumulativeChart";
+            series4.ChartArea = "ChartArea1";
+            series4.Legend = "Legend1";
+            series4.Name = "Series1";
+            cumulativeChart.Series.Add(series4);
+            cumulativeChart.Size = new Size(1605, 808);
+            cumulativeChart.TabIndex = 0;
+            cumulativeChart.Text = "chart2";
+            // 
             // MainWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1866, 1094);
+            Controls.Add(stopAtFirstCorrect);
             Controls.Add(eliteGroupBox);
             Controls.Add(unformBlocksGroupBox);
             Controls.Add(iterations);
@@ -1629,6 +1676,8 @@
             eliteGroupBox.ResumeLayout(false);
             eliteGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)eliteToMove).EndInit();
+            cumulativeChartPage.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)cumulativeChart).EndInit();
             ResumeLayout(false);
             PerformLayout();
 
@@ -1759,5 +1808,8 @@
         private NumericUpDown eliteToMove;
         private CheckBox eliteOn;
         private Label eliteToMoveLabel;
+        private CheckBox stopAtFirstCorrect;
+        private TabPage cumulativeChartPage;
+        private System.Windows.Forms.DataVisualization.Charting.Chart cumulativeChart;
     }
 }
