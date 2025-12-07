@@ -18,7 +18,7 @@ namespace Lab2
         InitialData InitialData;
 
         List<List<Individual>> historyOfIndividuals = new List<List<Individual>>();
-        List<int> cumlatiiveArrayBase = new List<int>();
+        int[] cumlatiiveArrayBase;
         public MainWindow()
         {
             InitialData = new InitialData();
@@ -45,7 +45,7 @@ namespace Lab2
 
         private async void startButton_Click(object sender, EventArgs e)
         {
-            cumlatiiveArrayBase = new List<int>();
+            
             if (!useSeed.Checked)
                 RandomSingleton.Reset();
             else
@@ -76,7 +76,7 @@ namespace Lab2
             InitialData.EliteToMove = eliteToMove.Value;
             InitialData.StopAtFirstCorrect = stopAtFirstCorrect.Checked;
             historyOfIndividuals.Clear();
-
+            cumlatiiveArrayBase = new int[(int) InitialData.NumberOfIterations];
             try
             {
                 new ValidationService(InitialData);
@@ -254,11 +254,6 @@ namespace Lab2
 
 
 
-                // ============================================
-                // CUMULATIVE CHART SETUP (NO EXCEPTIONS)
-                // ============================================
-
-                // 1. Build cumulative array
                 List<int> cumulative = new List<int>();
                 int sum = 0;
 
@@ -268,7 +263,12 @@ namespace Lab2
                     cumulative.Add(sum);
                 }
 
-                // 2. Prepare chart area
+                if (cumulative.Count == 0)
+                    return;
+
+                double maxCum = cumulative.Max();
+                var normalized = cumulative.Select(v => (double)v / maxCum).ToList();
+
                 cumulativeChart.Series.Clear();
 
                 if (cumulativeChart.ChartAreas.Count == 0)
@@ -276,26 +276,25 @@ namespace Lab2
 
                 ChartArea cumulativeArea = cumulativeChart.ChartAreas[0];
                 cumulativeArea.AxisX.Title = "Generation";
-                cumulativeArea.AxisY.Title = "Cumulative number of correct solutions";
+                cumulativeArea.AxisY.Title = "Cumulative (0–1)";
+                cumulativeArea.AxisX.TitleFont = new Font("Arial", 15);
+                cumulativeArea.AxisY.TitleFont = new Font("Arial", 15);
                 cumulativeArea.BackColor = Color.White;
 
-                // 3. Create series
+                cumulativeArea.AxisY.Minimum = 0;
+                cumulativeArea.AxisY.Maximum = 1;
+
                 Series cumulativeSeries = new Series("Cumulative");
                 cumulativeSeries.ChartType = SeriesChartType.Line;
                 cumulativeSeries.BorderWidth = 3;
 
-                // 4. FIXED: materialize X-values to avoid NotSupportedException
-                var xValues = Enumerable.Range(1, cumulative.Count).ToList();
+                var xValues = Enumerable.Range(1, normalized.Count).ToList();
+                cumulativeSeries.Points.DataBindXY(xValues, normalized);
 
-                // 5. Bind to chart
-                cumulativeSeries.Points.DataBindXY(xValues, cumulative);
-
-                // 6. Add series
                 cumulativeChart.Series.Add(cumulativeSeries);
-
-                // 7. Title
+                cumulativeChart.Legends[0].Font = new Font("Arial", 15);
                 cumulativeChart.Titles.Clear();
-                cumulativeChart.Titles.Add("Cumulative Correct Solutions");
+
 
 
             }
@@ -703,6 +702,7 @@ namespace Lab2
 
         private void AlgorithmRun(IProgress<int> progress, decimal precision)
         {
+            bool solutionFound = false;
             List<Individual> individuals = new List<Individual>();
             for (int i = 1; i <= individualNumberInput.Value; i++)
             {
@@ -777,10 +777,14 @@ namespace Lab2
 
 
 
-                const decimal Threshold = 0.95m;
+                const decimal Threshold = 0.975m;
 
-                int correctCount = individuals.Any(i => i.MarkAfterMutation >= Threshold) ? 1 : 0;
-                cumlatiiveArrayBase.Add(correctCount);
+                bool found = individuals.Any(i => i.MarkAfterMutation >= Threshold);
+                if (!solutionFound && found )
+                {
+                    solutionFound = true;
+                    cumlatiiveArrayBase[t] += 1;
+                }
                 historyOfIndividuals.Add(individuals);
 
                 List<Individual> coppiedIndividuals = individuals.ToList();
