@@ -453,5 +453,28 @@ namespace Lab2.Services
             }
         }
 
+        public static void SaveArrayAsIndexAndValues(
+            int[] values,
+            string fileName,
+            bool append = false
+        )
+        {
+            if (values == null || values.Length == 0)
+                return;
+
+            Directory.CreateDirectory(ResultDirectory);
+            string filePath = Path.Combine(ResultDirectory, fileName);
+
+            using (var writer = new StreamWriter(filePath, append, Encoding.UTF8))
+            {
+                writer.WriteLine(string.Join(" ",
+                    Enumerable.Range(0, values.Length)));
+
+                writer.WriteLine(string.Join(" ",
+                    values));
+            }
+        }
+
+
     }
 }

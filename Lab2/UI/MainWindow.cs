@@ -256,7 +256,7 @@ namespace Lab2
 
                 List<int> cumulative = new List<int>();
                 int sum = 0;
-
+                FileUtils.SaveArrayAsIndexAndValues(cumlatiiveArrayBase, "cumulative.txt");
                 foreach (var value in cumlatiiveArrayBase)
                 {
                     sum += value;

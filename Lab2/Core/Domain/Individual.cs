@@ -13,7 +13,13 @@ namespace Lab2.Core.Domain
     {
         private readonly int precisionDigits;
         public AlgorithmType AlgorithmType { get; set; }
-        public int MatrixSize { get; set; }
+        private int _matrixSize;
+
+        public int MatrixSize
+        {
+            get => _matrixSize + 2;
+            set => _matrixSize = value;
+        }
         private decimal precision;
         private decimal crossProbability;
         private decimal mutationPorbability;
