@@ -166,12 +166,12 @@ namespace Lab2.Core.Domain
                     {
                         for (int j = 1; j < MatrixSize - 1; j++)
                         {
-                            if (IndividualMatrix[i, j] == ReferenceMatrix[i, j] == true)
+                            if (IndividualMatrix[i, j] == ReferenceMatrix[i - 1, j - 1] == true)
                             {
                                 meter++;
                                 denominator++;
                             }
-                            if ((IndividualMatrix[i, j] == true && ReferenceMatrix[i, j] == false) || (IndividualMatrix[i, j] == false && ReferenceMatrix[i, j] == true))
+                            if ((IndividualMatrix[i, j] == true && ReferenceMatrix[i - 1, j - 1] == false) || (IndividualMatrix[i, j] == false && ReferenceMatrix[i - 1, j - 1] == true))
                             {
                                 denominator++;
                             }
@@ -282,12 +282,12 @@ namespace Lab2.Core.Domain
                         {
                             for (int j = 1; j < MatrixSize - 1; j++)
                             {
-                                if (matrixAfterMutation[i, j] == true && ReferenceMatrix[i, j] == true)
+                                if (matrixAfterMutation[i, j] == true && ReferenceMatrix[i - 1, j - 1] == true)
                                 {
                                     meter++;
                                     denominator++;
                                 }
-                                if ((matrixAfterMutation[i, j] == true && ReferenceMatrix[i, j] == false) || (matrixAfterMutation[i, j] == false && ReferenceMatrix[i, j] == true))
+                                if ((matrixAfterMutation[i, j] == true && ReferenceMatrix[i - 1, j - 1] == false) || (matrixAfterMutation[i, j] == false && ReferenceMatrix[i - 1, j - 1] == true))
                                 {
                                     denominator++;
                                 }

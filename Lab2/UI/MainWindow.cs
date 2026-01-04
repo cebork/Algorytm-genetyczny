@@ -267,7 +267,7 @@ namespace Lab2
                     return;
 
                 double maxCum = cumulative.Max();
-                var normalized = cumulative.Select(v => (double)v / maxCum).ToList();
+                var normalized = cumulative.Select(v => (double)v / (double)InitialData.NumberOfExperiments).ToList();
 
                 cumulativeChart.Series.Clear();
 
@@ -308,7 +308,7 @@ namespace Lab2
 
 
 
-}
+        }
 
 
 
@@ -775,7 +775,7 @@ namespace Lab2
                     individuals[i].MarkAfterMutation = individuals[i].SetOcena(individuals[i].MatrixAfterMutation);
                 }
 
-
+                
 
                 const decimal Threshold = 0.975m;
 
