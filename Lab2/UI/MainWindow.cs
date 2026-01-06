@@ -165,7 +165,14 @@ namespace Lab2
                         };
                 for (int i = 0; i < historyOfIndividuals.Count; i++)
                 {
-                    decimal max = historyOfIndividuals[i].Max(osobnik => osobnik.MarkAfterMutation);
+                    decimal max = decimal.MinValue;
+                    var generation = historyOfIndividuals[i];
+                    for (int j = 0; j < generation.Count; j++)
+                    {
+                        if (generation[j].MarkAfterMutation > max)
+                            max = generation[j].MarkAfterMutation;
+                    }
+
                     maxValues.Add(i + 1, max);
                 }
 
@@ -177,7 +184,14 @@ namespace Lab2
                         };
                 for (int i = 0; i < historyOfIndividuals.Count; i++)
                 {
-                    decimal avg = historyOfIndividuals[i].Average(osobnik => osobnik.MarkAfterMutation);
+                    decimal sumAvg = 0m;
+                    var generation = historyOfIndividuals[i];
+                    for (int j = 0; j < generation.Count; j++)
+                    {
+                        sumAvg += generation[j].MarkAfterMutation;
+                    }
+                    decimal avg = sumAvg / generation.Count;
+
                     avgValues.Add(i + 1, avg);
                 }
 
@@ -187,7 +201,14 @@ namespace Lab2
                         };
                 for (int i = 0; i < historyOfIndividuals.Count; i++)
                 {
-                    decimal min = historyOfIndividuals[i].Min(osobnik => osobnik.MarkAfterMutation);
+                    decimal min = decimal.MaxValue;
+                    var generation = historyOfIndividuals[i];
+                    for (int j = 0; j < generation.Count; j++)
+                    {
+                        if (generation[j].MarkAfterMutation < min)
+                            min = generation[j].MarkAfterMutation;
+                    }
+
                     minValues.Add(i + 1, min);
                 }
 
@@ -575,8 +596,8 @@ namespace Lab2
                                         //globalHistory.Add(initial, localHistory);
                                         list.Add(testObject);
 
-                                        localHistory.Clear();
-                                        GC.Collect();
+                                        //localHistory.Clear();
+                                        //GC.Collect();
                                     }
                                 }
                             }
@@ -598,8 +619,8 @@ namespace Lab2
 
             //historyOfIndividuals.Clear();
             //globalHistory.Clear();
-            list.Clear();
-            GC.Collect();
+            //list.Clear();
+            //GC.Collect();
         }
 
 
