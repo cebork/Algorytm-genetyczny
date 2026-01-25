@@ -1,0 +1,159 @@
+﻿using Lab2.Core.Domain;
+using Lab2.objects;
+using Lab2.UI.Domain;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+
+namespace Lab2.Infrastructure
+{
+
+    public static class FileUtils
+    {
+
+        private static readonly string DataDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
+        private static readonly string PatternsFilePath = Path.Combine(DataDirectory, "patterns.json");
+        private static readonly string ReferenceMatrixesFilePath = Path.Combine(DataDirectory, "referenceMatrixes.json");
+
+        private static readonly string ResultDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Results");
+        private static readonly string GaTunningFilePath = Path.Combine(ResultDirectory, "tunning_GA.txt");
+        private static readonly string GaResultsFilePath = Path.Combine(ResultDirectory, "results_GA.txt");
+        private static readonly string maxFCCorr = Path.Combine(ResultDirectory, "max_f_C_corr.txt");
+
+
+
+        private class SerializablePattern
+        {
+            public string PatternName { get; set; }
+            public int PatternSize { get; set; }
+            public bool[][] PatternMatrix { get; set; }
+        }
+
+
+        private class SerializableReferenceMatrix
+        {
+            public string ReferenceMatrixName { get; set; }
+            public int MatrixSize { get; set; }
+            public bool[][] ReferenceMatrixMatrix { get; set; }
+        }
+
+        public static List<PatternChoosingDisplayColumns> LoadAllPatterns()
+        {
+            if (!File.Exists(PatternsFilePath)) return new List<PatternChoosingDisplayColumns>();
+
+            var json = File.ReadAllText(PatternsFilePath);
+            var loadedList = JsonSerializer.Deserialize<List<SerializablePattern>>(json);
+
+            return loadedList?.Select(item => new PatternChoosingDisplayColumns
+            {
+                PatternName = item.PatternName,
+                PatternSize = item.PatternSize,
+                PatternMatrix = To2DArray(item.PatternMatrix)
+            }).ToList() ?? new List<PatternChoosingDisplayColumns>();
+        }
+
+        private static bool[,] To2DArray(bool[][] jagged)
+        {
+            int rows = jagged.Length;
+            int cols = jagged[0].Length;
+            var result = new bool[rows, cols];
+
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    result[i, j] = jagged[i][j];
+                }
+            }
+
+            return result;
+        }
+
+        public static void AppendPatternToFile(PatternChoosingDisplayColumns pattern)
+        {
+            Directory.CreateDirectory(DataDirectory);
+
+            var existing = new List<SerializablePattern>();
+
+            if (File.Exists(PatternsFilePath))
+            {
+                var json = File.ReadAllText(PatternsFilePath);
+                existing = JsonSerializer.Deserialize<List<SerializablePattern>>(json) ?? new List<SerializablePattern>();
+            }
+
+            var serializable = new SerializablePattern
+            {
+                PatternName = pattern.PatternName,
+                PatternSize = pattern.PatternSize,
+                PatternMatrix = ToJaggedArray(pattern.PatternMatrix)
+            };
+
+            existing.Add(serializable);
+
+            var newJson = JsonSerializer.Serialize(existing, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(PatternsFilePath, newJson);
+        }
+
+        private static bool[][] ToJaggedArray(bool[,] matrix)
+        {
+            int rows = matrix.GetLength(0);
+            int cols = matrix.GetLength(1);
+            var result = new bool[rows][];
+
+            for (int i = 0; i < rows; i++)
+            {
+                result[i] = new bool[cols];
+                for (int j = 0; j < cols; j++)
+                {
+                    result[i][j] = matrix[i, j];
+                }
+            }
+
+            return result;
+        }
+
+        public static List<ReferenceMatrixDisplayColumns> LoadAllReferenceMatrixes(int matrixSize)
+        {
+            if (!File.Exists(ReferenceMatrixesFilePath)) return new List<ReferenceMatrixDisplayColumns>();
+
+            var json = File.ReadAllText(ReferenceMatrixesFilePath);
+            var loadedList = JsonSerializer.Deserialize<List<SerializableReferenceMatrix>>(json);
+
+            return loadedList?.Where(item => item.MatrixSize == matrixSize).Select(item => new ReferenceMatrixDisplayColumns
+            {
+                ReferenceMatrixName = item.ReferenceMatrixName,
+                MatrixSize = item.MatrixSize,
+                ReferenceMatrix = To2DArray(item.ReferenceMatrixMatrix)
+            }).ToList() ?? new List<ReferenceMatrixDisplayColumns>();
+        }
+
+        public static void AppendReferenceMatrixToFile(ReferenceMatrixDisplayColumns referenceMatrixDisplayColumns)
+        {
+            Directory.CreateDirectory(DataDirectory);
+
+            var existing = new List<SerializableReferenceMatrix>();
+
+            if (File.Exists(ReferenceMatrixesFilePath))
+            {
+                var json = File.ReadAllText(ReferenceMatrixesFilePath);
+                existing = JsonSerializer.Deserialize<List<SerializableReferenceMatrix>>(json) ?? new List<SerializableReferenceMatrix>();
+            }
+
+            var serializable = new SerializableReferenceMatrix
+            {
+                ReferenceMatrixName = referenceMatrixDisplayColumns.ReferenceMatrixName,
+                MatrixSize = referenceMatrixDisplayColumns.MatrixSize,
+                ReferenceMatrixMatrix = ToJaggedArray(referenceMatrixDisplayColumns.ReferenceMatrix),
+            };
+
+            existing.Add(serializable);
+
+            var newJson = JsonSerializer.Serialize(existing, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(ReferenceMatrixesFilePath, newJson);
+        }
+
+    }
+}

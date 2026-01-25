@@ -5,6 +5,7 @@ using Lab2.Core.Domain;
 using Lab2.UI.Domain;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using Lab2.Services;
+using Lab2.Infrastructure;
 namespace Lab2.UI
 {
     public partial class PatternChoosingModalWindow : Form
@@ -173,7 +174,8 @@ namespace Lab2.UI
                 item.Checked = false;
 
                 patternList.Items.Add(item);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Błąd");
             }

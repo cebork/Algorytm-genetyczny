@@ -1,0 +1,50 @@
+﻿using Lab2.Core.Domain;
+using Lab2.Core.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Lab2.Core.Validation
+{
+    public sealed class InitialDataValidator : IValidator<InitialData>
+    {
+        public ValidationResult Validate(InitialData data)
+        {
+            var result = new ValidationResult();
+
+            if (data.MatrixSize <= 0)
+                result.Errors.Add("Rozmiar macierzy musi być > 0");
+
+            if (data.NumberOfIndividuals <= 0)
+                result.Errors.Add("Liczba osobników musi być > 0");
+
+            if (data.NumberOfIterations <= 0)
+                result.Errors.Add("Liczba iteracji musi być > 0");
+
+            if (data.CrossProbability is < 0 or > 1)
+                result.Errors.Add("Prawdopodobieństwo krzyżowania musi być w [0,1]");
+
+            if (data.MutationProbability is < 0 or > 1)
+                result.Errors.Add("Prawdopodobieństwo mutacji musi być w [0,1]");
+
+            if (data.ProbGen1 is < 0 or > 1)
+                result.Errors.Add("ProbGen1 musi być w [0,1]");
+
+            if (data.AlgorithmType == AlgorithmType.SUPERVISED &&
+                (data.SupervisedReferenceMatrix == null || data.SupervisedReferenceMatrix.Length == 0))
+            {
+                result.Errors.Add("Brak macierzy referencyjnej");
+            }
+
+            if (data.AlgorithmType == AlgorithmType.UNSUPERVISED &&
+                (data.UnsupervisedPatternMatrixes == null || data.UnsupervisedPatternMatrixes.Length == 0))
+            {
+                result.Errors.Add("Nie wybrano macierzy wzorców");
+            }
+
+            return result;
+        }
+    }
+}

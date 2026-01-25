@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Lab2.Core.Domain;
+using Lab2.Infrastructure;
 using Lab2.Services;
 using Lab2.UI.Domain;
 
@@ -194,7 +195,8 @@ namespace Lab2.UI
 
         private void saveReferenceTable_Click(object sender, EventArgs e)
         {
-            try {
+            try
+            {
                 new ValidationService(referenceTableName.Text);
                 int size = referenceMatrixInput.RowCount;
                 bool[,] matrix = new bool[size, size];
@@ -210,8 +212,8 @@ namespace Lab2.UI
 
                 ReferenceMatrixDisplayColumns referenceMatrixDisplayColumns = new ReferenceMatrixDisplayColumns()
                 {
-                    ReferenceMatrixName= referenceTableName.Text,
-                    MatrixSize = (int) InitialData.MatrixSize,
+                    ReferenceMatrixName = referenceTableName.Text,
+                    MatrixSize = (int)InitialData.MatrixSize,
                     ReferenceMatrix = matrix
                 };
 
@@ -225,7 +227,7 @@ namespace Lab2.UI
 
                 referenceMatrixList.Items.Add(item);
 
-            } 
+            }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Błąd");

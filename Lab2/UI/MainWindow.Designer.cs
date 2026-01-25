@@ -28,13 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             TabPage cumulativeChartPage;
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            cumulativeChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             matrixSizeLabel = new Label();
             matrixSizeInput = new NumericUpDown();
             individualNumberInput = new NumericUpDown();
@@ -160,8 +161,9 @@
             eliteOn = new CheckBox();
             eliteToMoveLabel = new Label();
             stopAtFirstCorrect = new CheckBox();
-            cumulativeChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             cumulativeChartPage = new TabPage();
+            cumulativeChartPage.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)cumulativeChart).BeginInit();
             ((System.ComponentModel.ISupportInitialize)matrixSizeInput).BeginInit();
             ((System.ComponentModel.ISupportInitialize)individualNumberInput).BeginInit();
             ((System.ComponentModel.ISupportInitialize)crossProbabilityInput).BeginInit();
@@ -220,9 +222,34 @@
             ((System.ComponentModel.ISupportInitialize)uniformProbRed).BeginInit();
             eliteGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)eliteToMove).BeginInit();
-            cumulativeChartPage.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)cumulativeChart).BeginInit();
             SuspendLayout();
+            // 
+            // cumulativeChartPage
+            // 
+            cumulativeChartPage.Controls.Add(cumulativeChart);
+            cumulativeChartPage.Location = new Point(4, 24);
+            cumulativeChartPage.Name = "cumulativeChartPage";
+            cumulativeChartPage.Padding = new Padding(3);
+            cumulativeChartPage.Size = new Size(1618, 820);
+            cumulativeChartPage.TabIndex = 3;
+            cumulativeChartPage.Text = "Wykres akumulacyjny";
+            cumulativeChartPage.UseVisualStyleBackColor = true;
+            // 
+            // cumulativeChart
+            // 
+            chartArea1.Name = "ChartArea1";
+            cumulativeChart.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            cumulativeChart.Legends.Add(legend1);
+            cumulativeChart.Location = new Point(7, 6);
+            cumulativeChart.Name = "cumulativeChart";
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            cumulativeChart.Series.Add(series1);
+            cumulativeChart.Size = new Size(1605, 808);
+            cumulativeChart.TabIndex = 0;
+            cumulativeChart.Text = "chart2";
             // 
             // matrixSizeLabel
             // 
@@ -384,16 +411,16 @@
             // 
             // chart1
             // 
-            chartArea3.Name = "ChartArea1";
-            chart1.ChartAreas.Add(chartArea3);
-            legend3.Name = "Legend1";
-            chart1.Legends.Add(legend3);
+            chartArea2.Name = "ChartArea1";
+            chart1.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            chart1.Legends.Add(legend2);
             chart1.Location = new Point(6, 6);
             chart1.Name = "chart1";
-            series3.ChartArea = "ChartArea1";
-            series3.Legend = "Legend1";
-            series3.Name = "Series1";
-            chart1.Series.Add(series3);
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            chart1.Series.Add(series2);
             chart1.Size = new Size(1510, 808);
             chart1.TabIndex = 0;
             chart1.Text = "chart1";
@@ -1091,7 +1118,6 @@
             unsupervisedTypeRadioButton.Name = "unsupervisedTypeRadioButton";
             unsupervisedTypeRadioButton.Size = new Size(112, 19);
             unsupervisedTypeRadioButton.TabIndex = 1;
-            unsupervisedTypeRadioButton.TabStop = true;
             unsupervisedTypeRadioButton.Text = "nienadzorowany";
             unsupervisedTypeRadioButton.UseVisualStyleBackColor = true;
             unsupervisedTypeRadioButton.CheckedChanged += unsupervisedTypeRadioButton_CheckedChanged;
@@ -1099,6 +1125,7 @@
             // supervisedTypedRadioButton
             // 
             supervisedTypedRadioButton.AutoSize = true;
+            supervisedTypedRadioButton.Checked = true;
             supervisedTypedRadioButton.Location = new Point(11, 19);
             supervisedTypedRadioButton.Name = "supervisedTypedRadioButton";
             supervisedTypedRadioButton.Size = new Size(96, 19);
@@ -1552,33 +1579,6 @@
             stopAtFirstCorrect.Text = "Zakończ na pierwszym poprawnym";
             stopAtFirstCorrect.UseVisualStyleBackColor = true;
             // 
-            // cumulativeChartPage
-            // 
-            cumulativeChartPage.Controls.Add(cumulativeChart);
-            cumulativeChartPage.Location = new Point(4, 24);
-            cumulativeChartPage.Name = "cumulativeChartPage";
-            cumulativeChartPage.Padding = new Padding(3);
-            cumulativeChartPage.Size = new Size(1618, 820);
-            cumulativeChartPage.TabIndex = 3;
-            cumulativeChartPage.Text = "Wykres akumulacyjny";
-            cumulativeChartPage.UseVisualStyleBackColor = true;
-            // 
-            // cumulativeChart
-            // 
-            chartArea4.Name = "ChartArea1";
-            cumulativeChart.ChartAreas.Add(chartArea4);
-            legend4.Name = "Legend1";
-            cumulativeChart.Legends.Add(legend4);
-            cumulativeChart.Location = new Point(7, 6);
-            cumulativeChart.Name = "cumulativeChart";
-            series4.ChartArea = "ChartArea1";
-            series4.Legend = "Legend1";
-            series4.Name = "Series1";
-            cumulativeChart.Series.Add(series4);
-            cumulativeChart.Size = new Size(1605, 808);
-            cumulativeChart.TabIndex = 0;
-            cumulativeChart.Text = "chart2";
-            // 
             // MainWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1602,6 +1602,8 @@
             Name = "MainWindow";
             Text = "Lab 2";
             Load += Form1_Load;
+            cumulativeChartPage.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)cumulativeChart).EndInit();
             ((System.ComponentModel.ISupportInitialize)matrixSizeInput).EndInit();
             ((System.ComponentModel.ISupportInitialize)individualNumberInput).EndInit();
             ((System.ComponentModel.ISupportInitialize)crossProbabilityInput).EndInit();
@@ -1676,8 +1678,6 @@
             eliteGroupBox.ResumeLayout(false);
             eliteGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)eliteToMove).EndInit();
-            cumulativeChartPage.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)cumulativeChart).EndInit();
             ResumeLayout(false);
             PerformLayout();
 

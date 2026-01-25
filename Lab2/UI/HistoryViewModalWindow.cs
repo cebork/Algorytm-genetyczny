@@ -16,11 +16,11 @@ namespace Lab2.UI
         {
             InitializeComponent();
             this.history = history;
-            Individual bestIndividual = history[0].OrderByDescending(ind => ind.MarkAfterMutation).FirstOrDefault();
+            Individual bestIndividual = history[0].OrderByDescending(ind => ind.Genotype).FirstOrDefault();
 
             if (bestIndividual != null)
             {
-                DisplayMatrix(bestIndividual.MatrixAfterMutation);
+                DisplayMatrix(bestIndividual.Genotype);
             }
             else
             {
@@ -106,26 +106,26 @@ namespace Lab2.UI
 
         private void hisotryIndex_ValueChanged(object sender, EventArgs e)
         {
-            try
-            {
-                Individual bestIndividual = history[(int)hisotryIndex.Value - 1].OrderByDescending(ind => ind.MarkAfterMutation).FirstOrDefault();
-                if (bestIndividual != null)
-                {
-                    DisplayMatrix(bestIndividual.MatrixAfterMutation);
-                }
-                else
-                {
-                    Console.WriteLine("No individuals found.");
-                }
-            } 
-            catch (IndexOutOfRangeException ex)
-            {
-                MessageBox.Show("Wartość wykracza poza ilość iteracji");
-            }
-            catch (ArgumentOutOfRangeException ex)
-            {
-                MessageBox.Show("Wartość wykracza poza ilość iteracji");
-            }
+            //try
+            //{
+            //    Individual bestIndividual = history[(int)hisotryIndex.Value - 1].OrderByDescending(ind => ind.MarkAfterMutation).FirstOrDefault();
+            //    if (bestIndividual != null)
+            //    {
+            //        DisplayMatrix(bestIndividual.MatrixAfterMutation);
+            //    }
+            //    else
+            //    {
+            //        Console.WriteLine("No individuals found.");
+            //    }
+            //} 
+            //catch (IndexOutOfRangeException ex)
+            //{
+            //    MessageBox.Show("Wartość wykracza poza ilość iteracji");
+            //}
+            //catch (ArgumentOutOfRangeException ex)
+            //{
+            //    MessageBox.Show("Wartość wykracza poza ilość iteracji");
+            //}
 
 
 
