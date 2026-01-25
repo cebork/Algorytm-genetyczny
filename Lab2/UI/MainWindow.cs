@@ -4,12 +4,14 @@ using Lab2.objects;
 using Lab2.Services;
 using Lab2.UI;
 using Lab2.Utils;
+using MathNet.Numerics;
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using Series = System.Windows.Forms.DataVisualization.Charting.Series;
 
 namespace Lab2
 {
@@ -596,8 +598,8 @@ namespace Lab2
                                         //globalHistory.Add(initial, localHistory);
                                         list.Add(testObject);
 
-                                        //localHistory.Clear();
-                                        //GC.Collect();
+                                        localHistory.Clear();
+                                        GC.Collect();
                                     }
                                 }
                             }
@@ -619,8 +621,8 @@ namespace Lab2
 
             //historyOfIndividuals.Clear();
             //globalHistory.Clear();
-            //list.Clear();
-            //GC.Collect();
+            list.Clear();
+            GC.Collect();
         }
 
 
@@ -723,6 +725,9 @@ namespace Lab2
 
         private void AlgorithmRun(IProgress<int> progress, decimal precision)
         {
+            int stagnationTime = 0;
+            Individual currentBest = null;
+            int stagnationLimit = 50;
             bool solutionFound = false;
             List<Individual> individuals = new List<Individual>();
             for (int i = 1; i <= individualNumberInput.Value; i++)
@@ -796,7 +801,46 @@ namespace Lab2
                     individuals[i].MarkAfterMutation = individuals[i].SetOcena(individuals[i].MatrixAfterMutation);
                 }
 
-                
+
+                //Individual bestThisIteration = null;
+                //decimal bestMark = decimal.MinValue;
+
+                //for (int i = 0; i < individuals.Count; i++)
+                //{
+                //    if (individuals[i].MarkAfterMutation > bestMark)
+                //    {
+                //        bestMark = individuals[i].MarkAfterMutation;
+                //        bestThisIteration = individuals[i];
+                //    }
+                //}
+
+                //if (currentBest == null)
+                //{
+                //    currentBest = bestThisIteration;
+                //    stagnationTime = 0;
+                //}
+                //else if (bestThisIteration.MarkAfterMutation > currentBest.MarkAfterMutation)
+                //{
+                //    currentBest = bestThisIteration;
+                //    stagnationTime = 0;
+                //}
+                //else
+                //{
+                //    stagnationTime++;
+                //}
+
+                //if (stagnationTime >= stagnationLimit)
+                //{
+                //    RemoveStagnation(
+                //        individuals,
+                //        precision,
+                //        500,
+                //        1m
+                //    );
+
+                //    stagnationTime = 0;
+                //}
+
 
                 const decimal Threshold = 0.975m;
 
@@ -858,6 +902,46 @@ namespace Lab2
 
 
         }
+
+        private void RemoveStagnation(
+            List<Individual> individuals,
+            decimal precision,
+            decimal amountToRemoveStagnation,
+            decimal probabilityOfRemovalStagnation
+        )
+        {
+            if (individuals == null || individuals.Count == 0)
+                return;
+
+            int amount = (int)(individuals.Count * amountToRemoveStagnation);
+            if (amount <= 0)
+                return;
+
+            var random = RandomSingleton.Instance;
+
+            for (int k = 0; k < amount; k++)
+            {
+                if (random.NextDouble() > (double)probabilityOfRemovalStagnation)
+                    continue;
+
+                int index = random.Next(individuals.Count);
+
+                individuals[index] = new Individual(
+                    index,
+                    matrixSizeInput.Value,
+                    precision,
+                    crossProbabilityInput.Value,
+                    mutationProbabilityInput.Value,
+                    InitialData.SupervisedReferenceMatrix,
+                    InitialData.AlgorithmType,
+                    InitialData.UnsupervisedPatternMatrixes,
+                    InitialData.ProbGen1,
+                    InitialData.UniformBlockMutationProbWhite,
+                    InitialData.UniformBlockMutationProbRed
+                );
+            }
+        }
+
 
         private List<decimal> GenerateDecimalRange(decimal start, decimal end, decimal step)
         {
