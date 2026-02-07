@@ -53,18 +53,17 @@ namespace Lab2
 
         private async void startButton_Click(object sender, EventArgs e)
         {
-            //try
-            //{
+            try
+            {
                 ReadUiData();
                 new ValidationFacade().ValidateOrThrow(_data);
                 RunGeneticAlgorithm();
-                MessageBox.Show("Algorytm zakoñczony poprawnie");
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show(ex.Message, "B³¹d");
-            //}
         }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "B³¹d");
+            }
+}
 
         private async void RunGeneticAlgorithm()
         {
@@ -99,7 +98,11 @@ namespace Lab2
                 runProgressBar.Value = Math.Min(value, runProgressBar.Maximum);
             });
 
+            var stopwatch = Stopwatch.StartNew();
+
             await Task.Run(() => ga.Run(progress));
+
+            stopwatch.Stop();
 
             runProgressBar.Visible = false;
 
@@ -114,6 +117,15 @@ namespace Lab2
             DisplayMatrix(lastGeneration.OrderByDescending(o => o.Fitness).First().Genotype);
             //FileUtils.SaveResultsGa(historyOfIndividuals, InitialData);
             DrawFitnessChart(ga.StatisticsHistory);
+
+            var elapsed = stopwatch.Elapsed;
+            MessageBox.Show(
+                $"Genetic algorithm finished in {elapsed.TotalMilliseconds:N0} ms\n" +
+                $"({elapsed.TotalSeconds:F2} seconds)",
+                "Execution time",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information
+            );
 
         }
 
@@ -294,7 +306,7 @@ namespace Lab2
                     AxisY =
             {
                 Title = "Fitness",
-                Minimum = 0.1,
+                Minimum = 0.0,
                 Maximum = 1.0,
                 TitleFont = new Font("Arial", 15),
                 LabelStyle = { Font = new Font("Arial", 14) }

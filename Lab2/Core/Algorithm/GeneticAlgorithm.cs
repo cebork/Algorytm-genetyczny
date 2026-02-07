@@ -101,10 +101,19 @@ namespace Lab2.Core.Algorithm
 
         private void EvaluatePopulation()
         {
-            foreach (var individual in _population)
-            {
-                individual.Fitness = _fitness.Evaluate(individual.Genotype);
-            }
+            Parallel.ForEach(
+                _population,
+                new ParallelOptions
+                {
+                    MaxDegreeOfParallelism = Environment.ProcessorCount
+                },
+                individual =>
+                {
+                    individual.Fitness = _fitness.Evaluate(individual.Genotype);
+                }
+            );
         }
+
+
     }
 }
