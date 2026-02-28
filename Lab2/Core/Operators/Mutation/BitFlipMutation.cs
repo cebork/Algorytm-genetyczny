@@ -23,20 +23,18 @@ namespace Lab2.Core.Operators.Mutation
             int rows = genotype.GetLength(0);
             int cols = genotype.GetLength(1);
 
-            bool[,] result = (bool[,])genotype.Clone();
-
             for (int i = 1; i < rows - 1; i++)
             {
                 for (int j = 1; j < cols - 1; j++)
                 {
                     if (_random.NextDouble() <= (double)_mutationProbability)
                     {
-                        result[i, j] = !result[i, j];
+                        genotype[i, j] = !genotype[i, j];
                     }
                 }
             }
 
-            return result;
+            return genotype;
         }
     }
 }

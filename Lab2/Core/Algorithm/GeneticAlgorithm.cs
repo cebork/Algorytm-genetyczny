@@ -7,7 +7,6 @@ using Lab2.Core.Statistics;
 using Lab2.Core.Termination;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -63,11 +62,13 @@ namespace Lab2.Core.Algorithm
 
             int maxIterations = _termination is MaxIterationCondition m ? m.MaxIterations : iteration;
 
+            var offspring = new List<Individual>(_populationSize + 1);
+
             while (!_termination.ShouldStop(iteration))
             {
                 var parents = _selection.Select(_population);
 
-                var offspring = new List<Individual>();
+                offspring.Clear();
 
                 for (int i = 0; i < parents.Count - 1; i += 2)
                 {
@@ -76,8 +77,6 @@ namespace Lab2.Core.Algorithm
                         parents[i + 1].Genotype
                     );
 
-
-
                     c1 = _mutation.Mutate(c1, iteration, maxIterations);
                     c2 = _mutation.Mutate(c2, iteration, maxIterations);
 
@@ -85,13 +84,22 @@ namespace Lab2.Core.Algorithm
                     offspring.Add(new Individual(c2));
                 }
 
-                _population = offspring.Take(_populationSize).ToList();
+                if (offspring.Count > _populationSize)
+                    offspring.RemoveAt(offspring.Count - 1);
+
+                // Swap references so _population becomes the new generation
+                // and offspring (now holding the old population) is reused next iteration
+                var temp = _population;
+                _population = offspring;
+                offspring = temp;
+                offspring.Clear();
+
                 EvaluatePopulation();
 
                 _statistics.Update(_population, iteration);
                 _statisticsHistory.Add(_statistics.Current);
 
-                _history.Add(_population.Select(i => i.Clone()).ToList());
+                _history.Add(_population);
                 iteration++;
 
                 progress?.Report(iteration);

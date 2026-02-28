@@ -58,15 +58,14 @@ namespace Lab2.Core.Operators.Mutation
                     (flat[secondStart + k], flat[firstStart + k]);
             }
 
-            bool[,] result = (bool[,])genotype.Clone();
             for (int i = 0; i < totalInnerBits; i++)
             {
                 int r = i / innerCols;
                 int c = i % innerCols;
-                result[r + 1, c + 1] = flat[i];
+                genotype[r + 1, c + 1] = flat[i];
             }
 
-            return result;
+            return genotype;
         }
     }
 }

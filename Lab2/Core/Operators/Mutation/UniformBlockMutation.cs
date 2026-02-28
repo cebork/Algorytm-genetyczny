@@ -29,20 +29,18 @@ namespace Lab2.Core.Operators.Mutation
             int rows = genotype.GetLength(0);
             int cols = genotype.GetLength(1);
 
-            bool[,] result = (bool[,])genotype.Clone();
-
             for (int i = 2; i < rows - 2; i++)
             {
                 for (int j = 2; j < cols - 2; j++)
                 {
-                    bool center = result[i, j];
+                    bool center = genotype[i, j];
                     bool uniform = true;
 
                     for (int di = -1; di <= 1 && uniform; di++)
                     {
                         for (int dj = -1; dj <= 1 && uniform; dj++)
                         {
-                            if (result[i + di, j + dj] != center)
+                            if (genotype[i + di, j + dj] != center)
                                 uniform = false;
                         }
                     }
@@ -53,12 +51,12 @@ namespace Lab2.Core.Operators.Mutation
                     decimal prob = center ? _probRed : _probWhite;
                     if (_random.NextDouble() <= (double)prob)
                     {
-                        result[i, j] = !center;
+                        genotype[i, j] = !center;
                     }
                 }
             }
 
-            return result;
+            return genotype;
         }
     }
 }

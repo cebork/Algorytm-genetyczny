@@ -1,10 +1,6 @@
 ﻿using Lab2.Core.Domain;
-using MathNet.Numerics.Statistics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Lab2.Core.Statistics
 {
@@ -18,17 +14,31 @@ namespace Lab2.Core.Statistics
             int generation
         )
         {
-            var fitness = population
-            .Select(i => (double)i.Fitness)
-            .ToArray();
+            int n = population.Count;
+            double min = double.MaxValue;
+            double max = double.MinValue;
+            double mean = 0.0;
+            double m2 = 0.0;
+
+            for (int i = 0; i < n; i++)
+            {
+                double f = (double)population[i].Fitness;
+                if (f < min) min = f;
+                if (f > max) max = f;
+                double delta = f - mean;
+                mean += delta / (i + 1);
+                m2 += delta * (f - mean);
+            }
+
+            double stdDev = n > 1 ? Math.Sqrt(m2 / (n - 1)) : 0.0;
 
             Current = new PopulationStatistics
             {
                 Generation = generation,
-                BestFitness = (decimal)fitness.Max(),
-                WorstFitness = (decimal)fitness.Min(),
-                AverageFitness = (decimal)fitness.Average(),
-                FitnessStdDev = (decimal)fitness.StandardDeviation(),
+                BestFitness = (decimal)max,
+                WorstFitness = (decimal)min,
+                AverageFitness = (decimal)mean,
+                FitnessStdDev = (decimal)stdDev,
                 Diversity = CalculateDiversity(population)
             };
         }
@@ -40,18 +50,24 @@ namespace Lab2.Core.Statistics
             int size = population.Count;
             if (size < 2) return 0;
 
+            const int MaxSampleSize = 10;
+            int sampleSize = Math.Min(size - 1, MaxSampleSize);
+            int step = Math.Max(1, (size - 1) / sampleSize);
+
+            var reference = population[0].Genotype;
+            int rows = reference.GetLength(0);
+            int cols = reference.GetLength(1);
+
             int totalGenes = 0;
             int differentGenes = 0;
 
-            var reference = population[0].Genotype;
-
-            for (int i = 1; i < size; i++)
+            for (int idx = 1; idx < size; idx += step)
             {
-                var matrix = population[i].Genotype;
+                var matrix = population[idx].Genotype;
 
-                for (int r = 0; r < reference.GetLength(0); r++)
+                for (int r = 0; r < rows; r++)
                 {
-                    for (int c = 0; c < reference.GetLength(1); c++)
+                    for (int c = 0; c < cols; c++)
                     {
                         totalGenes++;
                         if (matrix[r, c] != reference[r, c])

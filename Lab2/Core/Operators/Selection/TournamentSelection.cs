@@ -12,6 +12,7 @@ namespace Lab2.Core.Operators.Selection
     {
         private readonly int _tournamentSize;
         private readonly IRandomProvider _random;
+        private readonly Individual[] _contestantBuffer;
 
         public TournamentSelection(int tournamentSize, IRandomProvider random)
         {
@@ -20,6 +21,7 @@ namespace Lab2.Core.Operators.Selection
 
             _tournamentSize = tournamentSize;
             _random = random;
+            _contestantBuffer = new Individual[tournamentSize];
         }
 
         public IReadOnlyList<Individual> Select(IReadOnlyList<Individual> population)
@@ -39,19 +41,20 @@ namespace Lab2.Core.Operators.Selection
 
         private Individual RunTournament(IReadOnlyList<Individual> population)
         {
-            var contestants = new List<Individual>(_tournamentSize);
-
             for (int i = 0; i < _tournamentSize; i++)
             {
-                int index = _random.Next(0, population.Count);
-                contestants.Add(population[index]);
+                _contestantBuffer[i] = population[_random.Next(0, population.Count)];
             }
 
             // Zwycięzca = najlepszy fitness
-            return contestants
-                .OrderByDescending(i => i.Fitness)
-                .First()
-                .Clone();
+            Individual best = _contestantBuffer[0];
+            for (int i = 1; i < _tournamentSize; i++)
+            {
+                if (_contestantBuffer[i].Fitness > best.Fitness)
+                    best = _contestantBuffer[i];
+            }
+
+            return best;
         }
     }
 }

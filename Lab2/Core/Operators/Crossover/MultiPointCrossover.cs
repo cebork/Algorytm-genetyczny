@@ -1,9 +1,6 @@
 ﻿using Lab2.Core.Random;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Lab2.Core.Operators.Crossover
 {
@@ -26,13 +23,20 @@ namespace Lab2.Core.Operators.Crossover
             if (cols < 3 || _points <= 0)
                 return (p1, p2);
 
-            var cutPoints = new HashSet<int>();
-            while (cutPoints.Count < _points)
+            int[] cuts = new int[_points];
+            int cutCount = 0;
+            while (cutCount < _points)
             {
-                cutPoints.Add(_random.Next(1, cols - 1));
+                int candidate = _random.Next(1, cols - 1);
+                bool duplicate = false;
+                for (int k = 0; k < cutCount; k++)
+                {
+                    if (cuts[k] == candidate) { duplicate = true; break; }
+                }
+                if (!duplicate)
+                    cuts[cutCount++] = candidate;
             }
-
-            var cuts = cutPoints.OrderBy(x => x).ToList();
+            Array.Sort(cuts);
 
             bool[,] c1 = new bool[rows, cols];
             bool[,] c2 = new bool[rows, cols];
@@ -40,8 +44,9 @@ namespace Lab2.Core.Operators.Crossover
             bool takeFirst = true;
             int start = 0;
 
-            foreach (int cut in cuts.Append(cols))
+            for (int ci = 0; ci <= cuts.Length; ci++)
             {
+                int cut = ci < cuts.Length ? cuts[ci] : cols;
                 for (int r = 0; r < rows; r++)
                 {
                     for (int c = start; c < cut; c++)
