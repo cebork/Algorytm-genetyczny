@@ -474,7 +474,7 @@ namespace Lab2
             //if (InitialData.AlgorithmType == Core.Enums.AlgorithmType.SUPERVISED && (InitialData.SupervisedReferenceMatrix == null || InitialData.SupervisedReferenceMatrix.Length == 0) ||
             //    InitialData.AlgorithmType == Core.Enums.AlgorithmType.UNSUPERVISED && (InitialData.UnsupervisedPatternMatrixes == null || InitialData.UnsupervisedPatternMatrixes.Length == 0))
             //{
-            //    MessageBox.Show("Nie wybrano macierzy wzorc�w lub macierzy referencyjnej", "");
+            //    MessageBox.Show("Nie wybrano macierzy wzorców lub macierzy referencyjnej", "");
             //    return;
             //}
 
@@ -796,7 +796,7 @@ namespace Lab2
             if (selected != null && selected.Checked)
             {
                 _data.AlgorithmType = AlgorithmType.SUPERVISED;
-                additioanlDataButton.Text = "Wyb�r macierzy referencyjnej";
+                additioanlDataButton.Text = "Wybór macierzy referencyjnej";
             }
         }
 
@@ -806,7 +806,7 @@ namespace Lab2
             if (selected != null && selected.Checked)
             {
                 _data.AlgorithmType = AlgorithmType.UNSUPERVISED;
-                additioanlDataButton.Text = "Wyb�r macierzy wzorc�w";
+                additioanlDataButton.Text = "Wybór macierzy wzorców";
             }
         }
 
