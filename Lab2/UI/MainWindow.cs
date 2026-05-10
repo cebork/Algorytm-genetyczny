@@ -64,7 +64,7 @@ namespace Lab2
             {
                 ReadUiData();
                 new ValidationFacade().ValidateOrThrow(_data);
-                RunGeneticAlgorithm();
+                await RunGeneticAlgorithm();
         }
             catch (Exception ex)
             {
@@ -72,10 +72,72 @@ namespace Lab2
             }
 }
 
-        private async void RunGeneticAlgorithm()
+        private async Task RunGeneticAlgorithm()
         {
-            
-            var random = CreateRandomProvider();
+            int experimentCount = (int)_data.NumberOfExperiments;
+            int iterationCount = (int)_data.NumberOfIterations;
+
+            runProgressBar.Visible = true;
+            runProgressBar.Minimum = 0;
+            runProgressBar.Maximum = experimentCount * iterationCount;
+            runProgressBar.Value = 0;
+
+            var stopwatch = Stopwatch.StartNew();
+            var cumulativeSuccesses = new int[iterationCount + 1];
+            GeneticAlgorithm lastGa = null;
+
+            for (int experimentIndex = 0; experimentIndex < experimentCount; experimentIndex++)
+            {
+                var ga = CreateGeneticAlgorithm(experimentIndex);
+                int completedBeforeThisExperiment = experimentIndex * iterationCount;
+                var progress = new Progress<int>(value =>
+                {
+                    int totalProgress = completedBeforeThisExperiment + Math.Min(value, iterationCount);
+                    runProgressBar.Value = Math.Min(totalProgress, runProgressBar.Maximum);
+                });
+
+                await Task.Run(() => ga.Run(progress));
+
+                AddGenerationSuccess(cumulativeSuccesses, ga.StatisticsHistory);
+                lastGa = ga;
+            }
+
+            stopwatch.Stop();
+
+            runProgressBar.Visible = false;
+
+            if (lastGa == null)
+                return;
+
+            FileUtils.SaveCumulativeResults(cumulativeSuccesses, iterationCount);
+
+            _history = lastGa.History
+                .Select(g => g.ToList())
+                .ToList();
+
+            var lastGeneration = lastGa.History.Last();
+
+            DisplayLastGeneration(lastGa);
+
+            DisplayMatrix(lastGeneration.OrderByDescending(o => o.Fitness).First().Genotype);
+            //FileUtils.SaveResultsGa(historyOfIndividuals, InitialData);
+            DrawFitnessChart(lastGa.StatisticsHistory);
+            DrawCumulativeChart(cumulativeSuccesses, experimentCount);
+
+            var elapsed = stopwatch.Elapsed;
+            MessageBox.Show(
+                $"Genetic algorithm finished {experimentCount} experiment(s) in {elapsed.TotalMilliseconds:N0} ms\n" +
+                $"({elapsed.TotalSeconds:F2} seconds)",
+                "Execution time",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information
+            );
+
+        }
+
+        private GeneticAlgorithm CreateGeneticAlgorithm(int experimentIndex)
+        {
+            var random = CreateRandomProvider(experimentIndex);
 
             var fitness = CreateFitness();
             var selection = CreateSelection(random);
@@ -102,47 +164,25 @@ namespace Lab2
                     _data.ProbGen1
                 );
 
-            var ga = builder.Build();
+            return builder.Build();
+        }
 
-            runProgressBar.Visible = true;
-            runProgressBar.Minimum = 0;
-            runProgressBar.Maximum = (int)_data.NumberOfIterations;
-            runProgressBar.Value = 0;
+        private static void AddGenerationSuccess(
+            int[] generationSuccesses,
+            IReadOnlyList<PopulationStatistics> statistics
+        )
+        {
+            const decimal SuccessThreshold = 0.975m;
 
-            var progress = new Progress<int>(value =>
+            for (int i = 0; i < statistics.Count; i++)
             {
-                runProgressBar.Value = Math.Min(value, runProgressBar.Maximum);
-            });
-
-            var stopwatch = Stopwatch.StartNew();
-
-            await Task.Run(() => ga.Run(progress));
-
-            stopwatch.Stop();
-
-            runProgressBar.Visible = false;
-
-            _history = ga.History
-                .Select(g => g.ToList())
-                .ToList();
-
-            var lastGeneration = ga.History.Last();
-
-            DisplayLastGeneration(ga);
-
-            DisplayMatrix(lastGeneration.OrderByDescending(o => o.Fitness).First().Genotype);
-            //FileUtils.SaveResultsGa(historyOfIndividuals, InitialData);
-            DrawFitnessChart(ga.StatisticsHistory);
-
-            var elapsed = stopwatch.Elapsed;
-            MessageBox.Show(
-                $"Genetic algorithm finished in {elapsed.TotalMilliseconds:N0} ms\n" +
-                $"({elapsed.TotalSeconds:F2} seconds)",
-                "Execution time",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Information
-            );
-
+                if (statistics[i].BestFitness >= SuccessThreshold)
+                {
+                    int generation = Math.Min(statistics[i].Generation, generationSuccesses.Length - 1);
+                    generationSuccesses[generation]++;
+                    return;
+                }
+            }
         }
 
         private void CreateStagnationControls()
@@ -210,6 +250,7 @@ namespace Lab2
             _data.MatrixSize = matrixSizeInput.Value;
             _data.NumberOfIndividuals = individualNumberInput.Value;
             _data.NumberOfIterations = iterationNumberInput.Value;
+            _data.NumberOfExperiments = experimentNumber.Value;
             _data.MutationProbability = mutationProbabilityInput.Value;
             _data.CrossProbability = crossProbabilityInput.Value;
             _data.CrossCount = crossPoints.Value;
@@ -227,6 +268,15 @@ namespace Lab2
             return useSeed.Checked
                 ? new SeededRandomProvider(int.Parse(seed.Text))
                 : new SeededRandomProvider(Environment.TickCount);
+        }
+
+        private IRandomProvider CreateRandomProvider(int experimentIndex)
+        {
+            int seedValue = useSeed.Checked
+                ? int.Parse(seed.Text) + experimentIndex
+                : Environment.TickCount + experimentIndex;
+
+            return new SeededRandomProvider(seedValue);
         }
 
         private IFitnessEvaluator CreateFitness()
@@ -395,6 +445,58 @@ namespace Lab2
 
             chart1.ChartAreas.Add(chartArea);
             chart1.Legends[0].Font = new Font("Arial", 15);
+        }
+
+        private void DrawCumulativeChart(int[] cumulativeSuccesses, int experimentCount)
+        {
+            cumulativeChart.Series.Clear();
+            cumulativeChart.ChartAreas.Clear();
+
+            var series = new Series
+            {
+                Name = "Cumulative",
+                ChartType = SeriesChartType.Line,
+                Color = Color.Blue,
+                BorderWidth = 2
+            };
+
+            for (int generation = 0; generation < cumulativeSuccesses.Length; generation++)
+            {
+                decimal percentage = experimentCount == 0
+                    ? 0
+                    : cumulativeSuccesses[generation] * 100m / experimentCount;
+
+                series.Points.AddXY(generation, percentage);
+            }
+
+            var chartArea = new ChartArea
+            {
+                AxisX =
+                {
+                    Title = "Generations",
+                    Minimum = 0,
+                    IsMarginVisible = false,
+                    TitleFont = new Font("Arial", 15),
+                    LabelStyle = { Font = new Font("Arial", 14) }
+                },
+                AxisY =
+                {
+                    Title = "Solved experiments [%]",
+                    Minimum = 0.0,
+                    Maximum = 100.0,
+                    TitleFont = new Font("Arial", 15),
+                    LabelStyle = { Font = new Font("Arial", 14) }
+                },
+                BackColor = Color.White
+            };
+
+            cumulativeChart.ChartAreas.Add(chartArea);
+            cumulativeChart.Series.Add(series);
+
+            if (cumulativeChart.Legends.Count == 0)
+                cumulativeChart.Legends.Add(new Legend());
+
+            cumulativeChart.Legends[0].Font = new Font("Arial", 15);
         }
 
         private Series CreateSeries(

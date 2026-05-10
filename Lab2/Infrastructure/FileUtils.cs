@@ -22,6 +22,7 @@ namespace Lab2.Infrastructure
         private static readonly string GaTunningFilePath = Path.Combine(ResultDirectory, "tunning_GA.txt");
         private static readonly string GaResultsFilePath = Path.Combine(ResultDirectory, "results_GA.txt");
         private static readonly string maxFCCorr = Path.Combine(ResultDirectory, "max_f_C_corr.txt");
+        private static readonly string CumulativeFilePath = Path.Combine(ResultDirectory, "cumulative.txt");
 
 
 
@@ -153,6 +154,34 @@ namespace Lab2.Infrastructure
 
             var newJson = JsonSerializer.Serialize(existing, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(ReferenceMatrixesFilePath, newJson);
+        }
+
+        public static void SaveCumulativeResults(int[] generationSuccesses, int iterationCount)
+        {
+            Directory.CreateDirectory(ResultDirectory);
+
+            var builder = new StringBuilder();
+            int lastGeneration = Math.Min(iterationCount, generationSuccesses.Length - 1);
+
+            for (int generation = 0; generation <= lastGeneration; generation++)
+            {
+                if (generation > 0)
+                    builder.Append(' ');
+
+                builder.Append(generation);
+            }
+
+            builder.AppendLine();
+
+            for (int generation = 0; generation <= lastGeneration; generation++)
+            {
+                if (generation > 0)
+                    builder.Append(' ');
+
+                builder.Append(generationSuccesses[generation]);
+            }
+
+            File.WriteAllText(CumulativeFilePath, builder.ToString());
         }
 
     }
