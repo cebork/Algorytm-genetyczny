@@ -28,6 +28,12 @@ namespace Lab2
         private readonly InitialData _data;
 
         private List<List<Individual>>  _history = new();
+
+        // Stagnation reset controls (added programmatically)
+        private CheckBox _stagnationOnCheckBox;
+        private NumericUpDown _stagnationWindowInput;
+        private NumericUpDown _stagnationFractionInput;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -48,6 +54,7 @@ namespace Lab2
 
             SetupDefaultAlgorithmOtpions();
             seed.Enabled = false;
+            CreateStagnationControls();
         }
 
 
@@ -61,7 +68,7 @@ namespace Lab2
         }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "B³¹d");
+                MessageBox.Show(ex.Message, "Bï¿½ï¿½d");
             }
 }
 
@@ -76,7 +83,7 @@ namespace Lab2
             var mutation = CreateMutation(random);
             var population = CreateInitialPopulation(random);
 
-            var ga = GeneticAlgorithmBuilder
+            var builder = GeneticAlgorithmBuilder
                 .Create()
                 .WithInitialPopulation(population)
                 .WithFitness(fitness)
@@ -85,8 +92,17 @@ namespace Lab2
                 .WithMutation(mutation)
                 .WithTermination(
                     new MaxIterationCondition((int)_data.NumberOfIterations)
-                )
-                .Build();
+                );
+
+            if (_data.StagnationEnabled)
+                builder.WithStagnationReset(
+                    _data.StagnationWindow,
+                    _data.StagnationResetFraction,
+                    random,
+                    _data.ProbGen1
+                );
+
+            var ga = builder.Build();
 
             runProgressBar.Visible = true;
             runProgressBar.Minimum = 0;
@@ -129,6 +145,66 @@ namespace Lab2
 
         }
 
+        private void CreateStagnationControls()
+        {
+            // GroupBox positioned below the eliteGroupBox (1644, 79 + 153 + 8)
+            var group = new GroupBox
+            {
+                Text = "Stagnacja",
+                Location = new System.Drawing.Point(1644, 240),
+                Size = new System.Drawing.Size(200, 155)
+            };
+
+            _stagnationOnCheckBox = new CheckBox
+            {
+                Text = "WÅ‚Ä…cz",
+                AutoSize = true,
+                Location = new System.Drawing.Point(6, 22)
+            };
+
+            var windowLabel = new Label
+            {
+                Text = "Okno stagnacji (gen.)",
+                AutoSize = true,
+                Location = new System.Drawing.Point(6, 52)
+            };
+
+            _stagnationWindowInput = new NumericUpDown
+            {
+                Location = new System.Drawing.Point(6, 68),
+                Size = new System.Drawing.Size(138, 23),
+                Minimum = 5,
+                Maximum = 500,
+                Value = 50,
+                Increment = 5
+            };
+
+            var fractionLabel = new Label
+            {
+                Text = "Odsetek resetu (0â€“1)",
+                AutoSize = true,
+                Location = new System.Drawing.Point(6, 100)
+            };
+
+            _stagnationFractionInput = new NumericUpDown
+            {
+                Location = new System.Drawing.Point(6, 116),
+                Size = new System.Drawing.Size(138, 23),
+                Minimum = 0.1m,
+                Maximum = 0.95m,
+                Value = 0.5m,
+                Increment = 0.05m,
+                DecimalPlaces = 2
+            };
+
+            group.Controls.Add(_stagnationOnCheckBox);
+            group.Controls.Add(windowLabel);
+            group.Controls.Add(_stagnationWindowInput);
+            group.Controls.Add(fractionLabel);
+            group.Controls.Add(_stagnationFractionInput);
+            Controls.Add(group);
+        }
+
         private void ReadUiData()
         {
             _data.MatrixSize = matrixSizeInput.Value;
@@ -141,6 +217,9 @@ namespace Lab2
             _data.TournamentSelectionSize = tournamentSizeInput.Value;
             _data.UniformBlockMutationProbWhite = uniformProbWhite.Value;
             _data.UniformBlockMutationProbRed = uniformProbRed.Value;
+            _data.StagnationEnabled = _stagnationOnCheckBox.Checked;
+            _data.StagnationWindow = (int)_stagnationWindowInput.Value;
+            _data.StagnationResetFraction = _stagnationFractionInput.Value;
         }
 
         private IRandomProvider CreateRandomProvider()
@@ -194,7 +273,7 @@ namespace Lab2
                         random
                     ),
 
-                _ => throw new InvalidOperationException("Nieznany typ krzy¿owania")
+                _ => throw new InvalidOperationException("Nieznany typ krzyï¿½owania")
             };
         }
 
@@ -372,36 +451,36 @@ namespace Lab2
             //historyOfIndividuals.Clear();
             //if (testExperimentCount.Value <= 0)
             //{
-            //    MessageBox.Show("Liczba eksperymentów musi byæ wiêksza od 0", "");
+            //    MessageBox.Show("Liczba eksperymentï¿½w musi byï¿½ wiï¿½ksza od 0", "");
             //    return;
             //}
 
             //if (NaInput.Value <= 0 || TaInput.Value <= 0)
             //{
-            //    MessageBox.Show("Iloœæ osobników oraz iloœæ iteracji musi byæ wiêksza od 0", "");
+            //    MessageBox.Show("Iloï¿½ï¿½ osobnikï¿½w oraz iloï¿½ï¿½ iteracji musi byï¿½ wiï¿½ksza od 0", "");
             //    return;
             //}
             //if (NaInput.Value >= NbInput.Value || pkaInput.Value >= PkbbInput.Value || pmaInput.Value >= PmbInput.Value || TaInput.Value >= TbInput.Value || Ps_a.Value >= Ps_b_Input.Value || Rt_a_Input.Value >= rt_b_input.Value || ipk_input.Value >= ipk_b_input.Value)
             //{
-            //    MessageBox.Show("Wartoœæ przedzia³ów testów nie mo¿e byæ odwrotna lub zerowa", "");
+            //    MessageBox.Show("Wartoï¿½ï¿½ przedziaï¿½ï¿½w testï¿½w nie moï¿½e byï¿½ odwrotna lub zerowa", "");
             //    return;
             //}
             //if (NstepInput.Value == 0 || PkstepInput.Value == 0 || PmstepInput.Value == 0 || TstepInput.Value == 0 || rt_step_input.Value == 0 || Ps_step.Value == 0 || ipk_step_input.Value == 0)
             //{
-            //    MessageBox.Show("Wartoœæ kroku nie mo¿e byæ zerowa", "");
+            //    MessageBox.Show("Wartoï¿½ï¿½ kroku nie moï¿½e byï¿½ zerowa", "");
             //    return;
             //}
 
             //if (InitialData.AlgorithmType == Core.Enums.AlgorithmType.SUPERVISED && (InitialData.SupervisedReferenceMatrix == null || InitialData.SupervisedReferenceMatrix.Length == 0) ||
             //    InitialData.AlgorithmType == Core.Enums.AlgorithmType.UNSUPERVISED && (InitialData.UnsupervisedPatternMatrixes == null || InitialData.UnsupervisedPatternMatrixes.Length == 0))
             //{
-            //    MessageBox.Show("Nie wybrano macierzy wzorców lub macierzy referencyjnej", "");
+            //    MessageBox.Show("Nie wybrano macierzy wzorcï¿½w lub macierzy referencyjnej", "");
             //    return;
             //}
 
             //if (ipk_b_input.Value > matrixSizeInput.Value - 2)
             //{
-            //    MessageBox.Show("Maksymalna iloœæ ciêæ to rozmiar macierzy - 2", "");
+            //    MessageBox.Show("Maksymalna iloï¿½ï¿½ ciï¿½ï¿½ to rozmiar macierzy - 2", "");
             //    return;
             //}
 
@@ -441,13 +520,13 @@ namespace Lab2
             //                            InitialData.CrossCount = ipk;
 
             //                            testCounter.Text = $"Test {++currentCount} / {maxCount}";
-            //                            individualCount.Text = $"Iloœæ osobników {n}";
-            //                            mutationProb.Text = $"Prawdopodobieñstwo mutacji {pm}";
-            //                            crossProb.Text = $"Prawdopodobieñstwo krzy¿owania {pk}";
-            //                            iterationCount.Text = $"Iloœæ iteracji {t}";
+            //                            individualCount.Text = $"Iloï¿½ï¿½ osobnikï¿½w {n}";
+            //                            mutationProb.Text = $"Prawdopodobieï¿½stwo mutacji {pm}";
+            //                            crossProb.Text = $"Prawdopodobieï¿½stwo krzyï¿½owania {pk}";
+            //                            iterationCount.Text = $"Iloï¿½ï¿½ iteracji {t}";
             //                            tournamentSizeLabelTesty.Text = $"Rozmiar turnieju {rt}";
-            //                            selectionTresholLabelTesty.Text = $"Próg selekcji {ps}";
-            //                            ipkLabelTesty.Text = $"Iloœæ punktów krzy¿owañ {ipk}";
+            //                            selectionTresholLabelTesty.Text = $"Prï¿½g selekcji {ps}";
+            //                            ipkLabelTesty.Text = $"Iloï¿½ï¿½ punktï¿½w krzyï¿½owaï¿½ {ipk}";
             //                            Application.DoEvents();
 
             //                            List<List<Individual>> localHistory = new();
@@ -619,7 +698,7 @@ namespace Lab2
             //var elapsed = TimeSpan.FromMilliseconds(watch.ElapsedMilliseconds);
             //string elapsedFormatted = string.Format("{0:D2}:{1:D2}:{2:D2}.{3:D3}", elapsed.Hours, elapsed.Minutes, elapsed.Seconds, elapsed.Milliseconds);
 
-            //MessageBox.Show("Liczba wyników: " + list.Count + "\nPotrzebny czas: " + elapsedFormatted, "Sukces");
+            //MessageBox.Show("Liczba wynikï¿½w: " + list.Count + "\nPotrzebny czas: " + elapsedFormatted, "Sukces");
 
             //InitialData.MatrixSize = matrixSizeInput.Value;
             //InitialData.Precision = (decimal)precisionInput.SelectedItem;
@@ -717,7 +796,7 @@ namespace Lab2
             if (selected != null && selected.Checked)
             {
                 _data.AlgorithmType = AlgorithmType.SUPERVISED;
-                additioanlDataButton.Text = "Wybór macierzy referencyjnej";
+                additioanlDataButton.Text = "Wybï¿½r macierzy referencyjnej";
             }
         }
 
@@ -727,7 +806,7 @@ namespace Lab2
             if (selected != null && selected.Checked)
             {
                 _data.AlgorithmType = AlgorithmType.UNSUPERVISED;
-                additioanlDataButton.Text = "Wybór macierzy wzorców";
+                additioanlDataButton.Text = "Wybï¿½r macierzy wzorcï¿½w";
             }
         }
 
@@ -1126,7 +1205,7 @@ namespace Lab2
             }
             else
             {
-                MessageBox.Show("Brak elementów do podgl¹du");
+                MessageBox.Show("Brak elementï¿½w do podglï¿½du");
             }
 
 

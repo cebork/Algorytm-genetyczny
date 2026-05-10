@@ -33,6 +33,9 @@ namespace Lab2.Core.Domain
         public bool EliteOn { get; set; }
         public decimal EliteToMove { get; set; }
         public bool StopAtFirstCorrect { get; set; }
+        public bool StagnationEnabled { get; set; }
+        public int StagnationWindow { get; set; } = 50;
+        public decimal StagnationResetFraction { get; set; } = 0.5m;
         public InitialData() { }
 
         public InitialData(

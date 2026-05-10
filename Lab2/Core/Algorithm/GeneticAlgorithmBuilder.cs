@@ -3,13 +3,11 @@ using Lab2.Core.Fitness;
 using Lab2.Core.Operators.Crossover;
 using Lab2.Core.Operators.Mutation;
 using Lab2.Core.Operators.Selection;
+using Lab2.Core.Random;
 using Lab2.Core.Statistics;
 using Lab2.Core.Termination;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Lab2.Core.Algorithm
 {
@@ -22,6 +20,13 @@ namespace Lab2.Core.Algorithm
         private IMutationOperator _mutation;
         private ITerminationCondition _termination;
         private PopulationStatisticsCollector _statistics;
+
+        // Stagnation reset (optional)
+        private bool _stagnationEnabled;
+        private int _stagnationWindow;
+        private decimal _stagnationResetFraction;
+        private IRandomProvider _stagnationRandom;
+        private decimal _stagnationProbGen1;
 
         private GeneticAlgorithmBuilder() { }
 
@@ -77,7 +82,19 @@ namespace Lab2.Core.Algorithm
             return this;
         }
 
-
+        public GeneticAlgorithmBuilder WithStagnationReset(
+            int stagnationWindow,
+            decimal resetFraction,
+            IRandomProvider random,
+            decimal probGen1)
+        {
+            _stagnationEnabled = true;
+            _stagnationWindow = stagnationWindow;
+            _stagnationResetFraction = resetFraction;
+            _stagnationRandom = random ?? throw new ArgumentNullException(nameof(random));
+            _stagnationProbGen1 = probGen1;
+            return this;
+        }
 
         public GeneticAlgorithm Build()
         {
@@ -99,7 +116,7 @@ namespace Lab2.Core.Algorithm
             if (_termination == null)
                 throw new InvalidOperationException("Termination condition is not defined.");
 
-            return new GeneticAlgorithm(
+            var ga = new GeneticAlgorithm(
                 _initialPopulation,
                 _fitness,
                 _selection,
@@ -108,6 +125,16 @@ namespace Lab2.Core.Algorithm
                 _termination,
                 _statistics ?? new PopulationStatisticsCollector()
             );
+
+            if (_stagnationEnabled)
+                ga.ConfigureStagnationReset(
+                    _stagnationWindow,
+                    _stagnationResetFraction,
+                    _stagnationRandom,
+                    _stagnationProbGen1
+                );
+
+            return ga;
         }
     }
 }
