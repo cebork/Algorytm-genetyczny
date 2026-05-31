@@ -74,6 +74,8 @@ namespace Lab2
 
         private async Task RunGeneticAlgorithm()
         {
+            ClearPreviousRunState();
+
             int experimentCount = (int)_data.NumberOfExperiments;
             int iterationCount = (int)_data.NumberOfIterations;
 
@@ -111,13 +113,9 @@ namespace Lab2
 
             FileUtils.SaveCumulativeResults(cumulativeSuccesses, iterationCount);
 
-            _history = lastGa.History
-                .Select(g => g.ToList())
-                .ToList();
+            var lastGeneration = lastGa.CurrentPopulation;
 
-            var lastGeneration = lastGa.History.Last();
-
-            DisplayLastGeneration(lastGa);
+            DisplayLastGeneration(lastGeneration);
 
             DisplayMatrix(lastGeneration.OrderByDescending(o => o.Fitness).First().Genotype);
             //FileUtils.SaveResultsGa(historyOfIndividuals, InitialData);
@@ -133,6 +131,27 @@ namespace Lab2
                 MessageBoxIcon.Information
             );
 
+        }
+
+        private void ClearPreviousRunState()
+        {
+            _history.Clear();
+
+            osobniki.DataSource = null;
+            osobniki.Rows.Clear();
+            osobniki.Columns.Clear();
+
+            display.Rows.Clear();
+            display.Columns.Clear();
+
+            chart1.Series.Clear();
+            chart1.ChartAreas.Clear();
+            cumulativeChart.Series.Clear();
+            cumulativeChart.ChartAreas.Clear();
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
         }
 
         private GeneticAlgorithm CreateGeneticAlgorithm(int experimentIndex)
@@ -376,10 +395,8 @@ namespace Lab2
                 .ToList();
         }
 
-        private void DisplayLastGeneration(GeneticAlgorithm ga)
+        private void DisplayLastGeneration(IReadOnlyList<Individual> lastGeneration)
         {
-            var lastGeneration = ga.History.Last();
-
             int totalCount = lastGeneration.Count;
             int lp = 1;
 

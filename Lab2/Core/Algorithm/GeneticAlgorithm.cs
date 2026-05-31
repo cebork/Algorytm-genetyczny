@@ -35,6 +35,8 @@ namespace Lab2.Core.Algorithm
 
         public IReadOnlyList<IReadOnlyList<Individual>> History => _history;
         private readonly List<IReadOnlyList<Individual>> _history = new();
+        public IReadOnlyList<Individual> CurrentPopulation => _population;
+        public bool StoreHistory { get; set; }
 
         public GeneticAlgorithm(
             List<Individual> initialPopulation,
@@ -137,7 +139,8 @@ namespace Lab2.Core.Algorithm
 
                 _statistics.Update(_population, iteration);
                 _statisticsHistory.Add(_statistics.Current);
-                _history.Add(_population);
+                if (StoreHistory)
+                    _history.Add(_population);
                 iteration++;
 
                 progress?.Report(iteration);
