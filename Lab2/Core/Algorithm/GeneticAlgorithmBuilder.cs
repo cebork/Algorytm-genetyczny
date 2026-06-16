@@ -21,12 +21,12 @@ namespace Lab2.Core.Algorithm
         private ITerminationCondition _termination;
         private PopulationStatisticsCollector _statistics;
 
-        // Stagnation reset (optional)
+        // Stagnation diversification (optional)
         private bool _stagnationEnabled;
         private int _stagnationWindow;
         private decimal _stagnationResetFraction;
         private IRandomProvider _stagnationRandom;
-        private decimal _stagnationProbGen1;
+        private decimal _stagnationDiversityThreshold;
 
         private GeneticAlgorithmBuilder() { }
 
@@ -86,13 +86,13 @@ namespace Lab2.Core.Algorithm
             int stagnationWindow,
             decimal resetFraction,
             IRandomProvider random,
-            decimal probGen1)
+            decimal diversityThreshold)
         {
             _stagnationEnabled = true;
             _stagnationWindow = stagnationWindow;
             _stagnationResetFraction = resetFraction;
             _stagnationRandom = random ?? throw new ArgumentNullException(nameof(random));
-            _stagnationProbGen1 = probGen1;
+            _stagnationDiversityThreshold = diversityThreshold;
             return this;
         }
 
@@ -131,7 +131,7 @@ namespace Lab2.Core.Algorithm
                     _stagnationWindow,
                     _stagnationResetFraction,
                     _stagnationRandom,
-                    _stagnationProbGen1
+                    _stagnationDiversityThreshold
                 );
 
             return ga;

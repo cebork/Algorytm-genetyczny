@@ -33,6 +33,7 @@ namespace Lab2
         private CheckBox _stagnationOnCheckBox;
         private NumericUpDown _stagnationWindowInput;
         private NumericUpDown _stagnationFractionInput;
+        private NumericUpDown _stagnationDiversityThresholdInput = null!;
         private GroupBox _narrowingMutationGroupBox = null!;
         private NumericUpDown _narrowingMultiplierInput = null!;
         private NumericUpDown _narrowingStepInput = null!;
@@ -184,7 +185,7 @@ namespace Lab2
                     _data.StagnationWindow,
                     _data.StagnationResetFraction,
                     random,
-                    _data.ProbGen1
+                    _data.StagnationDiversityThreshold
                 );
 
             return builder.Build();
@@ -215,7 +216,7 @@ namespace Lab2
             {
                 Text = "Stagnacja",
                 Location = new System.Drawing.Point(1644, 240),
-                Size = new System.Drawing.Size(200, 155)
+                Size = new System.Drawing.Size(200, 190)
             };
 
             _stagnationOnCheckBox = new CheckBox
@@ -244,7 +245,7 @@ namespace Lab2
 
             var fractionLabel = new Label
             {
-                Text = "Odsetek resetu (0–1)",
+                Text = "Odsetek wymiany",
                 AutoSize = true,
                 Location = new System.Drawing.Point(6, 100)
             };
@@ -253,10 +254,28 @@ namespace Lab2
             {
                 Location = new System.Drawing.Point(6, 116),
                 Size = new System.Drawing.Size(138, 23),
-                Minimum = 0.1m,
-                Maximum = 0.95m,
-                Value = 0.5m,
+                Minimum = 0.01m,
+                Maximum = 0.5m,
+                Value = 0.1m,
                 Increment = 0.05m,
+                DecimalPlaces = 2
+            };
+
+            var diversityLabel = new Label
+            {
+                Text = "Próg różnorodności",
+                AutoSize = true,
+                Location = new System.Drawing.Point(6, 146)
+            };
+
+            _stagnationDiversityThresholdInput = new NumericUpDown
+            {
+                Location = new System.Drawing.Point(6, 162),
+                Size = new System.Drawing.Size(138, 23),
+                Minimum = 0m,
+                Maximum = 1m,
+                Value = 0.05m,
+                Increment = 0.01m,
                 DecimalPlaces = 2
             };
 
@@ -265,6 +284,8 @@ namespace Lab2
             group.Controls.Add(_stagnationWindowInput);
             group.Controls.Add(fractionLabel);
             group.Controls.Add(_stagnationFractionInput);
+            group.Controls.Add(diversityLabel);
+            group.Controls.Add(_stagnationDiversityThresholdInput);
             Controls.Add(group);
         }
 
@@ -273,7 +294,7 @@ namespace Lab2
             _narrowingMutationGroupBox = new GroupBox
             {
                 Text = "Mutacja zwężająca",
-                Location = new System.Drawing.Point(1644, 405),
+                Location = new System.Drawing.Point(1644, 440),
                 Size = new System.Drawing.Size(200, 125),
                 Enabled = false
             };
@@ -338,6 +359,7 @@ namespace Lab2
             _data.StagnationEnabled = _stagnationOnCheckBox.Checked;
             _data.StagnationWindow = (int)_stagnationWindowInput.Value;
             _data.StagnationResetFraction = _stagnationFractionInput.Value;
+            _data.StagnationDiversityThreshold = _stagnationDiversityThresholdInput.Value;
         }
 
         private IRandomProvider CreateRandomProvider()

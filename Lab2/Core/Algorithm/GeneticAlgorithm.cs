@@ -23,12 +23,17 @@ namespace Lab2.Core.Algorithm
         private readonly PopulationStatisticsCollector _statistics;
         private readonly int _populationSize;
 
-        // Stagnation reset (disabled by default)
+        private const decimal StagnationMinImprovement = 0.0001m;
+        private const decimal StagnationParentPoolFraction = 0.2m;
+        private const decimal StagnationEliteFraction = 0.1m;
+        private const decimal StagnationDiversificationMutationProbability = 0.1m;
+
+        // Stagnation diversification (disabled by default)
         private bool _stagnationEnabled;
         private int _stagnationWindow;
         private decimal _resetFraction;
+        private decimal _diversityThreshold;
         private IRandomProvider _stagnationRandom;
-        private decimal _probGen1;
 
         private readonly List<PopulationStatistics> _statisticsHistory = new();
         public IReadOnlyList<PopulationStatistics> StatisticsHistory => _statisticsHistory;
@@ -59,21 +64,20 @@ namespace Lab2.Core.Algorithm
         }
 
         /// <summary>
-        /// Enables the stagnation-reset mechanism. When best fitness does not improve
-        /// for <paramref name="stagnationWindow"/> consecutive generations, the bottom
-        /// <paramref name="resetFraction"/> of the population is replaced with fresh
-        /// random individuals, keeping the elite at the top.
+        /// Enables stagnation diversification. When best fitness does not improve
+        /// for <paramref name="stagnationWindow"/> consecutive generations and diversity
+        /// is low, the weakest individuals are replaced by mutated copies of strong ones.
         /// </summary>
         public void ConfigureStagnationReset(
             int stagnationWindow,
             decimal resetFraction,
             IRandomProvider random,
-            decimal probGen1)
+            decimal diversityThreshold)
         {
             _stagnationWindow = stagnationWindow;
             _resetFraction = resetFraction;
+            _diversityThreshold = diversityThreshold;
             _stagnationRandom = random;
-            _probGen1 = probGen1;
             _stagnationEnabled = stagnationWindow > 0;
         }
 
@@ -115,11 +119,12 @@ namespace Lab2.Core.Algorithm
                 _population = offspring;
 
                 EvaluatePopulation();
+                _statistics.Update(_population, iteration);
 
                 if (_stagnationEnabled)
                 {
-                    decimal currentBest = GetBestFitness();
-                    if (currentBest > bestFitness)
+                    decimal currentBest = _statistics.Current.BestFitness;
+                    if (currentBest > bestFitness + StagnationMinImprovement)
                     {
                         bestFitness = currentBest;
                         stagnationCounter = 0;
@@ -127,17 +132,18 @@ namespace Lab2.Core.Algorithm
                     else
                     {
                         stagnationCounter++;
-                        if (stagnationCounter >= _stagnationWindow)
+                        if (stagnationCounter >= _stagnationWindow &&
+                            _statistics.Current.Diversity < (double)_diversityThreshold)
                         {
-                            ApplyStagnationReset();
+                            ApplyStagnationDiversification();
                             EvaluatePopulation();
+                            _statistics.Update(_population, iteration);
                             stagnationCounter = 0;
-                            bestFitness = GetBestFitness();
+                            bestFitness = Math.Max(bestFitness, _statistics.Current.BestFitness);
                         }
                     }
                 }
 
-                _statistics.Update(_population, iteration);
                 _statisticsHistory.Add(_statistics.Current);
                 if (StoreHistory)
                     _history.Add(_population);
@@ -158,19 +164,37 @@ namespace Lab2.Core.Algorithm
             return best;
         }
 
-        private void ApplyStagnationReset()
+        private void ApplyStagnationDiversification()
         {
-            // Sort descending by fitness — keeps elite at the front
+            // Sort descending by fitness, then replace only the weakest tail.
             _population.Sort((a, b) => b.Fitness.CompareTo(a.Fitness));
 
-            int eliteCount = Math.Max(1, (int)(_populationSize * (1m - _resetFraction)));
-            int innerSize = _population[0].Genotype.GetLength(0) - 2;
+            int eliteCount = Math.Max(1, (int)Math.Ceiling(_populationSize * (double)StagnationEliteFraction));
+            int parentPoolSize = Math.Max(eliteCount, (int)Math.Ceiling(_populationSize * (double)StagnationParentPoolFraction));
+            int replaceCount = Math.Max(1, (int)Math.Ceiling(_populationSize * (double)_resetFraction));
+            replaceCount = Math.Min(replaceCount, _populationSize - eliteCount);
 
-            for (int i = eliteCount; i < _populationSize; i++)
+            for (int i = _populationSize - replaceCount; i < _populationSize; i++)
             {
-                _population[i] = new Individual(
-                    InitialGenotypeFactory.Create(innerSize, _probGen1, _stagnationRandom)
-                );
+                int parentIndex = _stagnationRandom.Next(0, parentPoolSize);
+                bool[,] genotype = (bool[,])_population[parentIndex].Genotype.Clone();
+                DiversifyGenotype(genotype);
+                _population[i] = new Individual(genotype);
+            }
+        }
+
+        private void DiversifyGenotype(bool[,] genotype)
+        {
+            int rows = genotype.GetLength(0);
+            int cols = genotype.GetLength(1);
+
+            for (int r = 1; r < rows - 1; r++)
+            {
+                for (int c = 1; c < cols - 1; c++)
+                {
+                    if (_stagnationRandom.NextDouble() <= (double)StagnationDiversificationMutationProbability)
+                        genotype[r, c] = !genotype[r, c];
+                }
             }
         }
 

@@ -81,6 +81,21 @@ namespace Lab2.Services
                 throw new Exception("Krok zejścia mutacji zwężającej musi być > 0");
             }
 
+            if (InitialData.StagnationWindow <= 0)
+            {
+                throw new Exception("Okno stagnacji musi być > 0");
+            }
+
+            if (InitialData.StagnationResetFraction <= 0 || InitialData.StagnationResetFraction > 0.5m)
+            {
+                throw new Exception("Odsetek wymiany przy stagnacji musi być w zakresie (0,0.5]");
+            }
+
+            if (InitialData.StagnationDiversityThreshold < 0 || InitialData.StagnationDiversityThreshold > 1)
+            {
+                throw new Exception("Próg różnorodności stagnacji musi być w [0,1]");
+            }
+
             if (InitialData.AlgorithmType == Core.Enums.AlgorithmType.SUPERVISED && (InitialData.SupervisedReferenceMatrix == null || InitialData.SupervisedReferenceMatrix.Length == 0))
             {
                 throw new Exception("Macierz referencyjna jest niepoprawna");

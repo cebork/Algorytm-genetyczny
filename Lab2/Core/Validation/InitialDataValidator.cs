@@ -44,6 +44,15 @@ namespace Lab2.Core.Validation
             if (data.ProbGen1 is < 0 or > 1)
                 result.Errors.Add("ProbGen1 musi być w [0,1]");
 
+            if (data.StagnationWindow <= 0)
+                result.Errors.Add("Okno stagnacji musi być > 0");
+
+            if (data.StagnationResetFraction is <= 0 or > 0.5m)
+                result.Errors.Add("Odsetek wymiany przy stagnacji musi być w zakresie (0,0.5]");
+
+            if (data.StagnationDiversityThreshold is < 0 or > 1)
+                result.Errors.Add("Próg różnorodności stagnacji musi być w [0,1]");
+
             if (data.AlgorithmType == AlgorithmType.SUPERVISED &&
                 (data.SupervisedReferenceMatrix == null || data.SupervisedReferenceMatrix.Length == 0))
             {

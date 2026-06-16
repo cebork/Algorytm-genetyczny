@@ -37,7 +37,8 @@ namespace Lab2.Core.Domain
         public bool StopAtFirstCorrect { get; set; }
         public bool StagnationEnabled { get; set; }
         public int StagnationWindow { get; set; } = 50;
-        public decimal StagnationResetFraction { get; set; } = 0.5m;
+        public decimal StagnationResetFraction { get; set; } = 0.1m;
+        public decimal StagnationDiversityThreshold { get; set; } = 0.05m;
         public InitialData() { }
 
         public InitialData(
