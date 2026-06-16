@@ -69,6 +69,36 @@ namespace Lab2.Services
             {
                 throw new Exception("Macierze wzorców nie zostały wybrane");
             }
+            if (InitialData.AlgorithmType == Core.Enums.AlgorithmType.UNSUPERVISED)
+            {
+                decimal matrixSizeWithDeadZone = InitialData.MatrixSize + 2;
+
+                foreach (var pattern in InitialData.UnsupervisedPatternMatrixes)
+                {
+                    if (pattern == null)
+                    {
+                        throw new Exception("Wzorzec nie może być pusty");
+                    }
+
+                    int rows = pattern.GetLength(0);
+                    int cols = pattern.GetLength(1);
+
+                    if (rows <= 0 || cols <= 0)
+                    {
+                        throw new Exception("Wzorzec musi mieć rozmiar > 0");
+                    }
+
+                    if (rows != cols)
+                    {
+                        throw new Exception("Wzorzec musi być macierzą kwadratową");
+                    }
+
+                    if (rows > matrixSizeWithDeadZone || cols > matrixSizeWithDeadZone)
+                    {
+                        throw new Exception("Wzorzec nie może być większy niż macierz algorytmu z martwą strefą");
+                    }
+                }
+            }
         }
 
         public void validatePatterCreation()
@@ -88,6 +118,19 @@ namespace Lab2.Services
             )
             {
                 throw new Exception("Minimalna długość nazwy wzorca to 5");
+            }
+
+            int rows = patternChoosingDisplayColumns.PatternMatrix.GetLength(0);
+            int cols = patternChoosingDisplayColumns.PatternMatrix.GetLength(1);
+
+            if (rows <= 0 || cols <= 0)
+            {
+                throw new Exception("Wzorzec musi mieć rozmiar > 0");
+            }
+
+            if (rows != cols)
+            {
+                throw new Exception("Wzorzec musi być macierzą kwadratową");
             }
         }
 

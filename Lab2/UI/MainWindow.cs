@@ -893,6 +893,7 @@ namespace Lab2
                     break;
 
                 case Core.Enums.AlgorithmType.UNSUPERVISED:
+                    _data.MatrixSize = matrixSizeInput.Value;
                     PatternChoosingModalWindow patternChoosingModalWindow = new PatternChoosingModalWindow(_data);
                     patternChoosingModalWindow.Show();
                     break;

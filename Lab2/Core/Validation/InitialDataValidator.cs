@@ -43,6 +43,31 @@ namespace Lab2.Core.Validation
             {
                 result.Errors.Add("Nie wybrano macierzy wzorców");
             }
+            else if (data.AlgorithmType == AlgorithmType.UNSUPERVISED)
+            {
+                int matrixSizeWithDeadZone = (int)data.MatrixSize + 2;
+
+                foreach (var pattern in data.UnsupervisedPatternMatrixes)
+                {
+                    if (pattern == null)
+                    {
+                        result.Errors.Add("Wzorzec nie może być pusty");
+                        continue;
+                    }
+
+                    int rows = pattern.GetLength(0);
+                    int cols = pattern.GetLength(1);
+
+                    if (rows <= 0 || cols <= 0)
+                        result.Errors.Add("Wzorzec musi mieć rozmiar > 0");
+
+                    if (rows != cols)
+                        result.Errors.Add("Wzorzec musi być macierzą kwadratową");
+
+                    if (rows > matrixSizeWithDeadZone || cols > matrixSizeWithDeadZone)
+                        result.Errors.Add("Wzorzec nie może być większy niż macierz algorytmu z martwą strefą");
+                }
+            }
 
             return result;
         }

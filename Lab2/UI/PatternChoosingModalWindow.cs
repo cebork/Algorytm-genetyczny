@@ -25,8 +25,18 @@ namespace Lab2.UI
             InitializeComponent();
             InitialData = initialData;
 
+            int maxPatternSize = Math.Max(1, (int)InitialData.MatrixSize + 2);
+            patternSizeInput.Minimum = 1;
+            patternSizeInput.Maximum = maxPatternSize;
+            if (patternSizeInput.Value > maxPatternSize)
+            {
+                patternSizeInput.Value = maxPatternSize;
+            }
+
             var allPatterns = FileUtils.LoadAllPatterns();
-            patternChoosingDisplayColumns = allPatterns;
+            patternChoosingDisplayColumns = allPatterns
+                .Where(pattern => pattern.PatternSize <= maxPatternSize)
+                .ToList();
             setupPatternListView();
 
 
@@ -111,13 +121,6 @@ namespace Lab2.UI
                 for (int col = 0; col < currentMatrixSize; col++)
                 {
                     bool value = false;
-
-                    if (InitialData.SupervisedReferenceMatrix != null &&
-                        InitialData.SupervisedReferenceMatrix.GetLength(0) == currentMatrixSize &&
-                        InitialData.SupervisedReferenceMatrix.GetLength(1) == currentMatrixSize)
-                    {
-                        value = InitialData.SupervisedReferenceMatrix[row, col];
-                    }
 
                     patternMatrixInput[col, row].Value = value;
                     patternMatrixInput[col, row].Style.BackColor = value ? Color.Red : Color.White;

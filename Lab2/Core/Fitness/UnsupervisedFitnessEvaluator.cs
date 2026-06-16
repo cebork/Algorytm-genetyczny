@@ -19,23 +19,33 @@ namespace Lab2.Core.Fitness
 
         public decimal Evaluate(bool[,] genotype)
         {
-            int size = genotype.GetLength(0);
             int totalPositions = 0;
             int matchCount = 0;
+            int lastRow = genotype.GetLength(0) - 1;
+            int lastCol = genotype.GetLength(1) - 1;
 
-            for (int i = 1; i < size - 1; i++)
+            for (int row = 0; row <= lastRow; row++)
             {
-                for (int j = 1; j < size - 1; j++)
+                for (int col = 0; col <= lastCol; col++)
                 {
+                    bool hasCandidate = false;
+
                     foreach (var pattern in _patterns)
                     {
-                        if (PatternMatchesAt(genotype, pattern, i, j))
+                        if (!CanStartPatternAt(genotype, pattern, row, col))
+                            continue;
+
+                        hasCandidate = true;
+
+                        if (PatternMatchesAt(genotype, pattern, row, col))
                         {
                             matchCount++;
                             break;
                         }
                     }
-                    totalPositions++;
+
+                    if (hasCandidate)
+                        totalPositions++;
                 }
             }
 
@@ -47,15 +57,35 @@ namespace Lab2.Core.Fitness
 
         private bool PatternMatchesAt(bool[,] matrix, bool[,] pattern, int row, int col)
         {
-            for (int i = -1; i <= 1; i++)
+            int patternRows = pattern.GetLength(0);
+            int patternCols = pattern.GetLength(1);
+
+            for (int i = 0; i < patternRows; i++)
             {
-                for (int j = -1; j <= 1; j++)
+                for (int j = 0; j < patternCols; j++)
                 {
-                    if (matrix[row + i, col + j] != pattern[i + 1, j + 1])
+                    if (matrix[row + i, col + j] != pattern[i, j])
                         return false;
                 }
             }
             return true;
+        }
+
+        private bool CanStartPatternAt(bool[,] genotype, bool[,] pattern, int row, int col)
+        {
+            if (pattern == null)
+                return false;
+
+            int patternRows = pattern.GetLength(0);
+            int patternCols = pattern.GetLength(1);
+            int lastPatternRow = row + patternRows - 1;
+            int lastPatternCol = col + patternCols - 1;
+
+            return patternRows > 0 &&
+                   patternCols > 0 &&
+                   patternRows == patternCols &&
+                   lastPatternRow < genotype.GetLength(0) &&
+                   lastPatternCol < genotype.GetLength(1);
         }
     }
 }
