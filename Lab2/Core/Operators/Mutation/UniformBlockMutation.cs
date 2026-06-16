@@ -28,10 +28,11 @@ namespace Lab2.Core.Operators.Mutation
         {
             int rows = genotype.GetLength(0);
             int cols = genotype.GetLength(1);
+            var cellsToFlip = new List<(int Row, int Col)>();
 
-            for (int i = 2; i < rows - 2; i++)
+            for (int i = 1; i < rows - 1; i++)
             {
-                for (int j = 2; j < cols - 2; j++)
+                for (int j = 1; j < cols - 1; j++)
                 {
                     bool center = genotype[i, j];
                     bool uniform = true;
@@ -51,9 +52,14 @@ namespace Lab2.Core.Operators.Mutation
                     decimal prob = center ? _probRed : _probWhite;
                     if (_random.NextDouble() <= (double)prob)
                     {
-                        genotype[i, j] = !center;
+                        cellsToFlip.Add((i, j));
                     }
                 }
+            }
+
+            foreach (var cell in cellsToFlip)
+            {
+                genotype[cell.Row, cell.Col] = !genotype[cell.Row, cell.Col];
             }
 
             return genotype;

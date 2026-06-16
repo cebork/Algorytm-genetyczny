@@ -61,6 +61,16 @@ namespace Lab2.Services
                 throw new Exception("Niepoprawny przedział dla prawdopodbieństwa mutacji");
             }
 
+            if (InitialData.UniformBlockMutationProbWhite > 1 || InitialData.UniformBlockMutationProbWhite < 0)
+            {
+                throw new Exception("Niepoprawny przedział dla prawdopodobieństwa rozbicia białych bloków");
+            }
+
+            if (InitialData.UniformBlockMutationProbRed > 1 || InitialData.UniformBlockMutationProbRed < 0)
+            {
+                throw new Exception("Niepoprawny przedział dla prawdopodobieństwa rozbicia czerwonych bloków");
+            }
+
             if (InitialData.NarrowingMutationMultiplier < 0)
             {
                 throw new Exception("Mnożnik mutacji zwężającej musi być >= 0");

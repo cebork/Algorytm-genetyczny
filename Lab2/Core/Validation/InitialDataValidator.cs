@@ -29,6 +29,12 @@ namespace Lab2.Core.Validation
             if (data.MutationProbability is < 0 or > 1)
                 result.Errors.Add("Prawdopodobieństwo mutacji musi być w [0,1]");
 
+            if (data.UniformBlockMutationProbWhite is < 0 or > 1)
+                result.Errors.Add("Prawdopodobieństwo rozbicia białych bloków musi być w [0,1]");
+
+            if (data.UniformBlockMutationProbRed is < 0 or > 1)
+                result.Errors.Add("Prawdopodobieństwo rozbicia czerwonych bloków musi być w [0,1]");
+
             if (data.NarrowingMutationMultiplier < 0)
                 result.Errors.Add("Mnożnik mutacji zwężającej musi być >= 0");
 
