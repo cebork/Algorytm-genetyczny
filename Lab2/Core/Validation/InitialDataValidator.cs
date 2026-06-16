@@ -17,6 +17,23 @@ namespace Lab2.Core.Validation
             if (data.MatrixSize <= 0)
                 result.Errors.Add("Rozmiar macierzy musi być > 0");
 
+            if (data.RequestedMatrixSize <= 0)
+                result.Errors.Add("Żądany rozmiar macierzy musi być > 0");
+
+            if (data.UseEvenMatrixPadding)
+            {
+                int requestedSize = (int)data.RequestedMatrixSize;
+
+                if (data.EmptyRowIndex < 1 || data.EmptyRowIndex > requestedSize)
+                    result.Errors.Add("Pozycja pustego wiersza musi mieścić się w rozmiarze macierzy");
+
+                if (data.EmptyColumnIndex < 1 || data.EmptyColumnIndex > requestedSize)
+                    result.Errors.Add("Pozycja pustej kolumny musi mieścić się w rozmiarze macierzy");
+
+                if (data.MatrixSize != data.RequestedMatrixSize - 1)
+                    result.Errors.Add("Efektywny rozmiar macierzy parzystej musi być o 1 mniejszy od rozmiaru żądanego");
+            }
+
             if (data.NumberOfIndividuals <= 0)
                 result.Errors.Add("Liczba osobników musi być > 0");
 
@@ -57,6 +74,18 @@ namespace Lab2.Core.Validation
                 (data.SupervisedReferenceMatrix == null || data.SupervisedReferenceMatrix.Length == 0))
             {
                 result.Errors.Add("Brak macierzy referencyjnej");
+            }
+            else if (data.AlgorithmType == AlgorithmType.SUPERVISED)
+            {
+                int expectedSize = data.UseEvenMatrixPadding
+                    ? (int)data.RequestedMatrixSize
+                    : (int)data.MatrixSize;
+
+                if (data.SupervisedReferenceMatrix.GetLength(0) != expectedSize ||
+                    data.SupervisedReferenceMatrix.GetLength(1) != expectedSize)
+                {
+                    result.Errors.Add("Macierz referencyjna ma niepoprawny rozmiar");
+                }
             }
 
             if (data.AlgorithmType == AlgorithmType.UNSUPERVISED &&

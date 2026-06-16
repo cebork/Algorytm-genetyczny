@@ -51,6 +51,31 @@ namespace Lab2.Services
                 throw new Exception("Macierze nie mogą mieć ujemnych wymiarów");
             }
 
+            if (InitialData.RequestedMatrixSize <= 0)
+            {
+                throw new Exception("Żądany rozmiar macierzy musi być > 0");
+            }
+
+            if (InitialData.UseEvenMatrixPadding)
+            {
+                int requestedSize = (int)InitialData.RequestedMatrixSize;
+
+                if (InitialData.EmptyRowIndex < 1 || InitialData.EmptyRowIndex > requestedSize)
+                {
+                    throw new Exception("Pozycja pustego wiersza musi mieścić się w rozmiarze macierzy");
+                }
+
+                if (InitialData.EmptyColumnIndex < 1 || InitialData.EmptyColumnIndex > requestedSize)
+                {
+                    throw new Exception("Pozycja pustej kolumny musi mieścić się w rozmiarze macierzy");
+                }
+
+                if (InitialData.MatrixSize != InitialData.RequestedMatrixSize - 1)
+                {
+                    throw new Exception("Efektywny rozmiar macierzy parzystej musi być o 1 mniejszy od rozmiaru żądanego");
+                }
+            }
+
             if (InitialData.CrossProbability > 1 || InitialData.CrossProbability < 0)
             {
                 throw new Exception("Niepoprawny przedział dla prawdopodbieństwa krzyżowania");
@@ -99,6 +124,18 @@ namespace Lab2.Services
             if (InitialData.AlgorithmType == Core.Enums.AlgorithmType.SUPERVISED && (InitialData.SupervisedReferenceMatrix == null || InitialData.SupervisedReferenceMatrix.Length == 0))
             {
                 throw new Exception("Macierz referencyjna jest niepoprawna");
+            }
+            if (InitialData.AlgorithmType == Core.Enums.AlgorithmType.SUPERVISED)
+            {
+                int expectedSize = InitialData.UseEvenMatrixPadding
+                    ? (int)InitialData.RequestedMatrixSize
+                    : (int)InitialData.MatrixSize;
+
+                if (InitialData.SupervisedReferenceMatrix.GetLength(0) != expectedSize ||
+                    InitialData.SupervisedReferenceMatrix.GetLength(1) != expectedSize)
+                {
+                    throw new Exception("Macierz referencyjna ma niepoprawny rozmiar");
+                }
             }
             if (InitialData.AlgorithmType == Core.Enums.AlgorithmType.UNSUPERVISED && (InitialData.UnsupervisedPatternMatrixes == null || InitialData.UnsupervisedPatternMatrixes.Length == 0))
             {

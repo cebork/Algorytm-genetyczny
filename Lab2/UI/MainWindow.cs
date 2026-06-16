@@ -37,6 +37,9 @@ namespace Lab2
         private GroupBox _narrowingMutationGroupBox = null!;
         private NumericUpDown _narrowingMultiplierInput = null!;
         private NumericUpDown _narrowingStepInput = null!;
+        private GroupBox _evenMatrixPaddingGroupBox = null!;
+        private NumericUpDown _emptyRowInput = null!;
+        private NumericUpDown _emptyColumnInput = null!;
 
         public MainWindow()
         {
@@ -46,7 +49,7 @@ namespace Lab2
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            _data.MatrixSize = matrixSizeInput.Value;
+            ConfigureMatrixSizing();
 
             precisionInput.Items.Add(0.1m);
             precisionInput.Items.Add(0.01m);
@@ -59,6 +62,7 @@ namespace Lab2
             seed.Enabled = false;
             CreateStagnationControls();
             CreateNarrowingMutationControls();
+            CreateEvenMatrixPaddingControls();
             SetupDefaultAlgorithmOtpions();
         }
 
@@ -122,7 +126,7 @@ namespace Lab2
 
             DisplayLastGeneration(lastGeneration);
 
-            DisplayMatrix(lastGeneration.OrderByDescending(o => o.Fitness).First().Genotype);
+            DisplayMatrix(GetMatrixForDisplay(lastGeneration.OrderByDescending(o => o.Fitness).First().Genotype));
             //FileUtils.SaveResultsGa(historyOfIndividuals, InitialData);
             DrawFitnessChart(lastGa.StatisticsHistory);
             DrawCumulativeChart(cumulativeSuccesses, experimentCount);
@@ -341,9 +345,96 @@ namespace Lab2
             Controls.Add(_narrowingMutationGroupBox);
         }
 
+        private void CreateEvenMatrixPaddingControls()
+        {
+            _evenMatrixPaddingGroupBox = new GroupBox
+            {
+                Text = "Parzysty rozmiar",
+                Location = new System.Drawing.Point(1644, 570),
+                Size = new System.Drawing.Size(200, 125),
+                Enabled = false
+            };
+
+            var rowLabel = new Label
+            {
+                Text = "Pusty wiersz",
+                AutoSize = true,
+                Location = new System.Drawing.Point(6, 24)
+            };
+
+            _emptyRowInput = new NumericUpDown
+            {
+                Location = new System.Drawing.Point(6, 40),
+                Size = new System.Drawing.Size(138, 23),
+                Minimum = 1,
+                Maximum = 1,
+                Value = 1
+            };
+
+            var columnLabel = new Label
+            {
+                Text = "Pusta kolumna",
+                AutoSize = true,
+                Location = new System.Drawing.Point(6, 72)
+            };
+
+            _emptyColumnInput = new NumericUpDown
+            {
+                Location = new System.Drawing.Point(6, 88),
+                Size = new System.Drawing.Size(138, 23),
+                Minimum = 1,
+                Maximum = 1,
+                Value = 1
+            };
+
+            _evenMatrixPaddingGroupBox.Controls.Add(rowLabel);
+            _evenMatrixPaddingGroupBox.Controls.Add(_emptyRowInput);
+            _evenMatrixPaddingGroupBox.Controls.Add(columnLabel);
+            _evenMatrixPaddingGroupBox.Controls.Add(_emptyColumnInput);
+            Controls.Add(_evenMatrixPaddingGroupBox);
+
+            UpdateEvenMatrixPaddingControls();
+        }
+
+        private void ConfigureMatrixSizing()
+        {
+            int requestedSize = (int)matrixSizeInput.Value;
+            bool usePadding = requestedSize > 1 && requestedSize % 2 == 0;
+
+            _data.RequestedMatrixSize = requestedSize;
+            _data.UseEvenMatrixPadding = usePadding;
+            _data.MatrixSize = usePadding ? requestedSize - 1 : requestedSize;
+
+            if (_emptyRowInput != null && _emptyColumnInput != null)
+            {
+                _data.EmptyRowIndex = (int)_emptyRowInput.Value;
+                _data.EmptyColumnIndex = (int)_emptyColumnInput.Value;
+            }
+        }
+
+        private void UpdateEvenMatrixPaddingControls()
+        {
+            if (_evenMatrixPaddingGroupBox == null)
+                return;
+
+            int requestedSize = (int)matrixSizeInput.Value;
+            bool enabled = requestedSize > 1 && requestedSize % 2 == 0;
+
+            _evenMatrixPaddingGroupBox.Enabled = enabled;
+            _emptyRowInput.Maximum = Math.Max(1, requestedSize);
+            _emptyColumnInput.Maximum = Math.Max(1, requestedSize);
+
+            if (_emptyRowInput.Value > _emptyRowInput.Maximum)
+                _emptyRowInput.Value = _emptyRowInput.Maximum;
+
+            if (_emptyColumnInput.Value > _emptyColumnInput.Maximum)
+                _emptyColumnInput.Value = _emptyColumnInput.Maximum;
+        }
+
         private void ReadUiData()
         {
-            _data.MatrixSize = matrixSizeInput.Value;
+            ConfigureMatrixSizing();
+            UpdateEvenMatrixPaddingControls();
             _data.NumberOfIndividuals = individualNumberInput.Value;
             _data.NumberOfIterations = iterationNumberInput.Value;
             _data.NumberOfExperiments = experimentNumber.Value;
@@ -360,6 +451,8 @@ namespace Lab2
             _data.StagnationWindow = (int)_stagnationWindowInput.Value;
             _data.StagnationResetFraction = _stagnationFractionInput.Value;
             _data.StagnationDiversityThreshold = _stagnationDiversityThresholdInput.Value;
+            _data.EmptyRowIndex = (int)_emptyRowInput.Value;
+            _data.EmptyColumnIndex = (int)_emptyColumnInput.Value;
         }
 
         private IRandomProvider CreateRandomProvider()
@@ -382,7 +475,7 @@ namespace Lab2
         {
             return _data.AlgorithmType == AlgorithmType.SUPERVISED
                 ? new SupervisedFitnessEvaluator(
-                    _data.SupervisedReferenceMatrix,
+                    GetReferenceMatrixForFitness(),
                     precisionDigits: 4
                 )
                 : new UnsupervisedPatternFitnessEvaluator(
@@ -916,6 +1009,32 @@ namespace Lab2
         }
 
 
+        private bool[,] GetReferenceMatrixForFitness()
+        {
+            if (!_data.UseEvenMatrixPadding)
+                return _data.SupervisedReferenceMatrix;
+
+            return MatrixPaddingMapper.RemoveRowAndColumn(
+                _data.SupervisedReferenceMatrix,
+                _data.EmptyRowIndex,
+                _data.EmptyColumnIndex
+            );
+        }
+
+        private bool[,] GetMatrixForDisplay(bool[,] genotype)
+        {
+            if (!_data.UseEvenMatrixPadding)
+                return genotype;
+
+            return MatrixPaddingMapper.AddEmptyActiveRowAndColumnToGenotype(
+                genotype,
+                (int)_data.RequestedMatrixSize,
+                _data.EmptyRowIndex,
+                _data.EmptyColumnIndex
+            );
+        }
+
+
         private void DisplayMatrix(bool[,] matrix)
         {
 
@@ -972,13 +1091,13 @@ namespace Lab2
             switch (_data.AlgorithmType)
             {
                 case Core.Enums.AlgorithmType.SUPERVISED:
-                    _data.MatrixSize = matrixSizeInput.Value;
+                    ConfigureMatrixSizing();
                     ReferenceMatrixModalWindow referenceMatrixModalWindow = new ReferenceMatrixModalWindow(_data);
                     referenceMatrixModalWindow.Show();
                     break;
 
                 case Core.Enums.AlgorithmType.UNSUPERVISED:
-                    _data.MatrixSize = matrixSizeInput.Value;
+                    ConfigureMatrixSizing();
                     PatternChoosingModalWindow patternChoosingModalWindow = new PatternChoosingModalWindow(_data);
                     patternChoosingModalWindow.Show();
                     break;
@@ -992,7 +1111,8 @@ namespace Lab2
 
         private void matrixSizeInput_ValueChanged(object sender, EventArgs e)
         {
-            _data.MatrixSize = matrixSizeInput.Value;
+            UpdateEvenMatrixPaddingControls();
+            ConfigureMatrixSizing();
         }
 
         private void supervisedTypedRadioButton_CheckedChanged(object sender, EventArgs e)

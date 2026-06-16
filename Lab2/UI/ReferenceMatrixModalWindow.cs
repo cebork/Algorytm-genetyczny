@@ -35,7 +35,7 @@ namespace Lab2.UI
             referenceMatrixInput.DefaultCellStyle.SelectionBackColor = referenceMatrixInput.DefaultCellStyle.BackColor;
             referenceMatrixInput.DefaultCellStyle.SelectionForeColor = referenceMatrixInput.DefaultCellStyle.ForeColor;
 
-            int size = (int)initialData.MatrixSize;
+            int size = GetDisplayedMatrixSize();
 
             referenceMatrixInput.ColumnCount = size;
             referenceMatrixInput.RowCount = size;
@@ -73,9 +73,16 @@ namespace Lab2.UI
             referenceMatrixInput.CurrentCell = null;
             referenceMatrixInput.ClearSelection();
 
-            var allReferenceMatrixies = FileUtils.LoadAllReferenceMatrixes((int)InitialData.MatrixSize);
+            var allReferenceMatrixies = FileUtils.LoadAllReferenceMatrixes(GetDisplayedMatrixSize());
             referenceMatrixDisplayColumns1 = allReferenceMatrixies;
             setupReferenceMatrixListView();
+        }
+
+        private int GetDisplayedMatrixSize()
+        {
+            return InitialData.UseEvenMatrixPadding
+                ? (int)InitialData.RequestedMatrixSize
+                : (int)InitialData.MatrixSize;
         }
 
 
@@ -86,7 +93,7 @@ namespace Lab2.UI
                 var selectedItem = referenceMatrixList.SelectedItems[0];
                 var data = selectedItem.Tag as bool[,];
 
-                int size = (int)InitialData.MatrixSize;
+                int size = GetDisplayedMatrixSize();
                 InitialData.SupervisedReferenceMatrix = data;
 
                 for (int row = 0; row < size; row++)
@@ -213,7 +220,7 @@ namespace Lab2.UI
                 ReferenceMatrixDisplayColumns referenceMatrixDisplayColumns = new ReferenceMatrixDisplayColumns()
                 {
                     ReferenceMatrixName = referenceTableName.Text,
-                    MatrixSize = (int)InitialData.MatrixSize,
+                    MatrixSize = GetDisplayedMatrixSize(),
                     ReferenceMatrix = matrix
                 };
 
@@ -239,7 +246,7 @@ namespace Lab2.UI
 
         private void generateMatrix_Click(object sender, EventArgs e)
         {
-            int size = (int)InitialData.MatrixSize;
+            int size = GetDisplayedMatrixSize();
             InitialData.SupervisedReferenceMatrix = new bool[size, size];
 
             for (int row = 1; row < size - 1; row++)

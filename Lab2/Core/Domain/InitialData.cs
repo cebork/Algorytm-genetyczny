@@ -11,6 +11,10 @@ namespace Lab2.Core.Domain
 
         public AlgorithmType AlgorithmType { get; set; }
         public decimal MatrixSize { get; set; }
+        public decimal RequestedMatrixSize { get; set; }
+        public bool UseEvenMatrixPadding { get; set; }
+        public int EmptyRowIndex { get; set; } = 1;
+        public int EmptyColumnIndex { get; set; } = 1;
         public decimal Precision { get; set; }
         public decimal NumberOfIndividuals { get; set; }
         public decimal CrossProbability { get; set; }
