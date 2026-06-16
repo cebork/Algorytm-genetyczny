@@ -61,6 +61,16 @@ namespace Lab2.Services
                 throw new Exception("Niepoprawny przedział dla prawdopodbieństwa mutacji");
             }
 
+            if (InitialData.NarrowingMutationMultiplier < 0)
+            {
+                throw new Exception("Mnożnik mutacji zwężającej musi być >= 0");
+            }
+
+            if (InitialData.NarrowingMutationStep <= 0)
+            {
+                throw new Exception("Krok zejścia mutacji zwężającej musi być > 0");
+            }
+
             if (InitialData.AlgorithmType == Core.Enums.AlgorithmType.SUPERVISED && (InitialData.SupervisedReferenceMatrix == null || InitialData.SupervisedReferenceMatrix.Length == 0))
             {
                 throw new Exception("Macierz referencyjna jest niepoprawna");

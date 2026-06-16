@@ -33,6 +33,9 @@ namespace Lab2
         private CheckBox _stagnationOnCheckBox;
         private NumericUpDown _stagnationWindowInput;
         private NumericUpDown _stagnationFractionInput;
+        private GroupBox _narrowingMutationGroupBox = null!;
+        private NumericUpDown _narrowingMultiplierInput = null!;
+        private NumericUpDown _narrowingStepInput = null!;
 
         public MainWindow()
         {
@@ -52,9 +55,10 @@ namespace Lab2
             precisionInput.SelectedItem = 0.001m;
             supervisedTypedRadioButton.Checked = true;
 
-            SetupDefaultAlgorithmOtpions();
             seed.Enabled = false;
             CreateStagnationControls();
+            CreateNarrowingMutationControls();
+            SetupDefaultAlgorithmOtpions();
         }
 
 
@@ -264,6 +268,58 @@ namespace Lab2
             Controls.Add(group);
         }
 
+        private void CreateNarrowingMutationControls()
+        {
+            _narrowingMutationGroupBox = new GroupBox
+            {
+                Text = "Mutacja zwężająca",
+                Location = new System.Drawing.Point(1644, 405),
+                Size = new System.Drawing.Size(200, 125),
+                Enabled = false
+            };
+
+            var multiplierLabel = new Label
+            {
+                Text = "Mnożnik",
+                AutoSize = true,
+                Location = new System.Drawing.Point(6, 24)
+            };
+
+            _narrowingMultiplierInput = new NumericUpDown
+            {
+                Location = new System.Drawing.Point(6, 40),
+                Size = new System.Drawing.Size(138, 23),
+                Minimum = 0m,
+                Maximum = 10m,
+                Value = 1m,
+                Increment = 0.1m,
+                DecimalPlaces = 2
+            };
+
+            var stepLabel = new Label
+            {
+                Text = "Krok zejścia (gen.)",
+                AutoSize = true,
+                Location = new System.Drawing.Point(6, 72)
+            };
+
+            _narrowingStepInput = new NumericUpDown
+            {
+                Location = new System.Drawing.Point(6, 88),
+                Size = new System.Drawing.Size(138, 23),
+                Minimum = 1,
+                Maximum = 10000,
+                Value = 1,
+                Increment = 1
+            };
+
+            _narrowingMutationGroupBox.Controls.Add(multiplierLabel);
+            _narrowingMutationGroupBox.Controls.Add(_narrowingMultiplierInput);
+            _narrowingMutationGroupBox.Controls.Add(stepLabel);
+            _narrowingMutationGroupBox.Controls.Add(_narrowingStepInput);
+            Controls.Add(_narrowingMutationGroupBox);
+        }
+
         private void ReadUiData()
         {
             _data.MatrixSize = matrixSizeInput.Value;
@@ -277,6 +333,8 @@ namespace Lab2
             _data.TournamentSelectionSize = tournamentSizeInput.Value;
             _data.UniformBlockMutationProbWhite = uniformProbWhite.Value;
             _data.UniformBlockMutationProbRed = uniformProbRed.Value;
+            _data.NarrowingMutationMultiplier = _narrowingMultiplierInput.Value;
+            _data.NarrowingMutationStep = (int)_narrowingStepInput.Value;
             _data.StagnationEnabled = _stagnationOnCheckBox.Checked;
             _data.StagnationWindow = (int)_stagnationWindowInput.Value;
             _data.StagnationResetFraction = _stagnationFractionInput.Value;
@@ -359,7 +417,12 @@ namespace Lab2
                     new BitSwapMutation(_data.MutationProbability, random),
 
                 MutationType.RANDOM_COORDS =>
-                    new NarrowingMutation(_data.MutationProbability, random),
+                    new NarrowingMutation(
+                        _data.MutationProbability,
+                        _data.NarrowingMutationMultiplier,
+                        _data.NarrowingMutationStep,
+                        random
+                    ),
 
                 _ => throw new InvalidOperationException()
             });
@@ -1207,6 +1270,7 @@ namespace Lab2
             selectionGroup.Enabled = false;
             crossGroup.Enabled = false;
             mutationGroup.Enabled = false;
+            _narrowingMutationGroupBox.Enabled = false;
             unformBlocksGroupBox.Enabled = false;
             eliteGroupBox.Enabled = false;
         }
@@ -1282,6 +1346,7 @@ namespace Lab2
             if (selected != null && selected.Checked)
             {
                 _data.MutationType = MutationType.EQUALY;
+                _narrowingMutationGroupBox.Enabled = false;
             }
         }
 
@@ -1291,6 +1356,7 @@ namespace Lab2
             if (selected != null && selected.Checked)
             {
                 _data.MutationType = MutationType.BIT_SWAPING;
+                _narrowingMutationGroupBox.Enabled = false;
             }
         }
 
@@ -1300,6 +1366,7 @@ namespace Lab2
             if (selected != null && selected.Checked)
             {
                 _data.MutationType = MutationType.RANDOM_COORDS;
+                _narrowingMutationGroupBox.Enabled = true;
             }
         }
 

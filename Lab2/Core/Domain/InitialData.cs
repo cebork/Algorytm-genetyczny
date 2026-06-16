@@ -15,6 +15,8 @@ namespace Lab2.Core.Domain
         public decimal NumberOfIndividuals { get; set; }
         public decimal CrossProbability { get; set; }
         public decimal MutationProbability { get; set; }
+        public decimal NarrowingMutationMultiplier { get; set; } = 1m;
+        public int NarrowingMutationStep { get; set; } = 1;
         public decimal NumberOfIterations { get; set; }
         public bool[,] SupervisedReferenceMatrix { get; set; }
         public bool[][,] UnsupervisedPatternMatrixes { get; set; }

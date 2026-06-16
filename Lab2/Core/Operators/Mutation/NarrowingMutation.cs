@@ -10,22 +10,31 @@ namespace Lab2.Core.Operators.Mutation
     public class NarrowingMutation : IMutationOperator
     {
         private readonly decimal _baseProbability;
+        private readonly decimal _startMultiplier;
+        private readonly int _narrowingStep;
         private readonly IRandomProvider _random;
 
-        public NarrowingMutation(decimal baseProbability, IRandomProvider random)
+        public NarrowingMutation(
+            decimal baseProbability,
+            decimal startMultiplier,
+            int narrowingStep,
+            IRandomProvider random)
         {
             _baseProbability = baseProbability;
+            _startMultiplier = startMultiplier;
+            _narrowingStep = narrowingStep;
             _random = random;
         }
 
         public bool[,] Mutate(bool[,] genotype, int iteration, int maxIterations)
         {
-            decimal multiplier = Math.Max(
-                0.000m,
-                (maxIterations - iteration) / (decimal)maxIterations
-            );
+            int step = Math.Max(1, _narrowingStep);
+            int totalSteps = Math.Max(1, (int)Math.Ceiling(maxIterations / (decimal)step));
+            int currentStep = Math.Min(totalSteps, iteration / step);
 
-            decimal effectiveProb = _baseProbability * multiplier;
+            decimal progress = currentStep / (decimal)totalSteps;
+            decimal multiplier = Math.Max(0m, _startMultiplier * (1m - progress));
+            decimal effectiveProb = Math.Min(1m, _baseProbability * multiplier);
             if (effectiveProb <= 0)
                 return genotype;
 

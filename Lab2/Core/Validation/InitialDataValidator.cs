@@ -29,6 +29,12 @@ namespace Lab2.Core.Validation
             if (data.MutationProbability is < 0 or > 1)
                 result.Errors.Add("Prawdopodobieństwo mutacji musi być w [0,1]");
 
+            if (data.NarrowingMutationMultiplier < 0)
+                result.Errors.Add("Mnożnik mutacji zwężającej musi być >= 0");
+
+            if (data.NarrowingMutationStep <= 0)
+                result.Errors.Add("Krok zejścia mutacji zwężającej musi być > 0");
+
             if (data.ProbGen1 is < 0 or > 1)
                 result.Errors.Add("ProbGen1 musi być w [0,1]");
 
