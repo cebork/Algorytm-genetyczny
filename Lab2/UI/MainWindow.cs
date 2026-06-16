@@ -37,9 +37,11 @@ namespace Lab2
         private GroupBox _narrowingMutationGroupBox = null!;
         private NumericUpDown _narrowingMultiplierInput = null!;
         private NumericUpDown _narrowingStepInput = null!;
+        private GroupBox _stagnationGroupBox = null!;
         private GroupBox _evenMatrixPaddingGroupBox = null!;
         private NumericUpDown _emptyRowInput = null!;
         private NumericUpDown _emptyColumnInput = null!;
+        private bool _visualLayoutApplied;
 
         public MainWindow()
         {
@@ -64,6 +66,7 @@ namespace Lab2
             CreateNarrowingMutationControls();
             CreateEvenMatrixPaddingControls();
             SetupDefaultAlgorithmOtpions();
+            ApplyVisualLayout();
         }
 
 
@@ -290,7 +293,114 @@ namespace Lab2
             group.Controls.Add(_stagnationFractionInput);
             group.Controls.Add(diversityLabel);
             group.Controls.Add(_stagnationDiversityThresholdInput);
+            _stagnationGroupBox = group;
             Controls.Add(group);
+        }
+
+        private void ApplyVisualLayout()
+        {
+            if (_visualLayoutApplied)
+                return;
+
+            _visualLayoutApplied = true;
+            SuspendLayout();
+
+            Text = "Algorytm genetyczny";
+            MinimumSize = new System.Drawing.Size(1180, 760);
+
+            var root = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 1,
+                RowCount = 2,
+                Padding = new Padding(8),
+                BackColor = System.Drawing.SystemColors.Control
+            };
+            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 290));
+            root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+            var configurationTabs = new TabControl
+            {
+                Dock = DockStyle.Fill,
+                Name = "configurationTabs"
+            };
+
+            var basicTab = CreateConfigurationTab("Podstawowe");
+            var operatorsTab = CreateConfigurationTab("Operatory");
+            var advancedTab = CreateConfigurationTab("Zaawansowane");
+
+            configurationTabs.TabPages.Add(basicTab);
+            configurationTabs.TabPages.Add(operatorsTab);
+            configurationTabs.TabPages.Add(advancedTab);
+
+            Controls.Add(root);
+            root.BringToFront();
+            root.Controls.Add(configurationTabs, 0, 0);
+            root.Controls.Add(tabs, 0, 1);
+
+            tabs.Dock = DockStyle.Fill;
+            tabs.Margin = new Padding(0, 8, 0, 0);
+
+            MoveControl(algorithmTypeGroupBox, basicTab, 12, 12);
+            MoveControl(probGen1Group, basicTab, 265, 12);
+            MoveControl(stopAtFirstCorrect, basicTab, 380, 27);
+            MoveControl(inputDataGroupBox, basicTab, 12, 72);
+            MoveControl(GAmodification, basicTab, 810, 72);
+
+            var runGroup = CreateRunGroup();
+            basicTab.Controls.Add(runGroup);
+            runGroup.Location = new System.Drawing.Point(970, 72);
+
+            MoveControl(selectionGroup, operatorsTab, 12, 12);
+            MoveControl(crossGroup, operatorsTab, 230, 12);
+            MoveControl(mutationGroup, operatorsTab, 345, 12);
+            MoveControl(_narrowingMutationGroupBox, operatorsTab, 480, 12);
+
+            MoveControl(unformBlocksGroupBox, advancedTab, 12, 12);
+            MoveControl(eliteGroupBox, advancedTab, 270, 12);
+            MoveControl(_stagnationGroupBox, advancedTab, 490, 12);
+            MoveControl(_evenMatrixPaddingGroupBox, advancedTab, 710, 12);
+            MoveControl(iterations, advancedTab, 930, 32);
+
+            startButton.Text = "Uruchom";
+            startButton.Width = 150;
+            historyViewButton.Width = 150;
+            runProgressBar.Width = 190;
+            runProgressBar.Visible = false;
+
+            ResumeLayout(true);
+        }
+
+        private static TabPage CreateConfigurationTab(string text)
+        {
+            return new TabPage(text)
+            {
+                AutoScroll = true,
+                Padding = new Padding(8),
+                BackColor = System.Drawing.SystemColors.Control
+            };
+        }
+
+        private GroupBox CreateRunGroup()
+        {
+            var runGroup = new GroupBox
+            {
+                Text = "Uruchamianie",
+                Size = new System.Drawing.Size(235, 153)
+            };
+
+            MoveControl(startButton, runGroup, 16, 28);
+            MoveControl(runProgressBar, runGroup, 16, 66);
+            MoveControl(historyViewButton, runGroup, 16, 100);
+
+            return runGroup;
+        }
+
+        private static void MoveControl(System.Windows.Forms.Control control, System.Windows.Forms.Control parent, int x, int y)
+        {
+            control.Parent = parent;
+            control.Location = new System.Drawing.Point(x, y);
         }
 
         private void CreateNarrowingMutationControls()
