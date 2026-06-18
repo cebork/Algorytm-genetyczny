@@ -58,6 +58,9 @@ namespace Lab2.Core.Validation
             if (data.NarrowingMutationStep <= 0)
                 result.Errors.Add("Krok zejścia mutacji zwężającej musi być > 0");
 
+            if (data.NarrowingMutationExponent < 0)
+                result.Errors.Add("Wykładnik asymptotyczny mutacji zwężającej musi być >= 0");
+
             if (data.ProbGen1 is < 0 or > 1)
                 result.Errors.Add("ProbGen1 musi być w [0,1]");
 

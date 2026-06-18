@@ -12,29 +12,38 @@ namespace Lab2.Core.Operators.Mutation
         private readonly decimal _baseProbability;
         private readonly decimal _startMultiplier;
         private readonly int _narrowingStep;
+        private readonly decimal _asymptoticExponent;
+        private readonly bool _useLowerLimit;
         private readonly IRandomProvider _random;
 
         public NarrowingMutation(
             decimal baseProbability,
             decimal startMultiplier,
             int narrowingStep,
+            decimal asymptoticExponent,
+            bool useLowerLimit,
             IRandomProvider random)
         {
             _baseProbability = baseProbability;
             _startMultiplier = startMultiplier;
             _narrowingStep = narrowingStep;
+            _asymptoticExponent = asymptoticExponent;
+            _useLowerLimit = useLowerLimit;
             _random = random;
         }
 
         public bool[,] Mutate(bool[,] genotype, int iteration, int maxIterations)
         {
-            int step = Math.Max(1, _narrowingStep);
-            int totalSteps = Math.Max(1, (int)Math.Ceiling(maxIterations / (decimal)step));
-            int currentStep = Math.Min(totalSteps, iteration / step);
+            decimal effectiveProb = CalculateEffectiveProbability(
+                _baseProbability,
+                _startMultiplier,
+                _narrowingStep,
+                _asymptoticExponent,
+                _useLowerLimit,
+                iteration,
+                maxIterations
+            );
 
-            decimal progress = currentStep / (decimal)totalSteps;
-            decimal multiplier = Math.Max(0m, _startMultiplier * (1m - progress));
-            decimal effectiveProb = Math.Min(1m, _baseProbability * multiplier);
             if (effectiveProb <= 0)
                 return genotype;
 
@@ -53,6 +62,28 @@ namespace Lab2.Core.Operators.Mutation
             }
 
             return genotype;
+        }
+
+        public static decimal CalculateEffectiveProbability(
+            decimal baseProbability,
+            decimal startMultiplier,
+            int narrowingStep,
+            decimal asymptoticExponent,
+            bool useLowerLimit,
+            int iteration,
+            int maxIterations)
+        {
+            int step = Math.Max(1, narrowingStep);
+            int totalIterations = Math.Max(1, maxIterations);
+            int currentStep = Math.Min(totalIterations, Math.Max(0, iteration / step * step));
+            decimal remainingRatio = Math.Max(0m, (totalIterations - currentStep) / (decimal)totalIterations);
+            decimal narrowingFactor = (decimal)Math.Pow((double)remainingRatio, (double)asymptoticExponent);
+
+            decimal effectiveProb = useLowerLimit
+                ? baseProbability * (startMultiplier - 1m) * narrowingFactor + baseProbability
+                : baseProbability * startMultiplier * narrowingFactor;
+
+            return Math.Min(1m, Math.Max(0m, effectiveProb));
         }
     }
 }

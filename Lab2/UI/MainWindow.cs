@@ -37,10 +37,13 @@ namespace Lab2
         private GroupBox _narrowingMutationGroupBox = null!;
         private NumericUpDown _narrowingMultiplierInput = null!;
         private NumericUpDown _narrowingStepInput = null!;
+        private NumericUpDown _narrowingExponentInput = null!;
+        private CheckBox _limitNarrowingMutationCheckBox = null!;
         private GroupBox _stagnationGroupBox = null!;
         private GroupBox _evenMatrixPaddingGroupBox = null!;
         private NumericUpDown _emptyRowInput = null!;
         private NumericUpDown _emptyColumnInput = null!;
+        private System.Windows.Forms.DataVisualization.Charting.Chart _mutationChart = null!;
         private bool _visualLayoutApplied;
 
         public MainWindow()
@@ -133,6 +136,7 @@ namespace Lab2
             //FileUtils.SaveResultsGa(historyOfIndividuals, InitialData);
             DrawFitnessChart(lastGa.StatisticsHistory);
             DrawCumulativeChart(cumulativeSuccesses, experimentCount);
+            DrawMutationChart(iterationCount);
 
             var elapsed = stopwatch.Elapsed;
             MessageBox.Show(
@@ -160,6 +164,11 @@ namespace Lab2
             chart1.ChartAreas.Clear();
             cumulativeChart.Series.Clear();
             cumulativeChart.ChartAreas.Clear();
+            if (_mutationChart != null)
+            {
+                _mutationChart.Series.Clear();
+                _mutationChart.ChartAreas.Clear();
+            }
 
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -341,6 +350,7 @@ namespace Lab2
 
             tabs.Dock = DockStyle.Fill;
             tabs.Margin = new Padding(0, 8, 0, 0);
+            CreateMutationChartTab();
 
             MoveControl(algorithmTypeGroupBox, basicTab, 12, 12);
             MoveControl(probGen1Group, basicTab, 265, 12);
@@ -397,6 +407,29 @@ namespace Lab2
             return runGroup;
         }
 
+        private void CreateMutationChartTab()
+        {
+            if (_mutationChart != null)
+                return;
+
+            var mutationChartPage = new TabPage
+            {
+                Text = "Mutacja",
+                Padding = new Padding(3),
+                UseVisualStyleBackColor = true
+            };
+
+            _mutationChart = new System.Windows.Forms.DataVisualization.Charting.Chart
+            {
+                Dock = DockStyle.Fill,
+                Text = "mutationChart"
+            };
+
+            _mutationChart.Legends.Add(new Legend());
+            mutationChartPage.Controls.Add(_mutationChart);
+            tabs.TabPages.Add(mutationChartPage);
+        }
+
         private static void MoveControl(System.Windows.Forms.Control control, System.Windows.Forms.Control parent, int x, int y)
         {
             control.Parent = parent;
@@ -409,7 +442,7 @@ namespace Lab2
             {
                 Text = "Mutacja zwężająca",
                 Location = new System.Drawing.Point(1644, 440),
-                Size = new System.Drawing.Size(200, 125),
+                Size = new System.Drawing.Size(200, 215),
                 Enabled = false
             };
 
@@ -448,10 +481,38 @@ namespace Lab2
                 Increment = 1
             };
 
+            var exponentLabel = new Label
+            {
+                Text = "Wykładnik b",
+                AutoSize = true,
+                Location = new System.Drawing.Point(6, 120)
+            };
+
+            _narrowingExponentInput = new NumericUpDown
+            {
+                Location = new System.Drawing.Point(6, 136),
+                Size = new System.Drawing.Size(138, 23),
+                Minimum = 0m,
+                Maximum = 10m,
+                Value = 1m,
+                Increment = 0.1m,
+                DecimalPlaces = 2
+            };
+
+            _limitNarrowingMutationCheckBox = new CheckBox
+            {
+                Text = "Limit dolny do pm",
+                AutoSize = true,
+                Location = new System.Drawing.Point(6, 170)
+            };
+
             _narrowingMutationGroupBox.Controls.Add(multiplierLabel);
             _narrowingMutationGroupBox.Controls.Add(_narrowingMultiplierInput);
             _narrowingMutationGroupBox.Controls.Add(stepLabel);
             _narrowingMutationGroupBox.Controls.Add(_narrowingStepInput);
+            _narrowingMutationGroupBox.Controls.Add(exponentLabel);
+            _narrowingMutationGroupBox.Controls.Add(_narrowingExponentInput);
+            _narrowingMutationGroupBox.Controls.Add(_limitNarrowingMutationCheckBox);
             Controls.Add(_narrowingMutationGroupBox);
         }
 
@@ -557,6 +618,8 @@ namespace Lab2
             _data.UniformBlockMutationProbRed = uniformProbRed.Value;
             _data.NarrowingMutationMultiplier = _narrowingMultiplierInput.Value;
             _data.NarrowingMutationStep = (int)_narrowingStepInput.Value;
+            _data.NarrowingMutationExponent = _narrowingExponentInput.Value;
+            _data.LimitNarrowingMutation = _limitNarrowingMutationCheckBox.Checked;
             _data.StagnationEnabled = _stagnationOnCheckBox.Checked;
             _data.StagnationWindow = (int)_stagnationWindowInput.Value;
             _data.StagnationResetFraction = _stagnationFractionInput.Value;
@@ -646,6 +709,8 @@ namespace Lab2
                         _data.MutationProbability,
                         _data.NarrowingMutationMultiplier,
                         _data.NarrowingMutationStep,
+                        _data.NarrowingMutationExponent,
+                        _data.LimitNarrowingMutation,
                         random
                     ),
 
@@ -802,6 +867,70 @@ namespace Lab2
                 cumulativeChart.Legends.Add(new Legend());
 
             cumulativeChart.Legends[0].Font = new Font("Arial", 15);
+        }
+
+        private void DrawMutationChart(int iterationCount)
+        {
+            if (_mutationChart == null)
+                return;
+
+            _mutationChart.Series.Clear();
+            _mutationChart.ChartAreas.Clear();
+
+            var points = Enumerable.Range(0, iterationCount + 1)
+                .Select(iteration =>
+                {
+                    decimal probability = _data.MutationType == MutationType.RANDOM_COORDS
+                        ? NarrowingMutation.CalculateEffectiveProbability(
+                            _data.MutationProbability,
+                            _data.NarrowingMutationMultiplier,
+                            _data.NarrowingMutationStep,
+                            _data.NarrowingMutationExponent,
+                            _data.LimitNarrowingMutation,
+                            iteration,
+                            iterationCount
+                        )
+                        : _data.MutationProbability;
+
+                    return (iteration, probability);
+                })
+                .ToList();
+
+            double yMaximum = Math.Max(0.01, (double)points.Max(point => point.probability));
+
+            _mutationChart.Series.Add(CreateSeries(
+                "p*",
+                Color.DarkOrange,
+                points
+            ));
+
+            var chartArea = new ChartArea
+            {
+                AxisX =
+                {
+                    Title = "Generations",
+                    Minimum = 0,
+                    IsMarginVisible = false,
+                    TitleFont = new Font("Arial", 15),
+                    LabelStyle = { Font = new Font("Arial", 14) }
+                },
+                AxisY =
+                {
+                    Title = "Mutation probability",
+                    Minimum = 0.0,
+                    Maximum = yMaximum,
+                    TitleFont = new Font("Arial", 15),
+                    LabelStyle = { Font = new Font("Arial", 14) }
+                },
+                BackColor = Color.White
+            };
+
+            _mutationChart.ChartAreas.Add(chartArea);
+
+            if (_mutationChart.Legends.Count == 0)
+                _mutationChart.Legends.Add(new Legend());
+
+            _mutationChart.Legends[0].Font = new Font("Arial", 15);
         }
 
         private Series CreateSeries(

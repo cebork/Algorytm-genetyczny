@@ -106,6 +106,11 @@ namespace Lab2.Services
                 throw new Exception("Krok zejścia mutacji zwężającej musi być > 0");
             }
 
+            if (InitialData.NarrowingMutationExponent < 0)
+            {
+                throw new Exception("Wykładnik asymptotyczny mutacji zwężającej musi być >= 0");
+            }
+
             if (InitialData.StagnationWindow <= 0)
             {
                 throw new Exception("Okno stagnacji musi być > 0");
