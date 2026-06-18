@@ -314,7 +314,7 @@ namespace Lab2
             _visualLayoutApplied = true;
             SuspendLayout();
 
-            Text = "Algorytm genetyczny";
+            Text = $"Praca magisterska v{GetApplicationVersion()}";
             MinimumSize = new System.Drawing.Size(1180, 760);
 
             var root = new TableLayoutPanel
@@ -390,6 +390,14 @@ namespace Lab2
                 Padding = new Padding(8),
                 BackColor = System.Drawing.SystemColors.Control
             };
+        }
+
+        private static string GetApplicationVersion()
+        {
+            var version = typeof(MainWindow).Assembly.GetName().Version;
+            return version == null
+                ? "1.0.0"
+                : $"{version.Major}.{version.Minor}.{version.Build}";
         }
 
         private GroupBox CreateRunGroup()
