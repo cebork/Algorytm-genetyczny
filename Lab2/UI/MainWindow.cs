@@ -15,6 +15,7 @@ using Lab2.UI;
 using MathNet.Numerics;
 using System;
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
@@ -64,7 +65,8 @@ namespace Lab2
             precisionInput.SelectedItem = 0.001m;
             supervisedTypedRadioButton.Checked = true;
 
-            seed.Enabled = false;
+            LoadLastSeed();
+            seed.Enabled = useSeed.Checked;
             CreateStagnationControls();
             CreateNarrowingMutationControls();
             CreateEvenMatrixPaddingControls();
@@ -79,6 +81,7 @@ namespace Lab2
             {
                 ReadUiData();
                 new ValidationFacade().ValidateOrThrow(_data);
+                FileUtils.SaveLastSeed(_data.RandomSeed);
                 await RunGeneticAlgorithm();
         }
             catch (Exception ex)
@@ -634,20 +637,32 @@ namespace Lab2
             _data.StagnationDiversityThreshold = _stagnationDiversityThresholdInput.Value;
             _data.EmptyRowIndex = (int)_emptyRowInput.Value;
             _data.EmptyColumnIndex = (int)_emptyColumnInput.Value;
+            _data.UseSeed = useSeed.Checked;
+            _data.RandomSeed = ResolveRunSeed();
+            seed.Text = _data.RandomSeed.ToString(CultureInfo.InvariantCulture);
         }
 
-        private IRandomProvider CreateRandomProvider()
+        private void LoadLastSeed()
         {
-            return useSeed.Checked
-                ? new SeededRandomProvider(int.Parse(seed.Text))
-                : new SeededRandomProvider(Environment.TickCount);
+            int? lastSeed = FileUtils.LoadLastSeed();
+            if (lastSeed.HasValue)
+                seed.Text = lastSeed.Value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        private int ResolveRunSeed()
+        {
+            if (!useSeed.Checked)
+                return Environment.TickCount;
+
+            if (int.TryParse(seed.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsedSeed))
+                return parsedSeed;
+
+            throw new InvalidOperationException("Seed musi być liczbą całkowitą.");
         }
 
         private IRandomProvider CreateRandomProvider(int experimentIndex)
         {
-            int seedValue = useSeed.Checked
-                ? int.Parse(seed.Text) + experimentIndex
-                : Environment.TickCount + experimentIndex;
+            int seedValue = unchecked(_data.RandomSeed + experimentIndex);
 
             return new SeededRandomProvider(seedValue);
         }

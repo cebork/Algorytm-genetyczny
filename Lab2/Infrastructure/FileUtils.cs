@@ -23,6 +23,7 @@ namespace Lab2.Infrastructure
         private static readonly string GaResultsFilePath = Path.Combine(ResultDirectory, "results_GA.txt");
         private static readonly string maxFCCorr = Path.Combine(ResultDirectory, "max_f_C_corr.txt");
         private static readonly string CumulativeFilePath = Path.Combine(ResultDirectory, "cumulative.txt");
+        private static readonly string LastSeedFilePath = Path.Combine(ResultDirectory, "last_seed.txt");
 
 
 
@@ -182,6 +183,21 @@ namespace Lab2.Infrastructure
             }
 
             File.WriteAllText(CumulativeFilePath, builder.ToString());
+        }
+
+        public static int? LoadLastSeed()
+        {
+            if (!File.Exists(LastSeedFilePath))
+                return null;
+
+            string text = File.ReadAllText(LastSeedFilePath).Trim();
+            return int.TryParse(text, out int value) ? value : null;
+        }
+
+        public static void SaveLastSeed(int seed)
+        {
+            Directory.CreateDirectory(ResultDirectory);
+            File.WriteAllText(LastSeedFilePath, seed.ToString());
         }
 
     }
