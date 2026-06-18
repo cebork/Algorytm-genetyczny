@@ -3,6 +3,9 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
+    <AssemblyName>praca-magisterska</AssemblyName>
+    <ApplicationTitle>Praca magisterska</ApplicationTitle>
+    <Product>Praca magisterska</Product>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
