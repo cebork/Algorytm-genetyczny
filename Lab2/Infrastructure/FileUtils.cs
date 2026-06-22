@@ -200,5 +200,34 @@ namespace Lab2.Infrastructure
             File.WriteAllText(LastSeedFilePath, seed.ToString());
         }
 
+        public static void SaveGaTunningResults(List<TestObject> testObjects, InitialData initialData)
+        {
+            Directory.CreateDirectory(ResultDirectory);
+
+            using var writer = new StreamWriter(GaTunningFilePath, false, Encoding.UTF8);
+
+            writer.WriteLine("# parametry badania");
+            writer.WriteLine($"# Rozmiar macierzy: {initialData.RequestedMatrixSize}");
+            writer.WriteLine($"# Efektywny rozmiar macierzy: {initialData.MatrixSize}");
+            writer.WriteLine($"# Typ algorytmu: {initialData.AlgorithmType}");
+            writer.WriteLine($"# Typ selekcji: {initialData.SelectionType}");
+            writer.WriteLine($"# Typ krzyzowania: {initialData.CrossType}");
+            writer.WriteLine($"# Typ mutacji: {initialData.MutationType}");
+            writer.WriteLine($"# Liczba eksperymentow na konfiguracje: {initialData.NumberOfExperiments}");
+            writer.WriteLine();
+            writer.WriteLine("# Wyniki badania posortowane malejaco po sredniej ocenie");
+            writer.WriteLine("#  1         2           3             4         5       6       7        8                9                       10");
+            writer.WriteLine("# No.        N           T             Pk        Pm      Rt      Ps       IPK      f_min_C_corr_N       f_avg_C_corr_N       f_max_C_corr_N");
+
+            int index = 1;
+            foreach (var result in testObjects.OrderByDescending(test => test.AvgMark))
+            {
+                writer.WriteLine(
+                    $"{index,-4} {result.N,10} {result.T,12} {result.pk,12:F3} {result.pm,10:F4} {result.Rt,7} {result.Ps,7:F3} {result.Ipk,8} {result.MinMark,18:F4} {result.AvgMark,21:F4} {result.MaxMark,21:F4}"
+                );
+                index++;
+            }
+        }
+
     }
 }

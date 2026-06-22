@@ -46,6 +46,13 @@ namespace Lab2
         private NumericUpDown _emptyColumnInput = null!;
         private System.Windows.Forms.DataVisualization.Charting.Chart _mutationChart = null!;
         private bool _visualLayoutApplied;
+        private CheckBox _testSweepNCheckBox = null!;
+        private CheckBox _testSweepPkCheckBox = null!;
+        private CheckBox _testSweepPmCheckBox = null!;
+        private CheckBox _testSweepTCheckBox = null!;
+        private CheckBox _testSweepRtCheckBox = null!;
+        private CheckBox _testSweepPsCheckBox = null!;
+        private CheckBox _testSweepIpkCheckBox = null!;
 
         public MainWindow()
         {
@@ -72,6 +79,7 @@ namespace Lab2
             CreateEvenMatrixPaddingControls();
             SetupDefaultAlgorithmOtpions();
             ApplyVisualLayout();
+            CreateTestSweepControls();
         }
 
 
@@ -625,6 +633,7 @@ namespace Lab2
             _data.CrossCount = crossPoints.Value;
             _data.ProbGen1 = propGen1.Value;
             _data.TournamentSelectionSize = tournamentSizeInput.Value;
+            _data.TournamentSoftSelectionTreshold = tournamentTresholdInput.Value;
             _data.UniformBlockMutationProbWhite = uniformProbWhite.Value;
             _data.UniformBlockMutationProbRed = uniformProbRed.Value;
             _data.NarrowingMutationMultiplier = _narrowingMultiplierInput.Value;
@@ -690,6 +699,13 @@ namespace Lab2
                 SelectionType.TOURNAMENT_HARD =>
                     new TournamentSelection(
                         (int)_data.TournamentSelectionSize,
+                        random
+                    ),
+
+                SelectionType.TOURNAMENT_SOFT =>
+                    new SoftTournamentSelection(
+                        (int)_data.TournamentSelectionSize,
+                        _data.TournamentSoftSelectionTreshold,
                         random
                     ),
 
@@ -981,87 +997,117 @@ namespace Lab2
 
 
 
-        private void testyStart_Click(object sender, EventArgs e)
+        private async void testyStart_Click(object sender, EventArgs e)
         {
-            //if (!useSeed.Checked)
-            //    RandomSingleton.Reset();
-            //else
-            //{
-            //    if (int.TryParse(seed.Text, out int parsedSeed))
-            //    {
-            //        RandomSingleton.SetSeed(parsedSeed);
-            //    }
-            //    else
-            //    {
-            //        MessageBox.Show("Invalid seed value. Please enter a valid integer.");
-            //    }
-            //}
-            //InitialData.MatrixSize = matrixSizeInput.Value;
-            //InitialData.Precision = (decimal)precisionInput.SelectedItem;
-            //InitialData.NumberOfIndividuals = individualNumberInput.Value;
-            //InitialData.CrossProbability = crossProbabilityInput.Value;
-            //InitialData.MutationProbability = mutationProbabilityInput.Value;
-            //InitialData.NumberOfIterations = iterationNumberInput.Value;
-            //InitialData.NumberOfExperiments = experimentNumber.Value;
-            //InitialData.CrossCount = crossPoints.Value;
-            //InitialData.ProbGen1 = propGen1.Value;
-            //InitialData.TournamentSelectionSize = tournamentSizeInput.Value;
-            //InitialData.TournamentSoftSelectionTreshold = tournamentTresholdInput.Value;
-            //historyOfIndividuals.Clear();
-            //if (testExperimentCount.Value <= 0)
-            //{
-            //    MessageBox.Show("Liczba eksperyment�w musi by� wi�ksza od 0", "");
-            //    return;
-            //}
+            try
+            {
+                ReadUiData();
+                _data.NumberOfExperiments = testExperimentCount.Value;
+                new ValidationFacade().ValidateOrThrow(_data);
+                ValidateTestSweepRanges();
 
-            //if (NaInput.Value <= 0 || TaInput.Value <= 0)
-            //{
-            //    MessageBox.Show("Ilo�� osobnik�w oraz ilo�� iteracji musi by� wi�ksza od 0", "");
-            //    return;
-            //}
-            //if (NaInput.Value >= NbInput.Value || pkaInput.Value >= PkbbInput.Value || pmaInput.Value >= PmbInput.Value || TaInput.Value >= TbInput.Value || Ps_a.Value >= Ps_b_Input.Value || Rt_a_Input.Value >= rt_b_input.Value || ipk_input.Value >= ipk_b_input.Value)
-            //{
-            //    MessageBox.Show("Warto�� przedzia��w test�w nie mo�e by� odwrotna lub zerowa", "");
-            //    return;
-            //}
-            //if (NstepInput.Value == 0 || PkstepInput.Value == 0 || PmstepInput.Value == 0 || TstepInput.Value == 0 || rt_step_input.Value == 0 || Ps_step.Value == 0 || ipk_step_input.Value == 0)
-            //{
-            //    MessageBox.Show("Warto�� kroku nie mo�e by� zerowa", "");
-            //    return;
-            //}
+                FileUtils.SaveLastSeed(_data.RandomSeed);
 
-            //if (InitialData.AlgorithmType == Core.Enums.AlgorithmType.SUPERVISED && (InitialData.SupervisedReferenceMatrix == null || InitialData.SupervisedReferenceMatrix.Length == 0) ||
-            //    InitialData.AlgorithmType == Core.Enums.AlgorithmType.UNSUPERVISED && (InitialData.UnsupervisedPatternMatrixes == null || InitialData.UnsupervisedPatternMatrixes.Length == 0))
-            //{
-            //    MessageBox.Show("Nie wybrano macierzy wzorców lub macierzy referencyjnej", "");
-            //    return;
-            //}
+                var nValues = GetTestValues(_testSweepNCheckBox, NaInput, NbInput, NstepInput, individualNumberInput.Value);
+                var pkValues = GetTestValues(_testSweepPkCheckBox, pkaInput, PkbbInput, PkstepInput, crossProbabilityInput.Value);
+                var pmValues = GetTestValues(_testSweepPmCheckBox, pmaInput, PmbInput, PmstepInput, mutationProbabilityInput.Value);
+                var tValues = GetTestValues(_testSweepTCheckBox, TaInput, TbInput, TstepInput, iterationNumberInput.Value);
+                var rtValues = GetTestValues(_testSweepRtCheckBox, Rt_a_Input, rt_b_input, rt_step_input, tournamentSizeInput.Value);
+                var psValues = GetTestValues(_testSweepPsCheckBox, Ps_a, Ps_b_Input, Ps_step, tournamentTresholdInput.Value);
+                var ipkValues = GetTestValues(_testSweepIpkCheckBox, ipk_input, ipk_b_input, ipk_step_input, crossPoints.Value);
 
-            //if (ipk_b_input.Value > matrixSizeInput.Value - 2)
-            //{
-            //    MessageBox.Show("Maksymalna ilo�� ci�� to rozmiar macierzy - 2", "");
-            //    return;
-            //}
+                int totalConfigurations = nValues.Count * pkValues.Count * pmValues.Count * tValues.Count *
+                    rtValues.Count * psValues.Count * ipkValues.Count;
 
-            //var watch = System.Diagnostics.Stopwatch.StartNew();
-            //////Dictionary<InitialData, List<List<Individual>>> globalHistory = new();
-            //List<TestObject> list = new();
+                if (totalConfigurations <= 0)
+                    throw new InvalidOperationException("Brak konfiguracji testowych do uruchomienia.");
 
-            //var NValues = GenerateDecimalRange(NaInput.Value, NbInput.Value, NstepInput.Value);
-            //var pkValues = GenerateDecimalRange(pkaInput.Value, PkbbInput.Value, PkstepInput.Value);
-            //var pmValues = GenerateDecimalRange(pmaInput.Value, PmbInput.Value, PmstepInput.Value);
-            //var tValues = GenerateDecimalRange(TaInput.Value, TbInput.Value, TstepInput.Value);
-            //var rtValues = GenerateDecimalRange(Rt_a_Input.Value, rt_b_input.Value, rt_step_input.Value);
-            //var psValues = GenerateDecimalRange(Ps_b_Input.Value, Ps_b_Input.Value, Ps_step.Value);
-            //var ipkValues = GenerateDecimalRange(ipk_input.Value, ipk_b_input.Value, ipk_step_input.Value);
-            //int maxCount = NValues.Count * pkValues.Count * pmValues.Count * tValues.Count * psValues.Count * rtValues.Count * ipkValues.Count;
-            //int currentCount = 0;
-            //decimal iter = 1;
+                var stopwatch = Stopwatch.StartNew();
+                var results = new List<TestObject>(totalConfigurations);
+                int experimentCount = (int)testExperimentCount.Value;
+                int currentConfiguration = 0;
+                decimal resultIndex = 1;
 
-            //MessageBox.Show("Zamknij okno aby kontyunuwac", "");
+                testyStart.Enabled = false;
 
-            //foreach (var n in NValues)
-            //{
+                await Task.Run(() =>
+                {
+                    foreach (var n in nValues)
+                    foreach (var pk in pkValues)
+                    foreach (var pm in pmValues)
+                    foreach (var t in tValues)
+                    foreach (var rt in rtValues)
+                    foreach (var ps in psValues)
+                    foreach (var ipk in ipkValues)
+                    {
+                        decimal min = decimal.MaxValue;
+                        decimal max = decimal.MinValue;
+                        decimal sum = 0m;
+
+                        for (int experimentIndex = 0; experimentIndex < experimentCount; experimentIndex++)
+                        {
+                            ApplyTestConfiguration(n, pk, pm, t, rt, ps, ipk);
+                            var ga = CreateGeneticAlgorithm(experimentIndex);
+                            ga.Run();
+
+                            decimal best = ga.StatisticsHistory.Count == 0
+                                ? 0m
+                                : ga.StatisticsHistory.Max(stat => stat.BestFitness);
+
+                            min = Math.Min(min, best);
+                            max = Math.Max(max, best);
+                            sum += best;
+                        }
+
+                        results.Add(new TestObject
+                        {
+                            Iter = resultIndex++,
+                            N = n,
+                            pk = pk,
+                            pm = pm,
+                            T = t,
+                            Rt = rt,
+                            Ps = ps,
+                            Ipk = ipk,
+                            MinMark = min,
+                            AvgMark = sum / experimentCount,
+                            MaxMark = max
+                        });
+
+                        int completed = Interlocked.Increment(ref currentConfiguration);
+                        BeginInvoke(new Action(() =>
+                        {
+                            testCounter.Text = $"Test {completed} / {totalConfigurations}";
+                            individualCount.Text = $"Ilość osobników {n}";
+                            mutationProb.Text = $"Prawdopodobieństwo mutacji {pm}";
+                            crossProb.Text = $"Prawdopodobieństwo krzyżowania {pk}";
+                            iterationCount.Text = $"Ilość iteracji {t}";
+                            tournamentSizeLabelTesty.Text = $"Rozmiar turnieju {rt}";
+                            selectionTresholLabelTesty.Text = $"Próg selekcji {ps}";
+                            ipkLabelTesty.Text = $"Ilość punktów krzyżowań {ipk}";
+                        }));
+                    }
+                });
+
+                stopwatch.Stop();
+
+                ApplyTestConfigurationFromUi();
+                FileUtils.SaveGaTunningResults(results, _data);
+
+                MessageBox.Show(
+                    $"Liczba wyników: {results.Count}\nPotrzebny czas: {stopwatch.Elapsed:hh\\:mm\\:ss\\.fff}",
+                    "Sukces"
+                );
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Błąd");
+            }
+            finally
+            {
+                testyStart.Enabled = true;
+            }
+        }
             //    foreach (var pk in pkValues)
             //    {
             //        foreach (var pm in pmValues)
@@ -1268,8 +1314,128 @@ namespace Lab2
             ////globalHistory.Clear();
             //list.Clear();
             //GC.Collect();
+
+
+        private void CreateTestSweepControls()
+        {
+            var group = new GroupBox
+            {
+                Text = "Parametry testowane",
+                Location = new System.Drawing.Point(875, 23),
+                Size = new System.Drawing.Size(170, 210)
+            };
+
+            _testSweepNCheckBox = CreateTestSweepCheckBox("N", 22, true);
+            _testSweepPkCheckBox = CreateTestSweepCheckBox("Pk", 47, true);
+            _testSweepPmCheckBox = CreateTestSweepCheckBox("Pm", 72, true);
+            _testSweepTCheckBox = CreateTestSweepCheckBox("T", 97, true);
+            _testSweepRtCheckBox = CreateTestSweepCheckBox("Rt", 122, false);
+            _testSweepPsCheckBox = CreateTestSweepCheckBox("Ps", 147, false);
+            _testSweepIpkCheckBox = CreateTestSweepCheckBox("IPK", 172, false);
+
+            group.Controls.AddRange(new System.Windows.Forms.Control[]
+            {
+                _testSweepNCheckBox,
+                _testSweepPkCheckBox,
+                _testSweepPmCheckBox,
+                _testSweepTCheckBox,
+                _testSweepRtCheckBox,
+                _testSweepPsCheckBox,
+                _testSweepIpkCheckBox
+            });
+
+            tabPage3.Controls.Add(group);
         }
 
+        private static CheckBox CreateTestSweepCheckBox(string text, int top, bool isChecked)
+        {
+            return new CheckBox
+            {
+                Text = text,
+                Checked = isChecked,
+                AutoSize = true,
+                Location = new System.Drawing.Point(12, top)
+            };
+        }
+
+        private void ValidateTestSweepRanges()
+        {
+            if (testExperimentCount.Value <= 0)
+                throw new InvalidOperationException("Liczba eksperymentów musi być większa od 0.");
+
+            ValidateRange(_testSweepNCheckBox, NaInput, NbInput, NstepInput, "N");
+            ValidateRange(_testSweepPkCheckBox, pkaInput, PkbbInput, PkstepInput, "Pk");
+            ValidateRange(_testSweepPmCheckBox, pmaInput, PmbInput, PmstepInput, "Pm");
+            ValidateRange(_testSweepTCheckBox, TaInput, TbInput, TstepInput, "T");
+            ValidateRange(_testSweepRtCheckBox, Rt_a_Input, rt_b_input, rt_step_input, "Rt");
+            ValidateRange(_testSweepPsCheckBox, Ps_a, Ps_b_Input, Ps_step, "Ps");
+            ValidateRange(_testSweepIpkCheckBox, ipk_input, ipk_b_input, ipk_step_input, "IPK");
+
+            if (_testSweepIpkCheckBox.Checked && ipk_b_input.Value > _data.MatrixSize - 2)
+                throw new InvalidOperationException("Maksymalna ilość punktów krzyżowania to rozmiar macierzy - 2.");
+        }
+
+        private static void ValidateRange(
+            CheckBox enabled,
+            NumericUpDown start,
+            NumericUpDown end,
+            NumericUpDown step,
+            string label
+        )
+        {
+            if (!enabled.Checked)
+                return;
+
+            if (start.Value > end.Value)
+                throw new InvalidOperationException($"Zakres {label} ma początek większy od końca.");
+
+            if (step.Value <= 0)
+                throw new InvalidOperationException($"Krok {label} musi być większy od 0.");
+        }
+
+        private static List<decimal> GetTestValues(
+            CheckBox enabled,
+            NumericUpDown start,
+            NumericUpDown end,
+            NumericUpDown step,
+            decimal currentValue
+        )
+        {
+            if (!enabled.Checked)
+                return new List<decimal> { currentValue };
+
+            var values = new List<decimal>();
+            for (decimal value = start.Value; value <= end.Value; value += step.Value)
+            {
+                values.Add(decimal.Round(value, 10));
+            }
+
+            return values;
+        }
+
+        private void ApplyTestConfiguration(decimal n, decimal pk, decimal pm, decimal t, decimal rt, decimal ps, decimal ipk)
+        {
+            _data.NumberOfIndividuals = n;
+            _data.CrossProbability = pk;
+            _data.MutationProbability = pm;
+            _data.NumberOfIterations = t;
+            _data.TournamentSelectionSize = rt;
+            _data.TournamentSoftSelectionTreshold = ps;
+            _data.CrossCount = ipk;
+        }
+
+        private void ApplyTestConfigurationFromUi()
+        {
+            ApplyTestConfiguration(
+                individualNumberInput.Value,
+                crossProbabilityInput.Value,
+                mutationProbabilityInput.Value,
+                iterationNumberInput.Value,
+                tournamentSizeInput.Value,
+                tournamentTresholdInput.Value,
+                crossPoints.Value
+            );
+        }
 
         private bool[,] GetReferenceMatrixForFitness()
         {
