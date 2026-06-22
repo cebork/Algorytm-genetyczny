@@ -116,6 +116,7 @@ namespace Lab2
 
             var stopwatch = Stopwatch.StartNew();
             var cumulativeSuccesses = new int[iterationCount + 1];
+            var perfectSeedResults = new List<PerfectSeedResult>();
             GeneticAlgorithm lastGa = null;
 
             for (int experimentIndex = 0; experimentIndex < experimentCount; experimentIndex++)
@@ -132,6 +133,18 @@ namespace Lab2
                 await Task.Run(() => ga.Run(progress));
 
                 AddGenerationSuccess(cumulativeSuccesses, ga.StatisticsHistory);
+                if (ga.PerfectSolution != null)
+                {
+                    perfectSeedResults.Add(new PerfectSeedResult
+                    {
+                        ExperimentIndex = experimentIndex,
+                        Seed = GetExperimentSeed(experimentIndex),
+                        Generation = ga.PerfectSolutionGeneration ?? 0,
+                        Fitness = ga.PerfectSolution.Fitness,
+                        Genotype = (bool[,])ga.PerfectSolution.Genotype.Clone()
+                    });
+                }
+
                 lastGa = ga;
             }
 
@@ -147,6 +160,7 @@ namespace Lab2
                 .ToList();
 
             FileUtils.SaveCumulativeResults(cumulativeSuccesses, iterationCount);
+            FileUtils.SavePerfectSeedResults(perfectSeedResults, _data);
 
             var lastGeneration = lastGa.CurrentPopulation;
 
@@ -741,9 +755,12 @@ namespace Lab2
 
         private IRandomProvider CreateRandomProvider(int experimentIndex)
         {
-            int seedValue = unchecked(_data.RandomSeed + experimentIndex);
+            return new SeededRandomProvider(GetExperimentSeed(experimentIndex));
+        }
 
-            return new SeededRandomProvider(seedValue);
+        private int GetExperimentSeed(int experimentIndex)
+        {
+            return unchecked(_data.RandomSeed + experimentIndex);
         }
 
         private IFitnessEvaluator CreateFitness()

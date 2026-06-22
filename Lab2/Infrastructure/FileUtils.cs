@@ -24,6 +24,7 @@ namespace Lab2.Infrastructure
         private static readonly string maxFCCorr = Path.Combine(ResultDirectory, "max_f_C_corr.txt");
         private static readonly string CumulativeFilePath = Path.Combine(ResultDirectory, "cumulative.txt");
         private static readonly string LastSeedFilePath = Path.Combine(ResultDirectory, "last_seed.txt");
+        private static readonly string PerfectSeedsFilePath = Path.Combine(ResultDirectory, "perfect_seeds.txt");
 
 
 
@@ -200,6 +201,47 @@ namespace Lab2.Infrastructure
             File.WriteAllText(LastSeedFilePath, seed.ToString());
         }
 
+        public static void SavePerfectSeedResults(
+            IEnumerable<PerfectSeedResult> results,
+            InitialData initialData
+        )
+        {
+            Directory.CreateDirectory(ResultDirectory);
+
+            using var writer = new StreamWriter(PerfectSeedsFilePath, false, Encoding.UTF8);
+
+            writer.WriteLine("# Seedy, dla ktorych znaleziono perfekcyjne rozwiazanie");
+            writer.WriteLine($"# Rozmiar macierzy: {initialData.RequestedMatrixSize}");
+            writer.WriteLine($"# Efektywny rozmiar macierzy: {initialData.MatrixSize}");
+            writer.WriteLine($"# Liczba eksperymentow: {initialData.NumberOfExperiments}");
+            writer.WriteLine($"# Typ algorytmu: {initialData.AlgorithmType}");
+            writer.WriteLine($"# Typ selekcji: {initialData.SelectionType}");
+            writer.WriteLine($"# Typ krzyzowania: {initialData.CrossType}");
+            writer.WriteLine($"# Typ mutacji: {initialData.MutationType}");
+            writer.WriteLine();
+
+            var orderedResults = results
+                .OrderBy(result => result.ExperimentIndex)
+                .ToList();
+
+            if (orderedResults.Count == 0)
+            {
+                writer.WriteLine("Brak perfekcyjnych rozwiazan w tym multirun.");
+                return;
+            }
+
+            foreach (var result in orderedResults)
+            {
+                writer.WriteLine($"Eksperyment: {result.ExperimentIndex + 1}");
+                writer.WriteLine($"Seed: {result.Seed}");
+                writer.WriteLine($"Pokolenie: {result.Generation}");
+                writer.WriteLine($"Fitness: {result.Fitness:F6}");
+                writer.WriteLine("Macierz:");
+                WriteMatrix(writer, result.Genotype);
+                writer.WriteLine();
+            }
+        }
+
         public static void SaveGaTunningResults(List<TestObject> testObjects, InitialData initialData)
         {
             Directory.CreateDirectory(ResultDirectory);
@@ -229,5 +271,32 @@ namespace Lab2.Infrastructure
             }
         }
 
+        private static void WriteMatrix(StreamWriter writer, bool[,] matrix)
+        {
+            int rows = matrix.GetLength(0);
+            int cols = matrix.GetLength(1);
+
+            for (int row = 0; row < rows; row++)
+            {
+                for (int col = 0; col < cols; col++)
+                {
+                    writer.Write(matrix[row, col] ? '1' : '0');
+                    if (col < cols - 1)
+                        writer.Write(' ');
+                }
+
+                writer.WriteLine();
+            }
+        }
+
+    }
+
+    public sealed class PerfectSeedResult
+    {
+        public int ExperimentIndex { get; init; }
+        public int Seed { get; init; }
+        public int Generation { get; init; }
+        public decimal Fitness { get; init; }
+        public bool[,] Genotype { get; init; } = null!;
     }
 }

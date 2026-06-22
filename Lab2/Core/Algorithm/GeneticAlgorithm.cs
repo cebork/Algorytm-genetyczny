@@ -27,6 +27,7 @@ namespace Lab2.Core.Algorithm
         private const decimal StagnationParentPoolFraction = 0.2m;
         private const decimal StagnationEliteFraction = 0.1m;
         private const decimal StagnationDiversificationMutationProbability = 0.1m;
+        private const decimal PerfectFitnessThreshold = 1m;
 
         // Stagnation diversification (disabled by default)
         private bool _stagnationEnabled;
@@ -41,6 +42,8 @@ namespace Lab2.Core.Algorithm
         public IReadOnlyList<IReadOnlyList<Individual>> History => _history;
         private readonly List<IReadOnlyList<Individual>> _history = new();
         public IReadOnlyList<Individual> CurrentPopulation => _population;
+        public Individual? PerfectSolution { get; private set; }
+        public int? PerfectSolutionGeneration { get; private set; }
         public bool StoreHistory { get; set; }
 
         public GeneticAlgorithm(
@@ -81,12 +84,13 @@ namespace Lab2.Core.Algorithm
             _stagnationEnabled = stagnationWindow > 0;
         }
 
-        public void Run(IProgress<int> progress = null)
+        public void Run(IProgress<int>? progress = null)
         {
             int iteration = 0;
             EvaluatePopulation();
             _statistics.Update(_population, iteration);
             _statisticsHistory.Add(_statistics.Current);
+            CapturePerfectSolution(iteration);
             StorePopulationSnapshot();
             progress?.Report(iteration);
 
@@ -146,11 +150,34 @@ namespace Lab2.Core.Algorithm
                 }
 
                 _statisticsHistory.Add(_statistics.Current);
+                CapturePerfectSolution(iteration + 1);
                 StorePopulationSnapshot();
                 iteration++;
 
                 progress?.Report(iteration);
             }
+        }
+
+        private void CapturePerfectSolution(int generation)
+        {
+            if (PerfectSolution != null)
+                return;
+
+            Individual? best = null;
+            for (int i = 0; i < _population.Count; i++)
+            {
+                if (_population[i].Fitness < PerfectFitnessThreshold)
+                    continue;
+
+                if (best == null || _population[i].Fitness > best.Fitness)
+                    best = _population[i];
+            }
+
+            if (best == null)
+                return;
+
+            PerfectSolution = best.Clone();
+            PerfectSolutionGeneration = generation;
         }
 
         private decimal GetBestFitness()
