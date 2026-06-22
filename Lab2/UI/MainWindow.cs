@@ -36,6 +36,9 @@ namespace Lab2
         private NumericUpDown _stagnationFractionInput;
         private NumericUpDown _stagnationDiversityThresholdInput = null!;
         private GroupBox _narrowingMutationGroupBox = null!;
+        private GroupBox _bitFlipMutationGroupBox = null!;
+        private NumericUpDown _bitFlipEarlyMultiplierInput = null!;
+        private NumericUpDown _bitFlipLateMultiplierInput = null!;
         private NumericUpDown _narrowingMultiplierInput = null!;
         private NumericUpDown _narrowingStepInput = null!;
         private NumericUpDown _narrowingExponentInput = null!;
@@ -75,6 +78,7 @@ namespace Lab2
             LoadLastSeed();
             seed.Enabled = useSeed.Checked;
             CreateStagnationControls();
+            CreateBitFlipMutationControls();
             CreateNarrowingMutationControls();
             CreateEvenMatrixPaddingControls();
             SetupDefaultAlgorithmOtpions();
@@ -381,7 +385,8 @@ namespace Lab2
             MoveControl(selectionGroup, operatorsTab, 12, 12);
             MoveControl(crossGroup, operatorsTab, 230, 12);
             MoveControl(mutationGroup, operatorsTab, 345, 12);
-            MoveControl(_narrowingMutationGroupBox, operatorsTab, 480, 12);
+            MoveControl(_bitFlipMutationGroupBox, operatorsTab, 480, 12);
+            MoveControl(_narrowingMutationGroupBox, operatorsTab, 690, 12);
 
             MoveControl(unformBlocksGroupBox, advancedTab, 12, 12);
             MoveControl(eliteGroupBox, advancedTab, 270, 12);
@@ -458,6 +463,59 @@ namespace Lab2
         {
             control.Parent = parent;
             control.Location = new System.Drawing.Point(x, y);
+        }
+
+        private void CreateBitFlipMutationControls()
+        {
+            _bitFlipMutationGroupBox = new GroupBox
+            {
+                Text = "Mutacja równomierna",
+                Location = new System.Drawing.Point(1644, 220),
+                Size = new System.Drawing.Size(200, 122),
+                Enabled = false
+            };
+
+            var earlyLabel = new Label
+            {
+                Text = "Mnożnik początkowy",
+                AutoSize = true,
+                Location = new System.Drawing.Point(6, 24)
+            };
+
+            _bitFlipEarlyMultiplierInput = new NumericUpDown
+            {
+                Location = new System.Drawing.Point(6, 40),
+                Size = new System.Drawing.Size(138, 23),
+                Minimum = 0m,
+                Maximum = 10m,
+                Value = 1.6m,
+                Increment = 0.1m,
+                DecimalPlaces = 2
+            };
+
+            var lateLabel = new Label
+            {
+                Text = "Mnożnik końcowy",
+                AutoSize = true,
+                Location = new System.Drawing.Point(6, 72)
+            };
+
+            _bitFlipLateMultiplierInput = new NumericUpDown
+            {
+                Location = new System.Drawing.Point(6, 88),
+                Size = new System.Drawing.Size(138, 23),
+                Minimum = 0m,
+                Maximum = 10m,
+                Value = 0.7m,
+                Increment = 0.1m,
+                DecimalPlaces = 2
+            };
+
+            _bitFlipMutationGroupBox.Controls.Add(earlyLabel);
+            _bitFlipMutationGroupBox.Controls.Add(_bitFlipEarlyMultiplierInput);
+            _bitFlipMutationGroupBox.Controls.Add(lateLabel);
+            _bitFlipMutationGroupBox.Controls.Add(_bitFlipLateMultiplierInput);
+            Controls.Add(_bitFlipMutationGroupBox);
         }
 
         private void CreateNarrowingMutationControls()
@@ -641,6 +699,13 @@ namespace Lab2
             _data.TournamentSoftSelectionTreshold = tournamentTresholdInput.Value;
             _data.UniformBlockMutationProbWhite = uniformProbWhite.Value;
             _data.UniformBlockMutationProbRed = uniformProbRed.Value;
+            _data.BitFlipEarlyExplorationMultiplier = _bitFlipEarlyMultiplierInput.Value;
+            _data.BitFlipLateExplorationMultiplier = _bitFlipLateMultiplierInput.Value;
+            if (_data.AlgorithmOption == AlgorithmOption.CLASSICAL)
+            {
+                _data.BitFlipEarlyExplorationMultiplier = 1m;
+                _data.BitFlipLateExplorationMultiplier = 1m;
+            }
             _data.NarrowingMutationMultiplier = _narrowingMultiplierInput.Value;
             _data.NarrowingMutationStep = (int)_narrowingStepInput.Value;
             _data.NarrowingMutationExponent = _narrowingExponentInput.Value;
@@ -743,7 +808,12 @@ namespace Lab2
             mutations.Add(_data.MutationType switch
             {
                 MutationType.EQUALY =>
-                    new BitFlipMutation(_data.MutationProbability, random),
+                    new BitFlipMutation(
+                        _data.MutationProbability,
+                        _data.BitFlipEarlyExplorationMultiplier,
+                        _data.BitFlipLateExplorationMultiplier,
+                        random
+                    ),
 
                 MutationType.BIT_SWAPING =>
                     new BitSwapMutation(_data.MutationProbability, random),
@@ -1810,6 +1880,7 @@ namespace Lab2
                 _data.SelectionType = SelectionType.ROULETTE;
                 _data.CrossType = CrossType.SINGLE_POINT;
                 _data.MutationType = MutationType.EQUALY;
+                SetUniformMutationMultipliers(1m, 1m);
                 SetupDefaultAlgorithmOtpions();
             }
         }
@@ -1827,6 +1898,7 @@ namespace Lab2
                 selectionGroup.Enabled = true;
                 crossGroup.Enabled = true;
                 mutationGroup.Enabled = true;
+                _bitFlipMutationGroupBox.Enabled = _data.MutationType == MutationType.EQUALY;
                 unformBlocksGroupBox.Enabled = true;
                 eliteGroupBox.Enabled = true;
             }
@@ -1845,9 +1917,16 @@ namespace Lab2
             selectionGroup.Enabled = false;
             crossGroup.Enabled = false;
             mutationGroup.Enabled = false;
+            _bitFlipMutationGroupBox.Enabled = false;
             _narrowingMutationGroupBox.Enabled = false;
             unformBlocksGroupBox.Enabled = false;
             eliteGroupBox.Enabled = false;
+        }
+
+        private void SetUniformMutationMultipliers(decimal earlyMultiplier, decimal lateMultiplier)
+        {
+            _bitFlipEarlyMultiplierInput.Value = earlyMultiplier;
+            _bitFlipLateMultiplierInput.Value = lateMultiplier;
         }
 
         private void ruletteRadio_CheckedChanged(object sender, EventArgs e)
@@ -1921,6 +2000,7 @@ namespace Lab2
             if (selected != null && selected.Checked)
             {
                 _data.MutationType = MutationType.EQUALY;
+                _bitFlipMutationGroupBox.Enabled = modifiedGARadio.Checked;
                 _narrowingMutationGroupBox.Enabled = false;
             }
         }
@@ -1931,6 +2011,7 @@ namespace Lab2
             if (selected != null && selected.Checked)
             {
                 _data.MutationType = MutationType.BIT_SWAPING;
+                _bitFlipMutationGroupBox.Enabled = false;
                 _narrowingMutationGroupBox.Enabled = false;
             }
         }
@@ -1941,6 +2022,7 @@ namespace Lab2
             if (selected != null && selected.Checked)
             {
                 _data.MutationType = MutationType.RANDOM_COORDS;
+                _bitFlipMutationGroupBox.Enabled = false;
                 _narrowingMutationGroupBox.Enabled = true;
             }
         }

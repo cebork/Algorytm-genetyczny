@@ -46,6 +46,12 @@ namespace Lab2.Core.Validation
             if (data.MutationProbability is < 0 or > 1)
                 result.Errors.Add("Prawdopodobieństwo mutacji musi być w [0,1]");
 
+            if (data.BitFlipEarlyExplorationMultiplier < 0)
+                result.Errors.Add("Początkowy mnożnik mutacji równomiernej musi być >= 0");
+
+            if (data.BitFlipLateExplorationMultiplier < 0)
+                result.Errors.Add("Końcowy mnożnik mutacji równomiernej musi być >= 0");
+
             if (data.UniformBlockMutationProbWhite is < 0 or > 1)
                 result.Errors.Add("Prawdopodobieństwo rozbicia białych bloków musi być w [0,1]");
 
