@@ -117,6 +117,7 @@ namespace Lab2
             for (int experimentIndex = 0; experimentIndex < experimentCount; experimentIndex++)
             {
                 var ga = CreateGeneticAlgorithm(experimentIndex);
+                ga.StoreHistory = experimentIndex == experimentCount - 1;
                 int completedBeforeThisExperiment = experimentIndex * iterationCount;
                 var progress = new Progress<int>(value =>
                 {
@@ -136,6 +137,10 @@ namespace Lab2
 
             if (lastGa == null)
                 return;
+
+            _history = lastGa.History
+                .Select(generation => generation.Select(individual => individual.Clone()).ToList())
+                .ToList();
 
             FileUtils.SaveCumulativeResults(cumulativeSuccesses, iterationCount);
 
@@ -1962,7 +1967,7 @@ namespace Lab2
             }
             else
             {
-                MessageBox.Show("Brak element�w do podgl�du");
+                MessageBox.Show("Brak elementów do podglądu. Uruchom algorytm przed otwarciem historii.");
             }
 
 

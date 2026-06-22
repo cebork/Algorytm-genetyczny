@@ -6,7 +6,8 @@ namespace Lab2.UI
 {
     public partial class HistoryViewModalWindow : Form
     {
-        List<List<Individual>> history;
+        private readonly List<List<Individual>> history = new();
+
         public HistoryViewModalWindow()
         {
             InitializeComponent();
@@ -15,17 +16,22 @@ namespace Lab2.UI
         public HistoryViewModalWindow(List<List<Individual>> history)
         {
             InitializeComponent();
-            this.history = history;
-            Individual bestIndividual = history[0].OrderByDescending(ind => ind.Genotype).FirstOrDefault();
 
-            if (bestIndividual != null)
+            this.history = history ?? new List<List<Individual>>();
+
+            if (this.history.Count == 0)
             {
-                DisplayMatrix(bestIndividual.Genotype);
+                hisotryIndex.Enabled = false;
+                previousIndividual.Enabled = false;
+                nextIndividual.Enabled = false;
+                MessageBox.Show("Historia jest pusta. Uruchom algorytm przed podglądem historii.");
+                return;
             }
-            else
-            {
-                Console.WriteLine("No individuals found.");
-            }
+
+            hisotryIndex.Minimum = 1;
+            hisotryIndex.Maximum = this.history.Count;
+            hisotryIndex.Value = 1;
+            ShowGeneration(0);
         }
 
         private void previousIndividual_Click(object sender, EventArgs e)
@@ -101,34 +107,28 @@ namespace Lab2.UI
             }
 
             historyDisplay.ReadOnly = true;
-            historyDisplay.Enabled = false;
+            historyDisplay.Enabled = true;
+            historyDisplay.ClearSelection();
         }
 
         private void hisotryIndex_ValueChanged(object sender, EventArgs e)
         {
-            //try
-            //{
-            //    Individual bestIndividual = history[(int)hisotryIndex.Value - 1].OrderByDescending(ind => ind.MarkAfterMutation).FirstOrDefault();
-            //    if (bestIndividual != null)
-            //    {
-            //        DisplayMatrix(bestIndividual.MatrixAfterMutation);
-            //    }
-            //    else
-            //    {
-            //        Console.WriteLine("No individuals found.");
-            //    }
-            //} 
-            //catch (IndexOutOfRangeException ex)
-            //{
-            //    MessageBox.Show("Wartość wykracza poza ilość iteracji");
-            //}
-            //catch (ArgumentOutOfRangeException ex)
-            //{
-            //    MessageBox.Show("Wartość wykracza poza ilość iteracji");
-            //}
+            ShowGeneration((int)hisotryIndex.Value - 1);
+        }
 
+        private void ShowGeneration(int generationIndex)
+        {
+            if (generationIndex < 0 || generationIndex >= history.Count)
+                return;
 
+            Individual bestIndividual = history[generationIndex]
+                .OrderByDescending(ind => ind.Fitness)
+                .FirstOrDefault();
 
+            if (bestIndividual == null)
+                return;
+
+            DisplayMatrix(bestIndividual.Genotype);
         }
     }
 }

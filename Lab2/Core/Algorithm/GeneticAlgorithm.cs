@@ -87,6 +87,7 @@ namespace Lab2.Core.Algorithm
             EvaluatePopulation();
             _statistics.Update(_population, iteration);
             _statisticsHistory.Add(_statistics.Current);
+            StorePopulationSnapshot();
             progress?.Report(iteration);
 
             int maxIterations = _termination is MaxIterationCondition m ? m.MaxIterations : iteration;
@@ -145,8 +146,7 @@ namespace Lab2.Core.Algorithm
                 }
 
                 _statisticsHistory.Add(_statistics.Current);
-                if (StoreHistory)
-                    _history.Add(_population);
+                StorePopulationSnapshot();
                 iteration++;
 
                 progress?.Report(iteration);
@@ -162,6 +162,14 @@ namespace Lab2.Core.Algorithm
                     best = _population[i].Fitness;
             }
             return best;
+        }
+
+        private void StorePopulationSnapshot()
+        {
+            if (!StoreHistory)
+                return;
+
+            _history.Add(_population.Select(individual => individual.Clone()).ToList());
         }
 
         private void ApplyStagnationDiversification()
