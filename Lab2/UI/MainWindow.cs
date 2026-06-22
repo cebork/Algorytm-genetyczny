@@ -56,6 +56,7 @@ namespace Lab2
         private CheckBox _testSweepRtCheckBox = null!;
         private CheckBox _testSweepPsCheckBox = null!;
         private CheckBox _testSweepIpkCheckBox = null!;
+        private CheckBox _archiveResultsCheckBox = null!;
 
         public MainWindow()
         {
@@ -93,6 +94,9 @@ namespace Lab2
             {
                 ReadUiData();
                 new ValidationFacade().ValidateOrThrow(_data);
+                if (_archiveResultsCheckBox.Checked)
+                    FileUtils.ArchiveResults();
+
                 FileUtils.SaveLastSeed(_data.RandomSeed);
                 await RunGeneticAlgorithm();
         }
@@ -440,12 +444,20 @@ namespace Lab2
             var runGroup = new GroupBox
             {
                 Text = "Uruchamianie",
-                Size = new System.Drawing.Size(235, 153)
+                Size = new System.Drawing.Size(235, 180)
+            };
+
+            _archiveResultsCheckBox = new CheckBox
+            {
+                Text = "Archiwizuj wyniki",
+                AutoSize = true,
+                Checked = true
             };
 
             MoveControl(startButton, runGroup, 16, 28);
             MoveControl(runProgressBar, runGroup, 16, 66);
             MoveControl(historyViewButton, runGroup, 16, 100);
+            MoveControl(_archiveResultsCheckBox, runGroup, 16, 136);
 
             return runGroup;
         }
@@ -1097,6 +1109,8 @@ namespace Lab2
                 _data.NumberOfExperiments = testExperimentCount.Value;
                 new ValidationFacade().ValidateOrThrow(_data);
                 ValidateTestSweepRanges();
+                if (_archiveResultsCheckBox.Checked)
+                    FileUtils.ArchiveResults();
 
                 FileUtils.SaveLastSeed(_data.RandomSeed);
 

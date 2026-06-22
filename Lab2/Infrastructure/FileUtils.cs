@@ -186,6 +186,36 @@ namespace Lab2.Infrastructure
             File.WriteAllText(CumulativeFilePath, builder.ToString());
         }
 
+        public static void ArchiveResults()
+        {
+            if (!Directory.Exists(ResultDirectory))
+                return;
+
+            var filesToArchive = Directory
+                .EnumerateFiles(ResultDirectory, "*", SearchOption.TopDirectoryOnly)
+                .Where(path => !string.Equals(path, LastSeedFilePath, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (filesToArchive.Count == 0)
+                return;
+
+            string archiveRoot = Path.Combine(ResultDirectory, "Archive");
+            Directory.CreateDirectory(archiveRoot);
+
+            string archiveDirectory = Path.Combine(
+                archiveRoot,
+                DateTime.Now.ToString("yyyyMMdd_HHmmss_fff")
+            );
+
+            Directory.CreateDirectory(archiveDirectory);
+
+            foreach (string sourcePath in filesToArchive)
+            {
+                string destinationPath = Path.Combine(archiveDirectory, Path.GetFileName(sourcePath));
+                File.Move(sourcePath, destinationPath, overwrite: false);
+            }
+        }
+
         public static int? LoadLastSeed()
         {
             if (!File.Exists(LastSeedFilePath))
