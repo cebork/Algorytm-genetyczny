@@ -175,12 +175,14 @@ namespace Lab2.Infrastructure
 
             builder.AppendLine();
 
+            int cumulativeSuccessCount = 0;
             for (int generation = 0; generation <= lastGeneration; generation++)
             {
                 if (generation > 0)
                     builder.Append(' ');
 
-                builder.Append(generationSuccesses[generation]);
+                cumulativeSuccessCount += generationSuccesses[generation];
+                builder.Append(cumulativeSuccessCount);
             }
 
             File.WriteAllText(CumulativeFilePath, builder.ToString());

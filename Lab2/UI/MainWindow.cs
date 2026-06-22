@@ -973,11 +973,13 @@ namespace Lab2
                 BorderWidth = 2
             };
 
+            int cumulativeSuccessCount = 0;
             for (int generation = 0; generation < cumulativeSuccesses.Length; generation++)
             {
+                cumulativeSuccessCount += cumulativeSuccesses[generation];
                 decimal percentage = experimentCount == 0
                     ? 0
-                    : cumulativeSuccesses[generation] * 100m / experimentCount;
+                    : cumulativeSuccessCount * 100m / experimentCount;
 
                 series.Points.AddXY(generation, percentage);
             }
