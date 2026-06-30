@@ -40,8 +40,6 @@
             matrixSizeInput = new NumericUpDown();
             individualNumberInput = new NumericUpDown();
             individualNumberLabel = new Label();
-            precisionInput = new ComboBox();
-            precisionLabel = new Label();
             startButton = new Button();
             corssProbabilityLabel = new Label();
             crossProbabilityInput = new NumericUpDown();
@@ -287,24 +285,6 @@
             individualNumberLabel.Size = new Size(112, 15);
             individualNumberLabel.TabIndex = 5;
             individualNumberLabel.Text = "Liczba osobników (N)";
-            // 
-            // precisionInput
-            // 
-            precisionInput.FormattingEnabled = true;
-            precisionInput.Location = new Point(435, 87);
-            precisionInput.Name = "precisionInput";
-            precisionInput.Size = new Size(58, 23);
-            precisionInput.TabIndex = 7;
-            // 
-            // precisionLabel
-            // 
-            precisionLabel.AutoSize = true;
-            precisionLabel.Location = new Point(317, 91);
-            precisionLabel.Name = "precisionLabel";
-            precisionLabel.Size = new Size(87, 15);
-            precisionLabel.TabIndex = 8;
-            precisionLabel.Text = "Dokładność (d)";
-            // 
             // startButton
             // 
             startButton.BackColor = SystemColors.ActiveCaption;
@@ -1147,9 +1127,7 @@
             inputDataGroupBox.Controls.Add(individualNumberLabel);
             inputDataGroupBox.Controls.Add(individualNumberInput);
             inputDataGroupBox.Controls.Add(iterationNumberInput);
-            inputDataGroupBox.Controls.Add(precisionInput);
             inputDataGroupBox.Controls.Add(iterationNumberLabel);
-            inputDataGroupBox.Controls.Add(precisionLabel);
             inputDataGroupBox.Controls.Add(corssProbabilityLabel);
             inputDataGroupBox.Controls.Add(mutationProbabilityInput);
             inputDataGroupBox.Controls.Add(crossProbabilityInput);
@@ -1688,8 +1666,6 @@
         private NumericUpDown matrixSizeInput;
         private NumericUpDown individualNumberInput;
         private Label individualNumberLabel;
-        private ComboBox precisionInput;
-        private Label precisionLabel;
         private Button startButton;
         private Label corssProbabilityLabel;
         private NumericUpDown crossProbabilityInput;

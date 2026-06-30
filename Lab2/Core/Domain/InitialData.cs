@@ -15,7 +15,6 @@ namespace Lab2.Core.Domain
         public bool UseEvenMatrixPadding { get; set; }
         public int EmptyRowIndex { get; set; } = 1;
         public int EmptyColumnIndex { get; set; } = 1;
-        public decimal Precision { get; set; }
         public decimal NumberOfIndividuals { get; set; }
         public decimal CrossProbability { get; set; }
         public decimal MutationProbability { get; set; }
@@ -53,7 +52,6 @@ namespace Lab2.Core.Domain
 
         public InitialData(
             decimal matrixSize,
-            decimal precision,
             decimal numberOfIndividuals,
             decimal crossProbability,
             decimal mutationProbability,
@@ -63,7 +61,6 @@ namespace Lab2.Core.Domain
         )
         {
             MatrixSize = matrixSize;
-            Precision = precision;
             NumberOfIndividuals = numberOfIndividuals;
             CrossProbability = crossProbability;
             MutationProbability = mutationProbability;

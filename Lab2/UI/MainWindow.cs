@@ -68,12 +68,6 @@ namespace Lab2
         {
             ConfigureMatrixSizing();
 
-            precisionInput.Items.Add(0.1m);
-            precisionInput.Items.Add(0.01m);
-            precisionInput.Items.Add(0.001m);
-            precisionInput.Items.Add(0.0001m);
-
-            precisionInput.SelectedItem = 0.001m;
             supervisedTypedRadioButton.Checked = true;
 
             LoadLastSeed();
@@ -1414,7 +1408,6 @@ namespace Lab2
             //MessageBox.Show("Liczba wynik�w: " + list.Count + "\nPotrzebny czas: " + elapsedFormatted, "Sukces");
 
             //InitialData.MatrixSize = matrixSizeInput.Value;
-            //InitialData.Precision = (decimal)precisionInput.SelectedItem;
             //FileUtils.saveGaTunningResults(list, InitialData);
             ////FileUtils.SaveMResultsGa(globalHistory);
 

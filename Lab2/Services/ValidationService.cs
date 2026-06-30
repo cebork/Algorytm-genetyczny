@@ -36,7 +36,6 @@ namespace Lab2.Services
         public void validate()
         {
             if (
-                InitialData.Precision == null ||
                 InitialData.MatrixSize == null || 
                 InitialData.NumberOfIndividuals == null || 
                 InitialData.CrossProbability == null ||
