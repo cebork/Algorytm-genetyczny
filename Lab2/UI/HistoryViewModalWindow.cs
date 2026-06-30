@@ -38,7 +38,7 @@ namespace Lab2.UI
         {
             if (hisotryIndex.Value == 1)
             {
-                MessageBox.Show("Wartość wykracza poza ilość iteracji");
+                MessageBox.Show("Wartość wykracza poza liczbę iteracji");
             }
             else
             {
@@ -51,7 +51,7 @@ namespace Lab2.UI
         {
             if (hisotryIndex.Value == history.Count)
             {
-                MessageBox.Show("Wartość wykracza poza ilość iteracji");
+                MessageBox.Show("Wartość wykracza poza liczbę iteracji");
             }
             else
             {

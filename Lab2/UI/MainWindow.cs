@@ -1186,13 +1186,13 @@ namespace Lab2
                         BeginInvoke(new Action(() =>
                         {
                             testCounter.Text = $"Test {completed} / {totalConfigurations}";
-                            individualCount.Text = $"Ilość osobników {n}";
+                            individualCount.Text = $"Liczba osobników {n}";
                             mutationProb.Text = $"Prawdopodobieństwo mutacji {pm}";
                             crossProb.Text = $"Prawdopodobieństwo krzyżowania {pk}";
-                            iterationCount.Text = $"Ilość iteracji {t}";
+                            iterationCount.Text = $"Liczba iteracji {t}";
                             tournamentSizeLabelTesty.Text = $"Rozmiar turnieju {rt}";
                             selectionTresholLabelTesty.Text = $"Próg selekcji {ps}";
-                            ipkLabelTesty.Text = $"Ilość punktów krzyżowań {ipk}";
+                            ipkLabelTesty.Text = $"Liczba punktów krzyżowań {ipk}";
                         }));
                     }
                 });
@@ -1480,7 +1480,7 @@ namespace Lab2
             ValidateRange(_testSweepIpkCheckBox, ipk_input, ipk_b_input, ipk_step_input, "IPK");
 
             if (_testSweepIpkCheckBox.Checked && ipk_b_input.Value > _data.MatrixSize - 2)
-                throw new InvalidOperationException("Maksymalna ilość punktów krzyżowania to rozmiar macierzy - 2.");
+                throw new InvalidOperationException("Maksymalna liczba punktów krzyżowania to rozmiar macierzy - 2.");
         }
 
         private static void ValidateRange(

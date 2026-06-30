@@ -286,7 +286,7 @@
             individualNumberLabel.Name = "individualNumberLabel";
             individualNumberLabel.Size = new Size(112, 15);
             individualNumberLabel.TabIndex = 5;
-            individualNumberLabel.Text = "Ilość osobników (N)";
+            individualNumberLabel.Text = "Liczba osobników (N)";
             // 
             // precisionInput
             // 
@@ -459,7 +459,7 @@
             ipkLabelTesty.Name = "ipkLabelTesty";
             ipkLabelTesty.Size = new Size(139, 15);
             ipkLabelTesty.TabIndex = 39;
-            ipkLabelTesty.Text = "Ilość punktów krzyżowań";
+            ipkLabelTesty.Text = "Liczba punktów krzyżowań";
             // 
             // crossCountGroupbox
             // 
@@ -474,7 +474,7 @@
             crossCountGroupbox.Size = new Size(528, 64);
             crossCountGroupbox.TabIndex = 34;
             crossCountGroupbox.TabStop = false;
-            crossCountGroupbox.Text = "Zakresy ilości punktów krzyżowań (Ipk)";
+            crossCountGroupbox.Text = "Zakresy liczby punktów krzyżowań (Ipk)";
             // 
             // ipk_step_label
             // 
@@ -705,7 +705,7 @@
             iterationCount.Name = "iterationCount";
             iterationCount.Size = new Size(69, 15);
             iterationCount.TabIndex = 36;
-            iterationCount.Text = "Ilość iteracji";
+            iterationCount.Text = "Liczba iteracji";
             // 
             // mutationProb
             // 
@@ -723,7 +723,7 @@
             individualCount.Name = "individualCount";
             individualCount.Size = new Size(92, 15);
             individualCount.TabIndex = 34;
-            individualCount.Text = "Ilość osobników";
+            individualCount.Text = "Liczba osobników";
             // 
             // crossProb
             // 
@@ -984,7 +984,7 @@
             individiualsCountGroupBox.Size = new Size(528, 64);
             individiualsCountGroupBox.TabIndex = 22;
             individiualsCountGroupBox.TabStop = false;
-            individiualsCountGroupBox.Text = "Zakresy ilości osobników (N)";
+            individiualsCountGroupBox.Text = "Zakresy liczby osobników (N)";
             // 
             // NstepLabel
             // 
@@ -1088,7 +1088,7 @@
             iterationNumberLabel.Name = "iterationNumberLabel";
             iterationNumberLabel.Size = new Size(87, 15);
             iterationNumberLabel.TabIndex = 17;
-            iterationNumberLabel.Text = "Ilość iteracji (T)";
+            iterationNumberLabel.Text = "Liczba iteracji (T)";
             // 
             // additioanlDataButton
             // 
@@ -1163,7 +1163,7 @@
             // 
             // seed
             // 
-            seed.Location = new Point(604, 83);
+            seed.Location = new Point(604, 99);
             seed.Name = "seed";
             seed.Size = new Size(171, 23);
             seed.TabIndex = 26;
@@ -1171,7 +1171,7 @@
             // useSeed
             // 
             useSeed.AutoSize = true;
-            useSeed.Location = new Point(604, 60);
+            useSeed.Location = new Point(604, 76);
             useSeed.Name = "useSeed";
             useSeed.Size = new Size(82, 19);
             useSeed.TabIndex = 25;
@@ -1182,15 +1182,15 @@
             // experimentNumberLabel
             // 
             experimentNumberLabel.AutoSize = true;
-            experimentNumberLabel.Location = new Point(599, 33);
+            experimentNumberLabel.Location = new Point(604, 28);
             experimentNumberLabel.Name = "experimentNumberLabel";
             experimentNumberLabel.Size = new Size(118, 15);
             experimentNumberLabel.TabIndex = 21;
-            experimentNumberLabel.Text = "Ilość eksperymentów";
+            experimentNumberLabel.Text = "Liczba eksperymentów";
             // 
             // experimentNumber
             // 
-            experimentNumber.Location = new Point(717, 29);
+            experimentNumber.Location = new Point(604, 47);
             experimentNumber.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
             experimentNumber.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             experimentNumber.Name = "experimentNumber";
@@ -1543,10 +1543,10 @@
             // eliteToMove
             // 
             eliteToMove.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
-            eliteToMove.Location = new Point(6, 59);
+            eliteToMove.Location = new Point(6, 63);
             eliteToMove.Maximum = new decimal(new int[] { 10000000, 0, 0, 0 });
             eliteToMove.Name = "eliteToMove";
-            eliteToMove.Size = new Size(138, 23);
+            eliteToMove.Size = new Size(188, 23);
             eliteToMove.TabIndex = 32;
             eliteToMove.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
@@ -1567,7 +1567,7 @@
             eliteToMoveLabel.Name = "eliteToMoveLabel";
             eliteToMoveLabel.Size = new Size(138, 15);
             eliteToMoveLabel.TabIndex = 31;
-            eliteToMoveLabel.Text = "Ilość elit do przeniesienia";
+            eliteToMoveLabel.Text = "Liczba elit do przeniesienia";
             // 
             // stopAtFirstCorrect
             // 
