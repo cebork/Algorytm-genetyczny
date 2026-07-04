@@ -17,6 +17,11 @@ namespace Lab2.Core.Algorithm
         private IFitnessEvaluator _fitness;
         private ISelectionStrategy _selection;
         private ICrossoverOperator _crossover;
+        private decimal _crossProbability = 1m;
+        private IRandomProvider _crossoverRandom;
+        private bool _eliteEnabled;
+        private int _eliteCount;
+        private bool _stopAtFirstCorrect;
         private IMutationOperator _mutation;
         private ITerminationCondition _termination;
         private PopulationStatisticsCollector _statistics;
@@ -60,6 +65,35 @@ namespace Lab2.Core.Algorithm
         public GeneticAlgorithmBuilder WithCrossover(ICrossoverOperator crossover)
         {
             _crossover = crossover ?? throw new ArgumentNullException(nameof(crossover));
+            return this;
+        }
+
+
+        public GeneticAlgorithmBuilder WithCrossoverProbability(decimal crossProbability, IRandomProvider random)
+        {
+            if (crossProbability < 0 || crossProbability > 1)
+                throw new ArgumentOutOfRangeException(nameof(crossProbability), "Crossover probability must be in [0,1].");
+
+            _crossProbability = crossProbability;
+            _crossoverRandom = random ?? throw new ArgumentNullException(nameof(random));
+            return this;
+        }
+
+
+        public GeneticAlgorithmBuilder WithElitism(bool enabled, int eliteCount)
+        {
+            if (eliteCount < 0)
+                throw new ArgumentOutOfRangeException(nameof(eliteCount), "Elite count must be >= 0.");
+
+            _eliteEnabled = enabled;
+            _eliteCount = eliteCount;
+            return this;
+        }
+
+
+        public GeneticAlgorithmBuilder StopAtFirstCorrect(bool enabled)
+        {
+            _stopAtFirstCorrect = enabled;
             return this;
         }
 
@@ -113,6 +147,9 @@ namespace Lab2.Core.Algorithm
             if (_mutation == null)
                 throw new InvalidOperationException("Mutation operator is not defined.");
 
+            if (_crossoverRandom == null)
+                throw new InvalidOperationException("Crossover random provider is not defined.");
+
             if (_termination == null)
                 throw new InvalidOperationException("Termination condition is not defined.");
 
@@ -121,6 +158,11 @@ namespace Lab2.Core.Algorithm
                 _fitness,
                 _selection,
                 _crossover,
+                _crossProbability,
+                _crossoverRandom,
+                _eliteEnabled,
+                _eliteCount,
+                _stopAtFirstCorrect,
                 _mutation,
                 _termination,
                 _statistics ?? new PopulationStatisticsCollector()

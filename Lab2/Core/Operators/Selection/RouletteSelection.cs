@@ -30,6 +30,14 @@ namespace Lab2.Core.Operators.Selection
             decimal total = prefixSum[n - 1];
             var selected = new List<Individual>(n);
 
+            if (total <= 0)
+            {
+                for (int i = 0; i < n; i++)
+                    selected.Add(population[_random.Next(0, n)]);
+
+                return selected;
+            }
+
             for (int i = 0; i < n; i++)
             {
                 decimal r = (decimal)_random.NextDouble() * total;

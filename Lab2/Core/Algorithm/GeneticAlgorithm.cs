@@ -18,6 +18,11 @@ namespace Lab2.Core.Algorithm
         private readonly IFitnessEvaluator _fitness;
         private readonly ISelectionStrategy _selection;
         private readonly ICrossoverOperator _crossover;
+        private readonly decimal _crossProbability;
+        private readonly IRandomProvider _random;
+        private readonly bool _eliteEnabled;
+        private readonly int _eliteCount;
+        private readonly bool _stopAtFirstCorrect;
         private readonly IMutationOperator _mutation;
         private readonly ITerminationCondition _termination;
         private readonly PopulationStatisticsCollector _statistics;
@@ -51,6 +56,11 @@ namespace Lab2.Core.Algorithm
             IFitnessEvaluator fitness,
             ISelectionStrategy selection,
             ICrossoverOperator crossover,
+            decimal crossProbability,
+            IRandomProvider random,
+            bool eliteEnabled,
+            int eliteCount,
+            bool stopAtFirstCorrect,
             IMutationOperator mutation,
             ITerminationCondition termination,
             PopulationStatisticsCollector statistics
@@ -61,6 +71,11 @@ namespace Lab2.Core.Algorithm
             _fitness = fitness;
             _selection = selection;
             _crossover = crossover;
+            _crossProbability = crossProbability;
+            _random = random;
+            _eliteEnabled = eliteEnabled;
+            _eliteCount = Math.Max(0, eliteCount);
+            _stopAtFirstCorrect = stopAtFirstCorrect;
             _mutation = mutation;
             _termination = termination;
             _statistics = statistics;
@@ -94,6 +109,9 @@ namespace Lab2.Core.Algorithm
             StorePopulationSnapshot();
             progress?.Report(iteration);
 
+            if (_stopAtFirstCorrect && PerfectSolution != null)
+                return;
+
             int maxIterations = _termination is MaxIterationCondition m ? m.MaxIterations : iteration;
 
             decimal bestFitness = _statistics.Current.BestFitness;
@@ -101,25 +119,37 @@ namespace Lab2.Core.Algorithm
 
             while (!_termination.ShouldStop(iteration))
             {
-                var parents = _selection.Select(_population);
-                var offspring = new List<Individual>(_populationSize + 1);
+                var parents = new List<Individual>(_selection.Select(_population));
+                ShuffleParents(parents);
+                var offspring = GetEliteClones();
 
-                for (int i = 0; i < parents.Count - 1; i += 2)
+                for (int i = 0; i < parents.Count - 1 && offspring.Count < _populationSize; i += 2)
                 {
-                    var (c1, c2) = _crossover.Cross(
-                        parents[i].Genotype,
-                        parents[i + 1].Genotype
-                    );
+                    bool[,] c1;
+                    bool[,] c2;
+
+                    if (_random.NextDouble() <= (double)_crossProbability)
+                    {
+                        (c1, c2) = _crossover.Cross(
+                            parents[i].Genotype,
+                            parents[i + 1].Genotype
+                        );
+                    }
+                    else
+                    {
+                        c1 = (bool[,])parents[i].Genotype.Clone();
+                        c2 = (bool[,])parents[i + 1].Genotype.Clone();
+                    }
 
                     c1 = _mutation.Mutate(c1, iteration, maxIterations);
                     c2 = _mutation.Mutate(c2, iteration, maxIterations);
 
-                    offspring.Add(new Individual(c1));
-                    offspring.Add(new Individual(c2));
-                }
+                    if (offspring.Count < _populationSize)
+                        offspring.Add(new Individual(c1));
 
-                if (offspring.Count > _populationSize)
-                    offspring.RemoveAt(offspring.Count - 1);
+                    if (offspring.Count < _populationSize)
+                        offspring.Add(new Individual(c2));
+                }
 
                 _population = offspring;
 
@@ -155,6 +185,34 @@ namespace Lab2.Core.Algorithm
                 iteration++;
 
                 progress?.Report(iteration);
+
+                if (_stopAtFirstCorrect && PerfectSolution != null)
+                    break;
+            }
+        }
+
+        private List<Individual> GetEliteClones()
+        {
+            var elites = new List<Individual>();
+            if (!_eliteEnabled || _eliteCount <= 0)
+                return elites;
+
+            var sortedPopulation = new List<Individual>(_population);
+            sortedPopulation.Sort((a, b) => b.Fitness.CompareTo(a.Fitness));
+
+            int count = Math.Min(_eliteCount, _populationSize);
+            for (int i = 0; i < count; i++)
+                elites.Add(sortedPopulation[i].Clone());
+
+            return elites;
+        }
+
+        private void ShuffleParents(List<Individual> parents)
+        {
+            for (int i = parents.Count - 1; i > 0; i--)
+            {
+                int j = _random.Next(0, i + 1);
+                (parents[i], parents[j]) = (parents[j], parents[i]);
             }
         }
 

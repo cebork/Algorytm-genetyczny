@@ -41,20 +41,35 @@ namespace Lab2.Core.Operators.Selection
 
         private Individual RunTournament(IReadOnlyList<Individual> population)
         {
-            for (int i = 0; i < _tournamentSize; i++)
-            {
-                _contestantBuffer[i] = population[_random.Next(0, population.Count)];
-            }
+            int contestantCount = PickContestantsWithoutReplacement(population);
 
             // Zwycięzca = najlepszy fitness
             Individual best = _contestantBuffer[0];
-            for (int i = 1; i < _tournamentSize; i++)
+            for (int i = 1; i < contestantCount; i++)
             {
                 if (_contestantBuffer[i].Fitness > best.Fitness)
                     best = _contestantBuffer[i];
             }
 
             return best;
+        }
+
+        private int PickContestantsWithoutReplacement(IReadOnlyList<Individual> population)
+        {
+            int contestantCount = Math.Min(_tournamentSize, population.Count);
+            var availableIndexes = new List<int>(population.Count);
+            for (int i = 0; i < population.Count; i++)
+                availableIndexes.Add(i);
+
+            for (int i = 0; i < contestantCount; i++)
+            {
+                int pick = _random.Next(0, availableIndexes.Count);
+                int populationIndex = availableIndexes[pick];
+                availableIndexes.RemoveAt(pick);
+                _contestantBuffer[i] = population[populationIndex];
+            }
+
+            return contestantCount;
         }
     }
 }

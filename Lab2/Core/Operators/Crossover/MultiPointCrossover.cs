@@ -23,9 +23,10 @@ namespace Lab2.Core.Operators.Crossover
             if (cols < 3 || _points <= 0)
                 return (p1, p2);
 
-            int[] cuts = new int[_points];
+            int effectivePoints = Math.Min(_points, cols - 2);
+            int[] cuts = new int[effectivePoints];
             int cutCount = 0;
-            while (cutCount < _points)
+            while (cutCount < effectivePoints)
             {
                 int candidate = _random.Next(1, cols - 1);
                 bool duplicate = false;

@@ -223,6 +223,9 @@ namespace Lab2
                 .WithFitness(fitness)
                 .WithSelection(selection)
                 .WithCrossover(crossover)
+                .WithCrossoverProbability(_data.CrossProbability, random)
+                .WithElitism(_data.EliteOn, (int)_data.EliteToMove)
+                .StopAtFirstCorrect(_data.StopAtFirstCorrect)
                 .WithMutation(mutation)
                 .WithTermination(
                     new MaxIterationCondition((int)_data.NumberOfIterations)
@@ -714,6 +717,9 @@ namespace Lab2
             _data.MutationProbability = mutationProbabilityInput.Value;
             _data.CrossProbability = crossProbabilityInput.Value;
             _data.CrossCount = crossPoints.Value;
+            _data.EliteOn = eliteOn.Checked;
+            _data.EliteToMove = eliteToMove.Value;
+            _data.StopAtFirstCorrect = stopAtFirstCorrect.Checked;
             _data.ProbGen1 = propGen1.Value;
             _data.TournamentSelectionSize = tournamentSizeInput.Value;
             _data.TournamentSoftSelectionTreshold = tournamentTresholdInput.Value;
