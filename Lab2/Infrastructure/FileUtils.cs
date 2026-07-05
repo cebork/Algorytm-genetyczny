@@ -1,4 +1,4 @@
-﻿using Lab2.Core.Domain;
+using Lab2.Core.Domain;
 using Lab2.objects;
 using Lab2.UI.Domain;
 using System;
@@ -20,6 +20,7 @@ namespace Lab2.Infrastructure
 
         private static readonly string ResultDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Results");
         private static readonly string GaTunningFilePath = Path.Combine(ResultDirectory, "tunning_GA.txt");
+        private static readonly string DetailedGaTunningFilePath = Path.Combine(ResultDirectory, "detailed_tunning_GA.txt");
         private static readonly string GaResultsFilePath = Path.Combine(ResultDirectory, "results_GA.txt");
         private static readonly string maxFCCorr = Path.Combine(ResultDirectory, "max_f_C_corr.txt");
         private static readonly string CumulativeFilePath = Path.Combine(ResultDirectory, "cumulative.txt");
@@ -300,6 +301,35 @@ namespace Lab2.Infrastructure
                     $"{index,-4} {result.N,10} {result.T,12} {result.pk,12:F3} {result.pm,10:F4} {result.Rt,7} {result.Ps,7:F3} {result.Ipk,8} {result.MinMark,18:F4} {result.AvgMark,21:F4} {result.MaxMark,21:F4}"
                 );
                 index++;
+            }
+        }
+
+
+        public static void SaveDetailedGaTunningResults(List<DetailedTestObject> testObjects, InitialData initialData)
+        {
+            Directory.CreateDirectory(ResultDirectory);
+
+            using var writer = new StreamWriter(DetailedGaTunningFilePath, false, Encoding.UTF8);
+
+            writer.WriteLine("# szczegolowe wyniki badania - jeden wiersz na eksperyment");
+            writer.WriteLine($"# Rozmiar macierzy: {initialData.RequestedMatrixSize}");
+            writer.WriteLine($"# Efektywny rozmiar macierzy: {initialData.MatrixSize}");
+            writer.WriteLine($"# Typ algorytmu: {initialData.AlgorithmType}");
+            writer.WriteLine($"# Typ selekcji: {initialData.SelectionType}");
+            writer.WriteLine($"# Typ krzyzowania: {initialData.CrossType}");
+            writer.WriteLine($"# Typ mutacji: {initialData.MutationType}");
+            writer.WriteLine($"# Liczba eksperymentow na konfiguracje: {initialData.NumberOfExperiments}");
+            writer.WriteLine();
+            writer.WriteLine("#  1          2           3            4           5             6         7       8       9       10       11              12");
+            writer.WriteLine("# ConfigNo   ExpNo       Seed          N           T             Pk        Pm      Rt      Ps      IPK      BestFitness     BestGeneration");
+
+            foreach (var result in testObjects
+                .OrderBy(test => test.ConfigurationIter)
+                .ThenBy(test => test.ExperimentIndex))
+            {
+                writer.WriteLine(
+                    $"{result.ConfigurationIter,-10} {result.ExperimentIndex + 1,5} {result.Seed,12} {result.N,12} {result.T,12} {result.pk,10:F3} {result.pm,8:F4} {result.Rt,7} {result.Ps,7:F3} {result.Ipk,8} {result.BestMark,16:F4} {result.BestGeneration,15}"
+                );
             }
         }
 

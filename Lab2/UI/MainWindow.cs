@@ -56,7 +56,25 @@ namespace Lab2
         private CheckBox _testSweepRtCheckBox = null!;
         private CheckBox _testSweepPsCheckBox = null!;
         private CheckBox _testSweepIpkCheckBox = null!;
+        private CheckBox _testUseSameSeedsCheckBox = null!;
+        private GroupBox _testRunStatusGroupBox = null!;
+        private Label _testStatusStateLabel = null!;
+        private Label _testStatusConfigurationLabel = null!;
+        private Label _testStatusExperimentLabel = null!;
+        private Label _testStatusGenerationLabel = null!;
+        private Label _testStatusSeedLabel = null!;
+        private Label _testStatusBestLabel = null!;
+        private Label _testStatusConfigStatsLabel = null!;
+        private Label _testStatusProgressLabel = null!;
+        private Label _testStatusElapsedLabel = null!;
+        private Label _testStatusAverageLabel = null!;
+        private Label _testStatusEtaLabel = null!;
+        private Label _testStatusSeedModeLabel = null!;
+        private GroupBox _selectedDataPreviewGroupBox = null!;
+        private FlowLayoutPanel _selectedDataPreviewFlow = null!;
+        private Label _selectedDataPreviewSummaryLabel = null!;
         private CheckBox _archiveResultsCheckBox = null!;
+        private int? _testSeedOverride;
 
         public MainWindow()
         {
@@ -79,6 +97,7 @@ namespace Lab2
             SetupDefaultAlgorithmOtpions();
             ApplyVisualLayout();
             CreateTestSweepControls();
+            CreateTestRunStatusControls();
         }
 
 
@@ -360,7 +379,7 @@ namespace Lab2
                 Padding = new Padding(8),
                 BackColor = System.Drawing.SystemColors.Control
             };
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 290));
+            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 310));
             root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
             root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
@@ -392,6 +411,8 @@ namespace Lab2
             MoveControl(stopAtFirstCorrect, basicTab, 380, 27);
             MoveControl(inputDataGroupBox, basicTab, 12, 72);
             MoveControl(GAmodification, basicTab, 810, 72);
+
+            CreateSelectedDataPreviewControls(basicTab);
 
             var runGroup = CreateRunGroup();
             basicTab.Controls.Add(runGroup);
@@ -436,6 +457,144 @@ namespace Lab2
                 : $"{version.Major}.{version.Minor}.{version.Build}";
         }
 
+        private void CreateSelectedDataPreviewControls(System.Windows.Forms.Control parent)
+        {
+            _selectedDataPreviewGroupBox = new GroupBox
+            {
+                Text = "Podgląd danych",
+                Size = new System.Drawing.Size(360, 180)
+            };
+
+            _selectedDataPreviewSummaryLabel = new Label
+            {
+                AutoSize = true,
+                Location = new System.Drawing.Point(10, 22),
+                MaximumSize = new System.Drawing.Size(335, 0)
+            };
+
+            _selectedDataPreviewFlow = new FlowLayoutPanel
+            {
+                Location = new System.Drawing.Point(10, 48),
+                Size = new System.Drawing.Size(340, 122),
+                AutoScroll = true,
+                WrapContents = true
+            };
+
+            _selectedDataPreviewGroupBox.Controls.Add(_selectedDataPreviewSummaryLabel);
+            _selectedDataPreviewGroupBox.Controls.Add(_selectedDataPreviewFlow);
+            MoveControl(_selectedDataPreviewGroupBox, parent, 1215, 72);
+            UpdateSelectedDataPreview();
+        }
+
+        private void UpdateSelectedDataPreview()
+        {
+            if (_selectedDataPreviewFlow == null || _selectedDataPreviewSummaryLabel == null)
+                return;
+
+            _selectedDataPreviewFlow.SuspendLayout();
+            _selectedDataPreviewFlow.Controls.Clear();
+
+            if (_data.AlgorithmType == AlgorithmType.UNSUPERVISED)
+            {
+                var patterns = _data.UnsupervisedPatternMatrixes;
+                if (patterns == null || patterns.Length == 0)
+                {
+                    _selectedDataPreviewSummaryLabel.Text = "Wybrane patterny: brak";
+                }
+                else
+                {
+                    _selectedDataPreviewSummaryLabel.Text = $"Wybrane patterny: {patterns.Length}";
+                    for (int i = 0; i < patterns.Length; i++)
+                    {
+                        _selectedDataPreviewFlow.Controls.Add(CreateMatrixPreviewTile($"Pattern {i + 1}", patterns[i]));
+                    }
+                }
+            }
+            else
+            {
+                var matrix = _data.SupervisedReferenceMatrix;
+                if (matrix == null || matrix.Length == 0)
+                {
+                    _selectedDataPreviewSummaryLabel.Text = "Macierz referencyjna: brak";
+                }
+                else
+                {
+                    _selectedDataPreviewSummaryLabel.Text = $"Macierz referencyjna: {matrix.GetLength(0)} x {matrix.GetLength(1)}";
+                    _selectedDataPreviewFlow.Controls.Add(CreateMatrixPreviewTile("Referencyjna", matrix));
+                }
+            }
+
+            _selectedDataPreviewFlow.ResumeLayout();
+        }
+
+        private static System.Windows.Forms.Control CreateMatrixPreviewTile(string title, bool[,] matrix)
+        {
+            var tile = new Panel
+            {
+                Size = new System.Drawing.Size(96, 104),
+                Margin = new Padding(4),
+                BackColor = System.Drawing.SystemColors.ControlLightLight,
+                BorderStyle = BorderStyle.FixedSingle
+            };
+
+            var label = new Label
+            {
+                Text = title,
+                AutoSize = false,
+                TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
+                Location = new System.Drawing.Point(3, 3),
+                Size = new System.Drawing.Size(88, 18)
+            };
+
+            var matrixPanel = new Panel
+            {
+                Location = new System.Drawing.Point(10, 26),
+                Size = new System.Drawing.Size(74, 74),
+                BackColor = Color.White
+            };
+
+            matrixPanel.Paint += (_, e) => PaintMatrixPreview(e.Graphics, matrixPanel.ClientRectangle, matrix);
+            matrixPanel.Resize += (_, _) => matrixPanel.Invalidate();
+
+            tile.Controls.Add(label);
+            tile.Controls.Add(matrixPanel);
+            return tile;
+        }
+
+        private static void PaintMatrixPreview(Graphics graphics, Rectangle bounds, bool[,] matrix)
+        {
+            int rows = matrix.GetLength(0);
+            int cols = matrix.GetLength(1);
+            if (rows == 0 || cols == 0)
+                return;
+
+            float cellWidth = bounds.Width / (float)cols;
+            float cellHeight = bounds.Height / (float)rows;
+
+            using var redBrush = new SolidBrush(Color.Red);
+            using var whiteBrush = new SolidBrush(Color.White);
+            using var gridPen = new Pen(Color.Gainsboro);
+
+            graphics.FillRectangle(whiteBrush, bounds);
+
+            for (int row = 0; row < rows; row++)
+            {
+                for (int col = 0; col < cols; col++)
+                {
+                    var cell = new RectangleF(
+                        bounds.Left + col * cellWidth,
+                        bounds.Top + row * cellHeight,
+                        cellWidth,
+                        cellHeight);
+
+                    graphics.FillRectangle(matrix[row, col] ? redBrush : whiteBrush, cell);
+                    if (cellWidth >= 4 && cellHeight >= 4)
+                        graphics.DrawRectangle(gridPen, cell.X, cell.Y, cell.Width, cell.Height);
+                }
+            }
+
+            graphics.DrawRectangle(Pens.Gray, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1);
+        }
         private GroupBox CreateRunGroup()
         {
             var runGroup = new GroupBox
@@ -767,12 +926,22 @@ namespace Lab2
 
         private IRandomProvider CreateRandomProvider(int experimentIndex)
         {
-            return new SeededRandomProvider(GetExperimentSeed(experimentIndex));
+            return new SeededRandomProvider(GetActiveExperimentSeed(experimentIndex));
+        }
+
+        private int GetActiveExperimentSeed(int experimentIndex)
+        {
+            return _testSeedOverride ?? GetExperimentSeed(experimentIndex);
         }
 
         private int GetExperimentSeed(int experimentIndex)
         {
             return unchecked(_data.RandomSeed + experimentIndex);
+        }
+
+        private int GetIndependentTestSeed(int configurationIndex, int experimentIndex, int experimentCount)
+        {
+            return unchecked(_data.RandomSeed + configurationIndex * experimentCount + experimentIndex);
         }
 
         private IFitnessEvaluator CreateFitness()
@@ -1132,11 +1301,26 @@ namespace Lab2
 
                 var stopwatch = Stopwatch.StartNew();
                 var results = new List<TestObject>(totalConfigurations);
+                var detailedResults = new List<DetailedTestObject>(totalConfigurations * (int)testExperimentCount.Value);
                 int experimentCount = (int)testExperimentCount.Value;
+                long totalExperimentRuns = (long)totalConfigurations * experimentCount;
+                bool useSameSeeds = _testUseSameSeedsCheckBox.Checked;
                 int currentConfiguration = 0;
+                int completedExperiments = 0;
                 decimal resultIndex = 1;
 
                 testyStart.Enabled = false;
+                runProgressBar.Visible = true;
+                runProgressBar.Minimum = 0;
+                runProgressBar.Maximum = totalExperimentRuns > int.MaxValue ? int.MaxValue : (int)totalExperimentRuns;
+                int testProgressMaximum = runProgressBar.Maximum;
+                runProgressBar.Value = 0;
+                ResetTestRunStatus();
+                _testStatusStateLabel.Text = "Stan: przygotowanie";
+                _testStatusProgressLabel.Text = $"Postęp eksperymentów: 0 / {totalExperimentRuns}";
+                _testStatusSeedModeLabel.Text = useSameSeeds
+                    ? "Tryb seedów: te same ziarna dla konfiguracji"
+                    : "Tryb seedów: osobne ziarno dla każdego testu";
 
                 await Task.Run(() =>
                 {
@@ -1148,23 +1332,106 @@ namespace Lab2
                     foreach (var ps in psValues)
                     foreach (var ipk in ipkValues)
                     {
+                        int configurationIndex = (int)resultIndex - 1;
+                        int configurationNumber = configurationIndex + 1;
                         decimal min = decimal.MaxValue;
                         decimal max = decimal.MinValue;
                         decimal sum = 0m;
 
+                        UpdateTestRunStatus(() =>
+                        {
+                            _testStatusStateLabel.Text = "Stan: konfiguracja w toku";
+                            _testStatusConfigurationLabel.Text = $"Konfiguracja: {configurationNumber} / {totalConfigurations}  N={n}, Pk={pk}, Pm={pm}, T={t}, Rt={rt}, Ps={ps}, IPK={ipk}";
+                            _testStatusExperimentLabel.Text = $"Eksperyment: 0 / {experimentCount}";
+                            _testStatusGenerationLabel.Text = "Generacja: -";
+                            _testStatusSeedLabel.Text = "Seed: -";
+                            _testStatusBestLabel.Text = "Najlepszy wynik: -";
+                            _testStatusConfigStatsLabel.Text = "Min/Avg/Max konfiguracji: -";
+                        });
+
                         for (int experimentIndex = 0; experimentIndex < experimentCount; experimentIndex++)
                         {
+                            _testSeedOverride = useSameSeeds
+                                ? null
+                                : GetIndependentTestSeed(configurationIndex, experimentIndex, experimentCount);
+                            int experimentSeed = GetActiveExperimentSeed(experimentIndex);
+                            int experimentNumber = experimentIndex + 1;
+                            int targetGenerations = (int)t;
+                            long lastProgressUiUpdate = 0;
+
+                            UpdateTestRunStatus(() =>
+                            {
+                                _testStatusStateLabel.Text = "Stan: eksperyment w toku";
+                                _testStatusExperimentLabel.Text = $"Eksperyment: {experimentNumber} / {experimentCount}";
+                                _testStatusGenerationLabel.Text = $"Generacja: 0 / {targetGenerations}";
+                                _testStatusSeedLabel.Text = $"Seed: {experimentSeed}";
+                                _testStatusBestLabel.Text = "Najlepszy wynik: w trakcie";
+                                _testStatusElapsedLabel.Text = $"Czas: {FormatTestDuration(stopwatch.Elapsed)}";
+                            });
+
                             ApplyTestConfiguration(n, pk, pm, t, rt, ps, ipk);
                             var ga = CreateGeneticAlgorithm(experimentIndex);
-                            ga.Run();
+                            var progress = new Progress<int>(generation =>
+                            {
+                                long now = Stopwatch.GetTimestamp();
+                                bool shouldUpdate = generation == 0 ||
+                                    generation >= targetGenerations ||
+                                    now - Interlocked.Read(ref lastProgressUiUpdate) >= Stopwatch.Frequency / 4;
 
-                            decimal best = ga.StatisticsHistory.Count == 0
-                                ? 0m
-                                : ga.StatisticsHistory.Max(stat => stat.BestFitness);
+                                if (!shouldUpdate)
+                                    return;
+
+                                Interlocked.Exchange(ref lastProgressUiUpdate, now);
+                                UpdateTestRunStatus(() =>
+                                {
+                                    _testStatusGenerationLabel.Text = $"Generacja: {Math.Min(generation, targetGenerations)} / {targetGenerations}";
+                                    _testStatusElapsedLabel.Text = $"Czas: {FormatTestDuration(stopwatch.Elapsed)}";
+                                });
+                            });
+
+                            ga.Run(progress);
+
+                            var bestStatistic = ga.StatisticsHistory.Count == 0
+                                ? null
+                                : ga.StatisticsHistory.OrderByDescending(stat => stat.BestFitness).First();
+                            decimal best = bestStatistic?.BestFitness ?? 0m;
+
+                            detailedResults.Add(new DetailedTestObject
+                            {
+                                ConfigurationIter = resultIndex,
+                                ExperimentIndex = experimentIndex,
+                                Seed = experimentSeed,
+                                N = n,
+                                pk = pk,
+                                pm = pm,
+                                T = t,
+                                Rt = rt,
+                                Ps = ps,
+                                Ipk = ipk,
+                                BestMark = best,
+                                BestGeneration = bestStatistic?.Generation ?? 0
+                            });
 
                             min = Math.Min(min, best);
                             max = Math.Max(max, best);
                             sum += best;
+
+                            int completedExperimentCount = Interlocked.Increment(ref completedExperiments);
+                            decimal averageForConfiguration = sum / experimentNumber;
+                            TimeSpan averageExperimentTime = TimeSpan.FromTicks(stopwatch.Elapsed.Ticks / Math.Max(1, completedExperimentCount));
+                            TimeSpan eta = TimeSpan.FromTicks(averageExperimentTime.Ticks * Math.Max(0, totalExperimentRuns - completedExperimentCount));
+                            int progressValue = Math.Min(testProgressMaximum, completedExperimentCount);
+
+                            UpdateTestRunStatus(() =>
+                            {
+                                runProgressBar.Value = progressValue;
+                                _testStatusBestLabel.Text = $"Najlepszy wynik eksperymentu: {best:F4} (gen. {bestStatistic?.Generation ?? 0})";
+                                _testStatusConfigStatsLabel.Text = $"Min/Avg/Max konfiguracji: {min:F4} / {averageForConfiguration:F4} / {max:F4}";
+                                _testStatusProgressLabel.Text = $"Postęp eksperymentów: {completedExperimentCount} / {totalExperimentRuns}";
+                                _testStatusElapsedLabel.Text = $"Czas: {FormatTestDuration(stopwatch.Elapsed)}";
+                                _testStatusAverageLabel.Text = $"Śr. czas eksperymentu: {FormatTestDuration(averageExperimentTime)}";
+                                _testStatusEtaLabel.Text = $"Pozostało: {FormatTestDuration(eta)}";
+                            });
                         }
 
                         results.Add(new TestObject
@@ -1183,7 +1450,7 @@ namespace Lab2
                         });
 
                         int completed = Interlocked.Increment(ref currentConfiguration);
-                        BeginInvoke(new Action(() =>
+                        UpdateTestRunStatus(() =>
                         {
                             testCounter.Text = $"Test {completed} / {totalConfigurations}";
                             individualCount.Text = $"Liczba osobników {n}";
@@ -1193,14 +1460,22 @@ namespace Lab2
                             tournamentSizeLabelTesty.Text = $"Rozmiar turnieju {rt}";
                             selectionTresholLabelTesty.Text = $"Próg selekcji {ps}";
                             ipkLabelTesty.Text = $"Liczba punktów krzyżowań {ipk}";
-                        }));
+                        });
                     }
                 });
 
                 stopwatch.Stop();
+                UpdateTestRunStatus(() =>
+                {
+                    _testStatusStateLabel.Text = "Stan: zakończono";
+                    _testStatusElapsedLabel.Text = $"Czas: {FormatTestDuration(stopwatch.Elapsed)}";
+                    _testStatusEtaLabel.Text = "Pozostało: 00:00";
+                });
 
+                _testSeedOverride = null;
                 ApplyTestConfigurationFromUi();
                 FileUtils.SaveGaTunningResults(results, _data);
+                FileUtils.SaveDetailedGaTunningResults(detailedResults, _data);
 
                 MessageBox.Show(
                     $"Liczba wyników: {results.Count}\nPotrzebny czas: {stopwatch.Elapsed:hh\\:mm\\:ss\\.fff}",
@@ -1213,6 +1488,7 @@ namespace Lab2
             }
             finally
             {
+                _testSeedOverride = null;
                 testyStart.Enabled = true;
             }
         }
@@ -1423,13 +1699,104 @@ namespace Lab2
             //GC.Collect();
 
 
+        private void CreateTestRunStatusControls()
+        {
+            _testRunStatusGroupBox = new GroupBox
+            {
+                Text = "Status testów",
+                Location = new System.Drawing.Point(875, 270),
+                Size = new System.Drawing.Size(610, 285)
+            };
+
+            _testStatusStateLabel = CreateTestStatusLabel(22);
+            _testStatusConfigurationLabel = CreateTestStatusLabel(47);
+            _testStatusExperimentLabel = CreateTestStatusLabel(72);
+            _testStatusGenerationLabel = CreateTestStatusLabel(97);
+            _testStatusSeedLabel = CreateTestStatusLabel(122);
+            _testStatusBestLabel = CreateTestStatusLabel(147);
+            _testStatusConfigStatsLabel = CreateTestStatusLabel(172);
+            _testStatusProgressLabel = CreateTestStatusLabel(197);
+            _testStatusElapsedLabel = CreateTestStatusLabel(222);
+            _testStatusAverageLabel = CreateTestStatusLabel(247);
+            _testStatusEtaLabel = CreateTestStatusLabel(22, 315);
+            _testStatusSeedModeLabel = CreateTestStatusLabel(47, 315);
+
+            _testRunStatusGroupBox.Controls.AddRange(new System.Windows.Forms.Control[]
+            {
+                _testStatusStateLabel,
+                _testStatusConfigurationLabel,
+                _testStatusExperimentLabel,
+                _testStatusGenerationLabel,
+                _testStatusSeedLabel,
+                _testStatusBestLabel,
+                _testStatusConfigStatsLabel,
+                _testStatusProgressLabel,
+                _testStatusElapsedLabel,
+                _testStatusAverageLabel,
+                _testStatusEtaLabel,
+                _testStatusSeedModeLabel
+            });
+
+            tabPage3.Controls.Add(_testRunStatusGroupBox);
+            ResetTestRunStatus();
+        }
+
+        private static Label CreateTestStatusLabel(int top, int left = 12)
+        {
+            return new Label
+            {
+                AutoSize = true,
+                Location = new System.Drawing.Point(left, top),
+                MaximumSize = new System.Drawing.Size(285, 0)
+            };
+        }
+
+        private void ResetTestRunStatus()
+        {
+            _testStatusStateLabel.Text = "Stan: bezczynny";
+            _testStatusConfigurationLabel.Text = "Konfiguracja: -";
+            _testStatusExperimentLabel.Text = "Eksperyment: -";
+            _testStatusGenerationLabel.Text = "Generacja: -";
+            _testStatusSeedLabel.Text = "Seed: -";
+            _testStatusBestLabel.Text = "Najlepszy wynik: -";
+            _testStatusConfigStatsLabel.Text = "Min/Avg/Max konfiguracji: -";
+            _testStatusProgressLabel.Text = "Postęp eksperymentów: -";
+            _testStatusElapsedLabel.Text = "Czas: -";
+            _testStatusAverageLabel.Text = "Śr. czas eksperymentu: -";
+            _testStatusEtaLabel.Text = "Pozostało: -";
+            _testStatusSeedModeLabel.Text = "Tryb seedów: -";
+        }
+
+        private void UpdateTestRunStatus(Action update)
+        {
+            if (IsDisposed)
+                return;
+
+            try
+            {
+                if (InvokeRequired)
+                    BeginInvoke(update);
+                else
+                    update();
+            }
+            catch (InvalidOperationException)
+            {
+            }
+        }
+
+        private static string FormatTestDuration(TimeSpan duration)
+        {
+            return duration.TotalHours >= 1
+                ? duration.ToString(@"hh\:mm\:ss")
+                : duration.ToString(@"mm\:ss");
+        }
         private void CreateTestSweepControls()
         {
             var group = new GroupBox
             {
                 Text = "Parametry testowane",
                 Location = new System.Drawing.Point(875, 23),
-                Size = new System.Drawing.Size(170, 210)
+                Size = new System.Drawing.Size(230, 240)
             };
 
             _testSweepNCheckBox = CreateTestSweepCheckBox("N", 22, true);
@@ -1439,6 +1806,7 @@ namespace Lab2
             _testSweepRtCheckBox = CreateTestSweepCheckBox("Rt", 122, false);
             _testSweepPsCheckBox = CreateTestSweepCheckBox("Ps", 147, false);
             _testSweepIpkCheckBox = CreateTestSweepCheckBox("IPK", 172, false);
+            _testUseSameSeedsCheckBox = CreateTestSweepCheckBox("Używaj tych samych ziaren", 202, true);
 
             group.Controls.AddRange(new System.Windows.Forms.Control[]
             {
@@ -1448,7 +1816,8 @@ namespace Lab2
                 _testSweepTCheckBox,
                 _testSweepRtCheckBox,
                 _testSweepPsCheckBox,
-                _testSweepIpkCheckBox
+                _testSweepIpkCheckBox,
+                _testUseSameSeedsCheckBox
             });
 
             tabPage3.Controls.Add(group);
@@ -1628,13 +1997,15 @@ namespace Lab2
                 case Core.Enums.AlgorithmType.SUPERVISED:
                     ConfigureMatrixSizing();
                     ReferenceMatrixModalWindow referenceMatrixModalWindow = new ReferenceMatrixModalWindow(_data);
-                    referenceMatrixModalWindow.Show();
+                    referenceMatrixModalWindow.FormClosed += (_, _) => UpdateSelectedDataPreview();
+                    referenceMatrixModalWindow.Show(this);
                     break;
 
                 case Core.Enums.AlgorithmType.UNSUPERVISED:
                     ConfigureMatrixSizing();
                     PatternChoosingModalWindow patternChoosingModalWindow = new PatternChoosingModalWindow(_data);
-                    patternChoosingModalWindow.Show();
+                    patternChoosingModalWindow.FormClosed += (_, _) => UpdateSelectedDataPreview();
+                    patternChoosingModalWindow.Show(this);
                     break;
 
                 default:
@@ -1657,6 +2028,7 @@ namespace Lab2
             {
                 _data.AlgorithmType = AlgorithmType.SUPERVISED;
                 additioanlDataButton.Text = "Wybór macierzy referencyjnej";
+                UpdateSelectedDataPreview();
             }
         }
 
@@ -1667,6 +2039,7 @@ namespace Lab2
             {
                 _data.AlgorithmType = AlgorithmType.UNSUPERVISED;
                 additioanlDataButton.Text = "Wybór macierzy wzorców";
+                UpdateSelectedDataPreview();
             }
         }
 
@@ -2097,3 +2470,12 @@ namespace Lab2
         }
     }
 }
+
+
+
+
+
+
+
+
+
