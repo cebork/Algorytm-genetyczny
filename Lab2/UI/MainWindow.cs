@@ -57,6 +57,9 @@ namespace Lab2
         private CheckBox _testSweepPsCheckBox = null!;
         private CheckBox _testSweepIpkCheckBox = null!;
         private CheckBox _testUseSameSeedsCheckBox = null!;
+        private Label _testMaxParallelLabel = null!;
+        private NumericUpDown _testMaxParallelInput = null!;
+        private DataGridView _testJobsGrid = null!;
         private GroupBox _testRunStatusGroupBox = null!;
         private Label _testStatusStateLabel = null!;
         private Label _testStatusConfigurationLabel = null!;
@@ -98,6 +101,7 @@ namespace Lab2
             ApplyVisualLayout();
             CreateTestSweepControls();
             CreateTestRunStatusControls();
+            CreateTestJobsGridControls();
         }
 
 
@@ -228,13 +232,18 @@ namespace Lab2
 
         private GeneticAlgorithm CreateGeneticAlgorithm(int experimentIndex)
         {
-            var random = CreateRandomProvider(experimentIndex);
+            return CreateGeneticAlgorithm(_data, GetActiveExperimentSeed(experimentIndex));
+        }
 
-            var fitness = CreateFitness();
-            var selection = CreateSelection(random);
-            var crossover = CreateCrossover(random);
-            var mutation = CreateMutation(random);
-            var population = CreateInitialPopulation(random);
+        private GeneticAlgorithm CreateGeneticAlgorithm(InitialData data, int seed)
+        {
+            var random = new SeededRandomProvider(seed);
+
+            var fitness = CreateFitness(data);
+            var selection = CreateSelection(data, random);
+            var crossover = CreateCrossover(data, random);
+            var mutation = CreateMutation(data, random);
+            var population = CreateInitialPopulation(data, random);
 
             var builder = GeneticAlgorithmBuilder
                 .Create()
@@ -242,25 +251,24 @@ namespace Lab2
                 .WithFitness(fitness)
                 .WithSelection(selection)
                 .WithCrossover(crossover)
-                .WithCrossoverProbability(_data.CrossProbability, random)
-                .WithElitism(_data.EliteOn, (int)_data.EliteToMove)
-                .StopAtFirstCorrect(_data.StopAtFirstCorrect)
+                .WithCrossoverProbability(data.CrossProbability, random)
+                .WithElitism(data.EliteOn, (int)data.EliteToMove)
+                .StopAtFirstCorrect(data.StopAtFirstCorrect)
                 .WithMutation(mutation)
                 .WithTermination(
-                    new MaxIterationCondition((int)_data.NumberOfIterations)
+                    new MaxIterationCondition((int)data.NumberOfIterations)
                 );
 
-            if (_data.StagnationEnabled)
+            if (data.StagnationEnabled)
                 builder.WithStagnationReset(
-                    _data.StagnationWindow,
-                    _data.StagnationResetFraction,
+                    data.StagnationWindow,
+                    data.StagnationResetFraction,
                     random,
-                    _data.StagnationDiversityThreshold
+                    data.StagnationDiversityThreshold
                 );
 
             return builder.Build();
         }
-
         private static void AddGenerationSuccess(
             int[] generationSuccesses,
             IReadOnlyList<PopulationStatistics> statistics
@@ -946,34 +954,44 @@ namespace Lab2
 
         private IFitnessEvaluator CreateFitness()
         {
-            return _data.AlgorithmType == AlgorithmType.SUPERVISED
+            return CreateFitness(_data);
+        }
+
+        private IFitnessEvaluator CreateFitness(InitialData data)
+        {
+            return data.AlgorithmType == AlgorithmType.SUPERVISED
                 ? new SupervisedFitnessEvaluator(
-                    GetReferenceMatrixForFitness(),
+                    GetReferenceMatrixForFitness(data),
                     precisionDigits: 4
                 )
                 : new UnsupervisedPatternFitnessEvaluator(
-                    _data.UnsupervisedPatternMatrixes,
+                    data.UnsupervisedPatternMatrixes,
                     precisionDigits: 4
                 );
         }
 
         private ISelectionStrategy CreateSelection(IRandomProvider random)
         {
-            return _data.SelectionType switch
+            return CreateSelection(_data, random);
+        }
+
+        private ISelectionStrategy CreateSelection(InitialData data, IRandomProvider random)
+        {
+            return data.SelectionType switch
             {
                 SelectionType.ROULETTE =>
                     new RouletteSelection(random),
 
                 SelectionType.TOURNAMENT_HARD =>
                     new TournamentSelection(
-                        (int)_data.TournamentSelectionSize,
+                        (int)data.TournamentSelectionSize,
                         random
                     ),
 
                 SelectionType.TOURNAMENT_SOFT =>
                     new SoftTournamentSelection(
-                        (int)_data.TournamentSelectionSize,
-                        _data.TournamentSoftSelectionTreshold,
+                        (int)data.TournamentSelectionSize,
+                        data.TournamentSoftSelectionTreshold,
                         random
                     ),
 
@@ -984,57 +1002,67 @@ namespace Lab2
 
         private ICrossoverOperator CreateCrossover(IRandomProvider random)
         {
-            return _data.CrossType switch
+            return CreateCrossover(_data, random);
+        }
+
+        private ICrossoverOperator CreateCrossover(InitialData data, IRandomProvider random)
+        {
+            return data.CrossType switch
             {
                 CrossType.SINGLE_POINT =>
                     new OnePointCrossover(random),
 
                 CrossType.MULTI_POINT =>
                     new MultiPointCrossover(
-                        (int)_data.CrossCount,
+                        (int)data.CrossCount,
                         random
                     ),
 
-                _ => throw new InvalidOperationException("Nieznany typ krzy�owania")
+                _ => throw new InvalidOperationException("Nieznany typ krzyżowania")
             };
         }
 
         private IMutationOperator CreateMutation(IRandomProvider random)
         {
+            return CreateMutation(_data, random);
+        }
+
+        private IMutationOperator CreateMutation(InitialData data, IRandomProvider random)
+        {
             var mutations = new List<IMutationOperator>();
 
-            mutations.Add(_data.MutationType switch
+            mutations.Add(data.MutationType switch
             {
                 MutationType.EQUALY =>
                     new BitFlipMutation(
-                        _data.MutationProbability,
-                        _data.BitFlipEarlyExplorationMultiplier,
-                        _data.BitFlipLateExplorationMultiplier,
+                        data.MutationProbability,
+                        data.BitFlipEarlyExplorationMultiplier,
+                        data.BitFlipLateExplorationMultiplier,
                         random
                     ),
 
                 MutationType.BIT_SWAPING =>
-                    new BitSwapMutation(_data.MutationProbability, random),
+                    new BitSwapMutation(data.MutationProbability, random),
 
                 MutationType.RANDOM_COORDS =>
                     new NarrowingMutation(
-                        _data.MutationProbability,
-                        _data.NarrowingMutationMultiplier,
-                        _data.NarrowingMutationStep,
-                        _data.NarrowingMutationExponent,
-                        _data.LimitNarrowingMutation,
+                        data.MutationProbability,
+                        data.NarrowingMutationMultiplier,
+                        data.NarrowingMutationStep,
+                        data.NarrowingMutationExponent,
+                        data.LimitNarrowingMutation,
                         random
                     ),
 
                 _ => throw new InvalidOperationException()
             });
 
-            if (_data.UniformBlock)
+            if (data.UniformBlock)
             {
                 mutations.Add(
                     new UniformBlockMutation(
-                        _data.UniformBlockMutationProbWhite,
-                        _data.UniformBlockMutationProbRed,
+                        data.UniformBlockMutationProbWhite,
+                        data.UniformBlockMutationProbRed,
                         random
                     )
                 );
@@ -1047,19 +1075,23 @@ namespace Lab2
 
         private List<Individual> CreateInitialPopulation(IRandomProvider random)
         {
-            return Enumerable.Range(0, (int)_data.NumberOfIndividuals)
+            return CreateInitialPopulation(_data, random);
+        }
+
+        private List<Individual> CreateInitialPopulation(InitialData data, IRandomProvider random)
+        {
+            return Enumerable.Range(0, (int)data.NumberOfIndividuals)
                 .Select(_ =>
                     new Individual(
                         InitialGenotypeFactory.Create(
-                            (int)_data.MatrixSize,
-                            _data.ProbGen1,
+                            (int)data.MatrixSize,
+                            data.ProbGen1,
                             random
                         )
                     )
                 )
                 .ToList();
         }
-
         private void DisplayLastGeneration(IReadOnlyList<Individual> lastGeneration)
         {
             int totalCount = lastGeneration.Count;
@@ -1272,6 +1304,166 @@ namespace Lab2
 
 
 
+        private sealed class TestJob
+        {
+            public int JobNo { get; init; }
+            public int ConfigurationNo { get; init; }
+            public int ConfigurationIndex { get; init; }
+            public int ExperimentIndex { get; init; }
+            public int ExperimentNo => ExperimentIndex + 1;
+            public int Seed { get; init; }
+            public decimal N { get; init; }
+            public decimal Pk { get; init; }
+            public decimal Pm { get; init; }
+            public decimal T { get; init; }
+            public decimal Rt { get; init; }
+            public decimal Ps { get; init; }
+            public decimal Ipk { get; init; }
+            public InitialData Data { get; init; } = null!;
+            public int GridRowIndex { get; set; } = -1;
+        }
+
+        private sealed class TestJobResult
+        {
+            public TestJob Job { get; init; } = null!;
+            public decimal BestFitness { get; init; }
+            public int BestGeneration { get; init; }
+            public TimeSpan Elapsed { get; init; }
+        }
+
+        private List<TestJob> BuildTestJobs(
+            InitialData baseData,
+            IReadOnlyList<decimal> nValues,
+            IReadOnlyList<decimal> pkValues,
+            IReadOnlyList<decimal> pmValues,
+            IReadOnlyList<decimal> tValues,
+            IReadOnlyList<decimal> rtValues,
+            IReadOnlyList<decimal> psValues,
+            IReadOnlyList<decimal> ipkValues,
+            int experimentCount,
+            bool useSameSeeds)
+        {
+            var jobs = new List<TestJob>();
+            int configurationIndex = 0;
+            int jobNo = 1;
+
+            foreach (var n in nValues)
+            foreach (var pk in pkValues)
+            foreach (var pm in pmValues)
+            foreach (var t in tValues)
+            foreach (var rt in rtValues)
+            foreach (var ps in psValues)
+            foreach (var ipk in ipkValues)
+            {
+                int configurationNo = configurationIndex + 1;
+                for (int experimentIndex = 0; experimentIndex < experimentCount; experimentIndex++)
+                {
+                    int seed = useSameSeeds
+                        ? unchecked(baseData.RandomSeed + experimentIndex)
+                        : unchecked(baseData.RandomSeed + configurationIndex * experimentCount + experimentIndex);
+
+                    var jobData = CloneInitialData(baseData);
+                    ApplyTestConfiguration(jobData, n, pk, pm, t, rt, ps, ipk);
+
+                    jobs.Add(new TestJob
+                    {
+                        JobNo = jobNo++,
+                        ConfigurationNo = configurationNo,
+                        ConfigurationIndex = configurationIndex,
+                        ExperimentIndex = experimentIndex,
+                        Seed = seed,
+                        N = n,
+                        Pk = pk,
+                        Pm = pm,
+                        T = t,
+                        Rt = rt,
+                        Ps = ps,
+                        Ipk = ipk,
+                        Data = jobData
+                    });
+                }
+
+                configurationIndex++;
+            }
+
+            return jobs;
+        }
+
+        private static InitialData CloneInitialData(InitialData source)
+        {
+            return new InitialData
+            {
+                AlgorithmType = source.AlgorithmType,
+                MatrixSize = source.MatrixSize,
+                RequestedMatrixSize = source.RequestedMatrixSize,
+                UseEvenMatrixPadding = source.UseEvenMatrixPadding,
+                EmptyRowIndex = source.EmptyRowIndex,
+                EmptyColumnIndex = source.EmptyColumnIndex,
+                NumberOfIndividuals = source.NumberOfIndividuals,
+                CrossProbability = source.CrossProbability,
+                MutationProbability = source.MutationProbability,
+                BitFlipEarlyExplorationMultiplier = source.BitFlipEarlyExplorationMultiplier,
+                BitFlipLateExplorationMultiplier = source.BitFlipLateExplorationMultiplier,
+                NarrowingMutationMultiplier = source.NarrowingMutationMultiplier,
+                NarrowingMutationStep = source.NarrowingMutationStep,
+                NarrowingMutationExponent = source.NarrowingMutationExponent,
+                LimitNarrowingMutation = source.LimitNarrowingMutation,
+                NumberOfIterations = source.NumberOfIterations,
+                SupervisedReferenceMatrix = CloneMatrix(source.SupervisedReferenceMatrix),
+                UnsupervisedPatternMatrixes = CloneMatrices(source.UnsupervisedPatternMatrixes),
+                NumberOfExperiments = source.NumberOfExperiments,
+                AlgorithmOption = source.AlgorithmOption,
+                SelectionType = source.SelectionType,
+                TournamentSelectionSize = source.TournamentSelectionSize,
+                TournamentSoftSelectionTreshold = source.TournamentSoftSelectionTreshold,
+                CrossType = source.CrossType,
+                CrossCount = source.CrossCount,
+                MutationType = source.MutationType,
+                UniformBlock = source.UniformBlock,
+                ProbGen1 = source.ProbGen1,
+                UniformBlockMutationProbWhite = source.UniformBlockMutationProbWhite,
+                UniformBlockMutationProbRed = source.UniformBlockMutationProbRed,
+                EliteOn = source.EliteOn,
+                EliteToMove = source.EliteToMove,
+                StopAtFirstCorrect = source.StopAtFirstCorrect,
+                UseSeed = source.UseSeed,
+                RandomSeed = source.RandomSeed,
+                StagnationEnabled = source.StagnationEnabled,
+                StagnationWindow = source.StagnationWindow,
+                StagnationResetFraction = source.StagnationResetFraction,
+                StagnationDiversityThreshold = source.StagnationDiversityThreshold
+            };
+        }
+
+        private static bool[,] CloneMatrix(bool[,] matrix)
+        {
+            return matrix == null ? null! : (bool[,])matrix.Clone();
+        }
+
+        private static bool[][,] CloneMatrices(bool[][,] matrices)
+        {
+            if (matrices == null)
+                return null!;
+
+            var clones = new bool[matrices.Length][,];
+            for (int i = 0; i < matrices.Length; i++)
+            {
+                clones[i] = CloneMatrix(matrices[i]);
+            }
+
+            return clones;
+        }
+
+        private static void ApplyTestConfiguration(InitialData data, decimal n, decimal pk, decimal pm, decimal t, decimal rt, decimal ps, decimal ipk)
+        {
+            data.NumberOfIndividuals = n;
+            data.CrossProbability = pk;
+            data.MutationProbability = pm;
+            data.NumberOfIterations = t;
+            data.TournamentSelectionSize = rt;
+            data.TournamentSoftSelectionTreshold = ps;
+            data.CrossCount = ipk;
+        }
         private async void testyStart_Click(object sender, EventArgs e)
         {
             try
@@ -1299,92 +1491,72 @@ namespace Lab2
                 if (totalConfigurations <= 0)
                     throw new InvalidOperationException("Brak konfiguracji testowych do uruchomienia.");
 
-                var stopwatch = Stopwatch.StartNew();
-                var results = new List<TestObject>(totalConfigurations);
-                var detailedResults = new List<DetailedTestObject>(totalConfigurations * (int)testExperimentCount.Value);
                 int experimentCount = (int)testExperimentCount.Value;
-                long totalExperimentRuns = (long)totalConfigurations * experimentCount;
                 bool useSameSeeds = _testUseSameSeedsCheckBox.Checked;
-                int currentConfiguration = 0;
+                int maxParallel = (int)_testMaxParallelInput.Value;
+                var baseData = CloneInitialData(_data);
+                var jobs = BuildTestJobs(baseData, nValues, pkValues, pmValues, tValues, rtValues, psValues, ipkValues, experimentCount, useSameSeeds);
+                long totalExperimentRuns = jobs.Count;
+
+                var stopwatch = Stopwatch.StartNew();
                 int completedExperiments = 0;
-                decimal resultIndex = 1;
+                int activeJobs = 0;
+                int testProgressMaximum;
 
                 testyStart.Enabled = false;
                 runProgressBar.Visible = true;
                 runProgressBar.Minimum = 0;
                 runProgressBar.Maximum = totalExperimentRuns > int.MaxValue ? int.MaxValue : (int)totalExperimentRuns;
-                int testProgressMaximum = runProgressBar.Maximum;
+                testProgressMaximum = runProgressBar.Maximum;
                 runProgressBar.Value = 0;
+
                 ResetTestRunStatus();
+                InitializeTestJobsGrid(jobs);
                 _testStatusStateLabel.Text = "Stan: przygotowanie";
                 _testStatusProgressLabel.Text = $"Postęp eksperymentów: 0 / {totalExperimentRuns}";
                 _testStatusSeedModeLabel.Text = useSameSeeds
                     ? "Tryb seedów: te same ziarna dla konfiguracji"
                     : "Tryb seedów: osobne ziarno dla każdego testu";
+                _testStatusAverageLabel.Text = $"Maks. równoległe: {maxParallel}";
 
-                await Task.Run(() =>
+                using var semaphore = new SemaphoreSlim(maxParallel, maxParallel);
+                var tasks = jobs.Select(async job =>
                 {
-                    foreach (var n in nValues)
-                    foreach (var pk in pkValues)
-                    foreach (var pm in pmValues)
-                    foreach (var t in tValues)
-                    foreach (var rt in rtValues)
-                    foreach (var ps in psValues)
-                    foreach (var ipk in ipkValues)
+                    await semaphore.WaitAsync();
+                    int activeNow = Interlocked.Increment(ref activeJobs);
+                    var jobStopwatch = Stopwatch.StartNew();
+
+                    UpdateTestRunStatus(() =>
                     {
-                        int configurationIndex = (int)resultIndex - 1;
-                        int configurationNumber = configurationIndex + 1;
-                        decimal min = decimal.MaxValue;
-                        decimal max = decimal.MinValue;
-                        decimal sum = 0m;
+                        _testStatusStateLabel.Text = "Stan: eksperymenty w toku";
+                        _testStatusConfigurationLabel.Text = $"Konfiguracja: {job.ConfigurationNo} / {totalConfigurations}  N={job.N}, Pk={job.Pk}, Pm={job.Pm}, T={job.T}, Rt={job.Rt}, Ps={job.Ps}, IPK={job.Ipk}";
+                        _testStatusExperimentLabel.Text = $"Aktywne: {activeNow} / {maxParallel}";
+                        _testStatusSeedLabel.Text = $"Seed: {job.Seed}";
+                        _testStatusGenerationLabel.Text = $"Job {job.JobNo}: 0 / {job.T}";
+                    });
+                    UpdateTestJobGridRow(job, "Uruchomiony", 0, elapsed: TimeSpan.Zero);
 
-                        UpdateTestRunStatus(() =>
+                    try
+                    {
+                        var result = await Task.Run(() =>
                         {
-                            _testStatusStateLabel.Text = "Stan: konfiguracja w toku";
-                            _testStatusConfigurationLabel.Text = $"Konfiguracja: {configurationNumber} / {totalConfigurations}  N={n}, Pk={pk}, Pm={pm}, T={t}, Rt={rt}, Ps={ps}, IPK={ipk}";
-                            _testStatusExperimentLabel.Text = $"Eksperyment: 0 / {experimentCount}";
-                            _testStatusGenerationLabel.Text = "Generacja: -";
-                            _testStatusSeedLabel.Text = "Seed: -";
-                            _testStatusBestLabel.Text = "Najlepszy wynik: -";
-                            _testStatusConfigStatsLabel.Text = "Min/Avg/Max konfiguracji: -";
-                        });
-
-                        for (int experimentIndex = 0; experimentIndex < experimentCount; experimentIndex++)
-                        {
-                            _testSeedOverride = useSameSeeds
-                                ? null
-                                : GetIndependentTestSeed(configurationIndex, experimentIndex, experimentCount);
-                            int experimentSeed = GetActiveExperimentSeed(experimentIndex);
-                            int experimentNumber = experimentIndex + 1;
-                            int targetGenerations = (int)t;
                             long lastProgressUiUpdate = 0;
-
-                            UpdateTestRunStatus(() =>
-                            {
-                                _testStatusStateLabel.Text = "Stan: eksperyment w toku";
-                                _testStatusExperimentLabel.Text = $"Eksperyment: {experimentNumber} / {experimentCount}";
-                                _testStatusGenerationLabel.Text = $"Generacja: 0 / {targetGenerations}";
-                                _testStatusSeedLabel.Text = $"Seed: {experimentSeed}";
-                                _testStatusBestLabel.Text = "Najlepszy wynik: w trakcie";
-                                _testStatusElapsedLabel.Text = $"Czas: {FormatTestDuration(stopwatch.Elapsed)}";
-                            });
-
-                            ApplyTestConfiguration(n, pk, pm, t, rt, ps, ipk);
-                            var ga = CreateGeneticAlgorithm(experimentIndex);
+                            var ga = CreateGeneticAlgorithm(job.Data, job.Seed);
                             var progress = new Progress<int>(generation =>
                             {
                                 long now = Stopwatch.GetTimestamp();
                                 bool shouldUpdate = generation == 0 ||
-                                    generation >= targetGenerations ||
+                                    generation >= (int)job.T ||
                                     now - Interlocked.Read(ref lastProgressUiUpdate) >= Stopwatch.Frequency / 4;
 
                                 if (!shouldUpdate)
                                     return;
 
                                 Interlocked.Exchange(ref lastProgressUiUpdate, now);
+                                UpdateTestJobGridRow(job, "W toku", generation, elapsed: jobStopwatch.Elapsed);
                                 UpdateTestRunStatus(() =>
                                 {
-                                    _testStatusGenerationLabel.Text = $"Generacja: {Math.Min(generation, targetGenerations)} / {targetGenerations}";
+                                    _testStatusGenerationLabel.Text = $"Job {job.JobNo}: {Math.Min(generation, (int)job.T)} / {job.T}";
                                     _testStatusElapsedLabel.Text = $"Czas: {FormatTestDuration(stopwatch.Elapsed)}";
                                 });
                             });
@@ -1394,82 +1566,111 @@ namespace Lab2
                             var bestStatistic = ga.StatisticsHistory.Count == 0
                                 ? null
                                 : ga.StatisticsHistory.OrderByDescending(stat => stat.BestFitness).First();
-                            decimal best = bestStatistic?.BestFitness ?? 0m;
 
-                            detailedResults.Add(new DetailedTestObject
+                            return new TestJobResult
                             {
-                                ConfigurationIter = resultIndex,
-                                ExperimentIndex = experimentIndex,
-                                Seed = experimentSeed,
-                                N = n,
-                                pk = pk,
-                                pm = pm,
-                                T = t,
-                                Rt = rt,
-                                Ps = ps,
-                                Ipk = ipk,
-                                BestMark = best,
-                                BestGeneration = bestStatistic?.Generation ?? 0
-                            });
-
-                            min = Math.Min(min, best);
-                            max = Math.Max(max, best);
-                            sum += best;
-
-                            int completedExperimentCount = Interlocked.Increment(ref completedExperiments);
-                            decimal averageForConfiguration = sum / experimentNumber;
-                            TimeSpan averageExperimentTime = TimeSpan.FromTicks(stopwatch.Elapsed.Ticks / Math.Max(1, completedExperimentCount));
-                            TimeSpan eta = TimeSpan.FromTicks(averageExperimentTime.Ticks * Math.Max(0, totalExperimentRuns - completedExperimentCount));
-                            int progressValue = Math.Min(testProgressMaximum, completedExperimentCount);
-
-                            UpdateTestRunStatus(() =>
-                            {
-                                runProgressBar.Value = progressValue;
-                                _testStatusBestLabel.Text = $"Najlepszy wynik eksperymentu: {best:F4} (gen. {bestStatistic?.Generation ?? 0})";
-                                _testStatusConfigStatsLabel.Text = $"Min/Avg/Max konfiguracji: {min:F4} / {averageForConfiguration:F4} / {max:F4}";
-                                _testStatusProgressLabel.Text = $"Postęp eksperymentów: {completedExperimentCount} / {totalExperimentRuns}";
-                                _testStatusElapsedLabel.Text = $"Czas: {FormatTestDuration(stopwatch.Elapsed)}";
-                                _testStatusAverageLabel.Text = $"Śr. czas eksperymentu: {FormatTestDuration(averageExperimentTime)}";
-                                _testStatusEtaLabel.Text = $"Pozostało: {FormatTestDuration(eta)}";
-                            });
-                        }
-
-                        results.Add(new TestObject
-                        {
-                            Iter = resultIndex++,
-                            N = n,
-                            pk = pk,
-                            pm = pm,
-                            T = t,
-                            Rt = rt,
-                            Ps = ps,
-                            Ipk = ipk,
-                            MinMark = min,
-                            AvgMark = sum / experimentCount,
-                            MaxMark = max
+                                Job = job,
+                                BestFitness = bestStatistic?.BestFitness ?? 0m,
+                                BestGeneration = bestStatistic?.Generation ?? 0,
+                                Elapsed = jobStopwatch.Elapsed
+                            };
                         });
 
-                        int completed = Interlocked.Increment(ref currentConfiguration);
+                        jobStopwatch.Stop();
+                        int completedExperimentCount = Interlocked.Increment(ref completedExperiments);
+                        TimeSpan averageExperimentTime = TimeSpan.FromTicks(stopwatch.Elapsed.Ticks / Math.Max(1, completedExperimentCount));
+                        TimeSpan eta = TimeSpan.FromTicks(averageExperimentTime.Ticks * Math.Max(0, totalExperimentRuns - completedExperimentCount));
+                        int progressValue = Math.Min(testProgressMaximum, completedExperimentCount);
+
+                        UpdateTestJobGridRow(job, "Zakończony", (int)job.T, result.BestFitness, result.BestGeneration, result.Elapsed);
                         UpdateTestRunStatus(() =>
                         {
-                            testCounter.Text = $"Test {completed} / {totalConfigurations}";
-                            individualCount.Text = $"Liczba osobników {n}";
-                            mutationProb.Text = $"Prawdopodobieństwo mutacji {pm}";
-                            crossProb.Text = $"Prawdopodobieństwo krzyżowania {pk}";
-                            iterationCount.Text = $"Liczba iteracji {t}";
-                            tournamentSizeLabelTesty.Text = $"Rozmiar turnieju {rt}";
-                            selectionTresholLabelTesty.Text = $"Próg selekcji {ps}";
-                            ipkLabelTesty.Text = $"Liczba punktów krzyżowań {ipk}";
+                            runProgressBar.Value = progressValue;
+                            testCounter.Text = $"Test {completedExperimentCount} / {totalExperimentRuns}";
+                            individualCount.Text = $"Liczba osobników {job.N}";
+                            mutationProb.Text = $"Prawdopodobieństwo mutacji {job.Pm}";
+                            crossProb.Text = $"Prawdopodobieństwo krzyżowania {job.Pk}";
+                            iterationCount.Text = $"Liczba iteracji {job.T}";
+                            tournamentSizeLabelTesty.Text = $"Rozmiar turnieju {job.Rt}";
+                            selectionTresholLabelTesty.Text = $"Próg selekcji {job.Ps}";
+                            ipkLabelTesty.Text = $"Liczba punktów krzyżowań {job.Ipk}";
+                            _testStatusBestLabel.Text = $"Ostatni wynik: {result.BestFitness:F4} (job {job.JobNo}, gen. {result.BestGeneration})";
+                            _testStatusProgressLabel.Text = $"Postęp eksperymentów: {completedExperimentCount} / {totalExperimentRuns}";
+                            _testStatusElapsedLabel.Text = $"Czas: {FormatTestDuration(stopwatch.Elapsed)}";
+                            _testStatusAverageLabel.Text = $"Śr. czas eksperymentu: {FormatTestDuration(averageExperimentTime)}";
+                            _testStatusEtaLabel.Text = $"Pozostało: {FormatTestDuration(eta)}";
                         });
-                    }
-                });
 
+                        return result;
+                    }
+                    catch
+                    {
+                        UpdateTestJobGridRow(job, "Błąd", elapsed: jobStopwatch.Elapsed);
+                        throw;
+                    }
+                    finally
+                    {
+                        int activeAfter = Interlocked.Decrement(ref activeJobs);
+                        UpdateTestRunStatus(() =>
+                        {
+                            _testStatusExperimentLabel.Text = $"Aktywne: {activeAfter} / {maxParallel}";
+                        });
+                        semaphore.Release();
+                    }
+                }).ToArray();
+
+                var jobResults = await Task.WhenAll(tasks);
                 stopwatch.Stop();
+
+                var results = jobResults
+                    .GroupBy(result => result.Job.ConfigurationNo)
+                    .OrderBy(group => group.Key)
+                    .Select(group =>
+                    {
+                        var first = group.First().Job;
+                        return new TestObject
+                        {
+                            Iter = first.ConfigurationNo,
+                            N = first.N,
+                            pk = first.Pk,
+                            pm = first.Pm,
+                            T = first.T,
+                            Rt = first.Rt,
+                            Ps = first.Ps,
+                            Ipk = first.Ipk,
+                            MinMark = group.Min(result => result.BestFitness),
+                            AvgMark = group.Average(result => result.BestFitness),
+                            MaxMark = group.Max(result => result.BestFitness)
+                        };
+                    })
+                    .ToList();
+
+                var detailedResults = jobResults
+                    .OrderBy(result => result.Job.ConfigurationNo)
+                    .ThenBy(result => result.Job.ExperimentIndex)
+                    .Select(result => new DetailedTestObject
+                    {
+                        ConfigurationIter = result.Job.ConfigurationNo,
+                        ExperimentIndex = result.Job.ExperimentIndex,
+                        Seed = result.Job.Seed,
+                        N = result.Job.N,
+                        pk = result.Job.Pk,
+                        pm = result.Job.Pm,
+                        T = result.Job.T,
+                        Rt = result.Job.Rt,
+                        Ps = result.Job.Ps,
+                        Ipk = result.Job.Ipk,
+                        BestMark = result.BestFitness,
+                        BestGeneration = result.BestGeneration
+                    })
+                    .ToList();
+
                 UpdateTestRunStatus(() =>
                 {
                     _testStatusStateLabel.Text = "Stan: zakończono";
                     _testStatusElapsedLabel.Text = $"Czas: {FormatTestDuration(stopwatch.Elapsed)}";
                     _testStatusEtaLabel.Text = "Pozostało: 00:00";
+                    _testStatusConfigStatsLabel.Text = $"Konfiguracje: {results.Count}, joby: {jobResults.Length}";
                 });
 
                 _testSeedOverride = null;
@@ -1478,7 +1679,7 @@ namespace Lab2
                 FileUtils.SaveDetailedGaTunningResults(detailedResults, _data);
 
                 MessageBox.Show(
-                    $"Liczba wyników: {results.Count}\nPotrzebny czas: {stopwatch.Elapsed:hh\\:mm\\:ss\\.fff}",
+                    $"Liczba wyników: {results.Count}\nLiczba jobów: {jobResults.Length}\nPotrzebny czas: {stopwatch.Elapsed:hh\\:mm\\:ss\\.fff}",
                     "Sukces"
                 );
             }
@@ -1491,8 +1692,7 @@ namespace Lab2
                 _testSeedOverride = null;
                 testyStart.Enabled = true;
             }
-        }
-            //    foreach (var pk in pkValues)
+        }            //    foreach (var pk in pkValues)
             //    {
             //        foreach (var pm in pmValues)
             //        {
@@ -1704,8 +1904,8 @@ namespace Lab2
             _testRunStatusGroupBox = new GroupBox
             {
                 Text = "Status testów",
-                Location = new System.Drawing.Point(875, 270),
-                Size = new System.Drawing.Size(610, 285)
+                Location = new System.Drawing.Point(1115, 23),
+                Size = new System.Drawing.Size(480, 285)
             };
 
             _testStatusStateLabel = CreateTestStatusLabel(22);
@@ -1743,11 +1943,12 @@ namespace Lab2
 
         private static Label CreateTestStatusLabel(int top, int left = 12)
         {
+            int maxWidth = left > 250 ? 150 : 285;
             return new Label
             {
                 AutoSize = true,
                 Location = new System.Drawing.Point(left, top),
-                MaximumSize = new System.Drawing.Size(285, 0)
+                MaximumSize = new System.Drawing.Size(maxWidth, 0)
             };
         }
 
@@ -1790,13 +1991,94 @@ namespace Lab2
                 ? duration.ToString(@"hh\:mm\:ss")
                 : duration.ToString(@"mm\:ss");
         }
+        private void CreateTestJobsGridControls()
+        {
+            _testJobsGrid = new DataGridView
+            {
+                Location = new System.Drawing.Point(23, 535),
+                Size = new System.Drawing.Size(1572, 220),
+                AllowUserToAddRows = false,
+                AllowUserToDeleteRows = false,
+                AllowUserToResizeRows = false,
+                ReadOnly = true,
+                RowHeadersVisible = false,
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None,
+                ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
+            };
+
+            AddTestJobColumn("Job", "Job", 55);
+            AddTestJobColumn("Config", "Konf.", 55);
+            AddTestJobColumn("Experiment", "Exp.", 50);
+            AddTestJobColumn("Seed", "Seed", 90);
+            AddTestJobColumn("Status", "Status", 95);
+            AddTestJobColumn("Generation", "Gen", 70);
+            AddTestJobColumn("Best", "Best", 80);
+            AddTestJobColumn("BestGeneration", "Best gen", 70);
+            AddTestJobColumn("Elapsed", "Czas", 70);
+            AddTestJobColumn("Parameters", "Parametry", 230);
+
+            tabPage3.Controls.Add(_testJobsGrid);
+        }
+
+        private void AddTestJobColumn(string name, string header, int width)
+        {
+            _testJobsGrid.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = name,
+                HeaderText = header,
+                Width = width,
+                SortMode = DataGridViewColumnSortMode.NotSortable
+            });
+        }
+
+        private void InitializeTestJobsGrid(IReadOnlyList<TestJob> jobs)
+        {
+            _testJobsGrid.Rows.Clear();
+            foreach (var job in jobs)
+            {
+                int rowIndex = _testJobsGrid.Rows.Add(
+                    job.JobNo,
+                    job.ConfigurationNo,
+                    job.ExperimentNo,
+                    job.Seed,
+                    "Oczekuje",
+                    $"0 / {job.T}",
+                    "-",
+                    "-",
+                    "-",
+                    $"N={job.N}, Pk={job.Pk}, Pm={job.Pm}, Rt={job.Rt}, Ps={job.Ps}, IPK={job.Ipk}"
+                );
+                job.GridRowIndex = rowIndex;
+            }
+        }
+
+        private void UpdateTestJobGridRow(TestJob job, string status, int? generation = null, decimal? best = null, int? bestGeneration = null, TimeSpan? elapsed = null)
+        {
+            UpdateTestRunStatus(() =>
+            {
+                if (_testJobsGrid == null || job.GridRowIndex < 0 || job.GridRowIndex >= _testJobsGrid.Rows.Count)
+                    return;
+
+                var row = _testJobsGrid.Rows[job.GridRowIndex];
+                row.Cells["Status"].Value = status;
+                if (generation.HasValue)
+                    row.Cells["Generation"].Value = $"{Math.Min(generation.Value, (int)job.T)} / {job.T}";
+                if (best.HasValue)
+                    row.Cells["Best"].Value = best.Value.ToString("F4", CultureInfo.InvariantCulture);
+                if (bestGeneration.HasValue)
+                    row.Cells["BestGeneration"].Value = bestGeneration.Value;
+                if (elapsed.HasValue)
+                    row.Cells["Elapsed"].Value = FormatTestDuration(elapsed.Value);
+            });
+        }
         private void CreateTestSweepControls()
         {
             var group = new GroupBox
             {
                 Text = "Parametry testowane",
                 Location = new System.Drawing.Point(875, 23),
-                Size = new System.Drawing.Size(230, 240)
+                Size = new System.Drawing.Size(230, 285)
             };
 
             _testSweepNCheckBox = CreateTestSweepCheckBox("N", 22, true);
@@ -1807,6 +2089,20 @@ namespace Lab2
             _testSweepPsCheckBox = CreateTestSweepCheckBox("Ps", 147, false);
             _testSweepIpkCheckBox = CreateTestSweepCheckBox("IPK", 172, false);
             _testUseSameSeedsCheckBox = CreateTestSweepCheckBox("Używaj tych samych ziaren", 202, true);
+            _testMaxParallelLabel = new Label
+            {
+                Text = "Maks. równoległe",
+                AutoSize = true,
+                Location = new System.Drawing.Point(12, 232)
+            };
+            _testMaxParallelInput = new NumericUpDown
+            {
+                Location = new System.Drawing.Point(130, 228),
+                Size = new System.Drawing.Size(70, 23),
+                Minimum = 1,
+                Maximum = 1024,
+                Value = Math.Max(1, Environment.ProcessorCount)
+            };
 
             group.Controls.AddRange(new System.Windows.Forms.Control[]
             {
@@ -1817,7 +2113,9 @@ namespace Lab2
                 _testSweepRtCheckBox,
                 _testSweepPsCheckBox,
                 _testSweepIpkCheckBox,
-                _testUseSameSeedsCheckBox
+                _testUseSameSeedsCheckBox,
+                _testMaxParallelLabel,
+                _testMaxParallelInput
             });
 
             tabPage3.Controls.Add(group);
@@ -1915,13 +2213,18 @@ namespace Lab2
 
         private bool[,] GetReferenceMatrixForFitness()
         {
-            if (!_data.UseEvenMatrixPadding)
-                return _data.SupervisedReferenceMatrix;
+            return GetReferenceMatrixForFitness(_data);
+        }
+
+        private bool[,] GetReferenceMatrixForFitness(InitialData data)
+        {
+            if (!data.UseEvenMatrixPadding)
+                return data.SupervisedReferenceMatrix;
 
             return MatrixPaddingMapper.RemoveRowAndColumn(
-                _data.SupervisedReferenceMatrix,
-                _data.EmptyRowIndex,
-                _data.EmptyColumnIndex
+                data.SupervisedReferenceMatrix,
+                data.EmptyRowIndex,
+                data.EmptyColumnIndex
             );
         }
 
@@ -2470,6 +2773,17 @@ namespace Lab2
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
