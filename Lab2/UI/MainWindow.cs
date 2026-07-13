@@ -73,6 +73,20 @@ namespace Lab2
         private Label _testStatusAverageLabel = null!;
         private Label _testStatusEtaLabel = null!;
         private Label _testStatusSeedModeLabel = null!;
+        private TabPage _runJobsPage = null!;
+        private NumericUpDown _runMaxParallelInput = null!;
+        private DataGridView _runJobsGrid = null!;
+        private GroupBox _runStatusGroupBox = null!;
+        private Label _runStatusStateLabel = null!;
+        private Label _runStatusExperimentLabel = null!;
+        private Label _runStatusGenerationLabel = null!;
+        private Label _runStatusSeedLabel = null!;
+        private Label _runStatusBestLabel = null!;
+        private Label _runStatusProgressLabel = null!;
+        private Label _runStatusElapsedLabel = null!;
+        private Label _runStatusAverageLabel = null!;
+        private Label _runStatusEtaLabel = null!;
+        private Label _runStatusActiveLabel = null!;
         private GroupBox _selectedDataPreviewGroupBox = null!;
         private FlowLayoutPanel _selectedDataPreviewFlow = null!;
         private Label _selectedDataPreviewSummaryLabel = null!;
@@ -102,6 +116,7 @@ namespace Lab2
             CreateTestSweepControls();
             CreateTestRunStatusControls();
             CreateTestJobsGridControls();
+            CreateRunJobsPageControls();
         }
 
 
@@ -115,13 +130,18 @@ namespace Lab2
                     FileUtils.ArchiveResults();
 
                 FileUtils.SaveLastSeed(_data.RandomSeed);
+                startButton.Enabled = false;
                 await RunGeneticAlgorithm();
-        }
+            }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "B��d");
+                MessageBox.Show(ex.Message, "Błąd");
             }
-}
+            finally
+            {
+                startButton.Enabled = true;
+            }
+        }
 
         private async Task RunGeneticAlgorithm()
         {
@@ -129,81 +149,211 @@ namespace Lab2
 
             int experimentCount = (int)_data.NumberOfExperiments;
             int iterationCount = (int)_data.NumberOfIterations;
+            int maxParallel = _runMaxParallelInput == null ? 1 : (int)_runMaxParallelInput.Value;
+            var jobs = BuildRunJobs(CloneInitialData(_data), experimentCount);
 
             runProgressBar.Visible = true;
             runProgressBar.Minimum = 0;
-            runProgressBar.Maximum = experimentCount * iterationCount;
+            runProgressBar.Maximum = experimentCount;
             runProgressBar.Value = 0;
 
+            ResetRunStatus();
+            InitializeRunJobsGrid(jobs);
+            _runStatusStateLabel.Text = "Stan: przygotowanie";
+            _runStatusProgressLabel.Text = $"Postęp eksperymentów: 0 / {experimentCount}";
+            _runStatusAverageLabel.Text = $"Maks. równoległe: {maxParallel}";
+            if (_runJobsPage != null)
+                tabs.SelectedTab = _runJobsPage;
+
             var stopwatch = Stopwatch.StartNew();
-            var cumulativeSuccesses = new int[iterationCount + 1];
-            var perfectSeedResults = new List<PerfectSeedResult>();
-            GeneticAlgorithm lastGa = null;
+            int completedExperiments = 0;
+            int activeJobs = 0;
 
-            for (int experimentIndex = 0; experimentIndex < experimentCount; experimentIndex++)
+            using var semaphore = new SemaphoreSlim(maxParallel, maxParallel);
+            var tasks = jobs.Select(async job =>
             {
-                var ga = CreateGeneticAlgorithm(experimentIndex);
-                ga.StoreHistory = experimentIndex == experimentCount - 1;
-                int completedBeforeThisExperiment = experimentIndex * iterationCount;
-                var progress = new Progress<int>(value =>
+                await semaphore.WaitAsync();
+                int activeNow = Interlocked.Increment(ref activeJobs);
+                var jobStopwatch = Stopwatch.StartNew();
+
+                UpdateRunStatus(() =>
                 {
-                    int totalProgress = completedBeforeThisExperiment + Math.Min(value, iterationCount);
-                    runProgressBar.Value = Math.Min(totalProgress, runProgressBar.Maximum);
+                    _runStatusStateLabel.Text = "Stan: eksperymenty w toku";
+                    _runStatusExperimentLabel.Text = $"Eksperyment: {job.ExperimentNo} / {experimentCount}";
+                    _runStatusActiveLabel.Text = $"Aktywne: {activeNow} / {maxParallel}";
+                    _runStatusSeedLabel.Text = $"Seed: {job.Seed}";
+                    _runStatusGenerationLabel.Text = $"Job {job.JobNo}: 0 / {iterationCount}";
                 });
+                UpdateRunJobGridRow(job, "Uruchomiony", 0, elapsed: TimeSpan.Zero);
 
-                await Task.Run(() => ga.Run(progress));
-
-                AddGenerationSuccess(cumulativeSuccesses, ga.StatisticsHistory);
-                if (ga.PerfectSolution != null)
+                try
                 {
-                    perfectSeedResults.Add(new PerfectSeedResult
+                    var result = await Task.Run(() =>
                     {
-                        ExperimentIndex = experimentIndex,
-                        Seed = GetExperimentSeed(experimentIndex),
-                        Generation = ga.PerfectSolutionGeneration ?? 0,
-                        Fitness = ga.PerfectSolution.Fitness,
-                        Genotype = (bool[,])ga.PerfectSolution.Genotype.Clone()
+                        long lastProgressUiUpdate = 0;
+                        var ga = CreateGeneticAlgorithm(job.Data, job.Seed);
+                        var progress = new Progress<int>(generation =>
+                        {
+                            long now = Stopwatch.GetTimestamp();
+                            bool shouldUpdate = generation == 0 ||
+                                generation >= iterationCount ||
+                                now - Interlocked.Read(ref lastProgressUiUpdate) >= Stopwatch.Frequency / 4;
+
+                            if (!shouldUpdate)
+                                return;
+
+                            Interlocked.Exchange(ref lastProgressUiUpdate, now);
+                            UpdateRunJobGridRow(job, "W toku", generation, elapsed: jobStopwatch.Elapsed);
+                            UpdateRunStatus(() =>
+                            {
+                                _runStatusGenerationLabel.Text = $"Job {job.JobNo}: {Math.Min(generation, iterationCount)} / {iterationCount}";
+                                _runStatusElapsedLabel.Text = $"Czas: {FormatTestDuration(stopwatch.Elapsed)}";
+                            });
+                        });
+
+                        ga.Run(progress);
+
+                        var bestStatistic = ga.StatisticsHistory.Count == 0
+                            ? null
+                            : ga.StatisticsHistory.OrderByDescending(stat => stat.BestFitness).First();
+
+                        return new RunJobResult
+                        {
+                            Job = job,
+                            MinFitness = bestStatistic?.WorstFitness ?? 0m,
+                            AvgFitness = bestStatistic?.AverageFitness ?? 0m,
+                            BestFitness = bestStatistic?.BestFitness ?? 0m,
+                            BestGeneration = bestStatistic?.Generation ?? 0,
+                            Elapsed = jobStopwatch.Elapsed,
+                            Statistics = ga.StatisticsHistory.ToList(),
+                            PerfectSolution = ga.PerfectSolution?.Clone(),
+                            PerfectSolutionGeneration = ga.PerfectSolutionGeneration
+                        };
                     });
+
+                    jobStopwatch.Stop();
+                    int completedExperimentCount = Interlocked.Increment(ref completedExperiments);
+                    TimeSpan averageExperimentTime = TimeSpan.FromTicks(stopwatch.Elapsed.Ticks / Math.Max(1, completedExperimentCount));
+                    TimeSpan eta = TimeSpan.FromTicks(averageExperimentTime.Ticks * Math.Max(0, experimentCount - completedExperimentCount));
+                    int progressValue = Math.Min(runProgressBar.Maximum, completedExperimentCount);
+
+                    UpdateRunJobGridRow(job, "Zakończony", iterationCount, result.BestFitness, result.BestGeneration, result.Elapsed);
+                    UpdateRunStatus(() =>
+                    {
+                        runProgressBar.Value = progressValue;
+                        _runStatusExperimentLabel.Text = $"Eksperyment: {job.ExperimentNo} / {experimentCount}";
+                        _runStatusBestLabel.Text = $"Ostatni wynik: {result.BestFitness:F4} (job {job.JobNo}, gen. {result.BestGeneration})";
+                        _runStatusProgressLabel.Text = $"Postęp eksperymentów: {completedExperimentCount} / {experimentCount}";
+                        _runStatusElapsedLabel.Text = $"Czas: {FormatTestDuration(stopwatch.Elapsed)}";
+                        _runStatusAverageLabel.Text = $"Śr. czas eksperymentu: {FormatTestDuration(averageExperimentTime)}";
+                        _runStatusEtaLabel.Text = $"Pozostało: {FormatTestDuration(eta)}";
+                    });
+
+                    return result;
                 }
+                catch
+                {
+                    UpdateRunJobGridRow(job, "Błąd", elapsed: jobStopwatch.Elapsed);
+                    throw;
+                }
+                finally
+                {
+                    int activeAfter = Interlocked.Decrement(ref activeJobs);
+                    UpdateRunStatus(() =>
+                    {
+                        _runStatusActiveLabel.Text = $"Aktywne: {activeAfter} / {maxParallel}";
+                    });
+                    semaphore.Release();
+                }
+            }).ToArray();
 
-                lastGa = ga;
-            }
-
+            var runResults = await Task.WhenAll(tasks);
             stopwatch.Stop();
-
             runProgressBar.Visible = false;
 
-            if (lastGa == null)
+            if (runResults.Length == 0)
                 return;
 
-            _history = lastGa.History
-                .Select(generation => generation.Select(individual => individual.Clone()).ToList())
+            var cumulativeSuccesses = new int[iterationCount + 1];
+            foreach (var result in runResults)
+                AddGenerationSuccess(cumulativeSuccesses, result.Statistics);
+
+            var perfectSeedResults = runResults
+                .Where(result => result.PerfectSolution != null)
+                .Select(result => new PerfectSeedResult
+                {
+                    ExperimentIndex = result.Job.ExperimentIndex,
+                    Seed = result.Job.Seed,
+                    Generation = result.PerfectSolutionGeneration ?? 0,
+                    Fitness = result.PerfectSolution!.Fitness,
+                    Genotype = (bool[,])result.PerfectSolution.Genotype.Clone()
+                })
                 .ToList();
 
             FileUtils.SaveCumulativeResults(cumulativeSuccesses, iterationCount);
             FileUtils.SavePerfectSeedResults(perfectSeedResults, _data);
 
-            var lastGeneration = lastGa.CurrentPopulation;
+            var detailedRunResults = runResults
+                .OrderBy(result => result.Job.ExperimentIndex)
+                .Select(result => new DetailedRunObject
+                {
+                    ExperimentIndex = result.Job.ExperimentIndex,
+                    Seed = result.Job.Seed,
+                    N = result.Job.Data.NumberOfIndividuals,
+                    pk = result.Job.Data.CrossProbability,
+                    pm = result.Job.Data.MutationProbability,
+                    T = result.Job.Data.NumberOfIterations,
+                    Rt = result.Job.Data.TournamentSelectionSize,
+                    Ps = result.Job.Data.TournamentSoftSelectionTreshold,
+                    Ipk = result.Job.Data.CrossCount,
+                    MinMark = result.MinFitness,
+                    AvgMark = result.AvgFitness,
+                    BestMark = result.BestFitness,
+                    BestGeneration = result.BestGeneration,
+                    Elapsed = result.Elapsed
+                })
+                .ToList();
+            FileUtils.SaveDetailedGaResults(detailedRunResults, _data);
 
-            DisplayLastGeneration(lastGeneration);
+            var bestRun = runResults
+                .OrderByDescending(result => result.BestFitness)
+                .ThenBy(result => result.BestGeneration)
+                .First();
 
-            DisplayMatrix(GetMatrixForDisplay(lastGeneration.OrderByDescending(o => o.Fitness).First().Genotype));
-            //FileUtils.SaveResultsGa(historyOfIndividuals, InitialData);
-            DrawFitnessChart(lastGa.StatisticsHistory);
+            var replayGa = CreateGeneticAlgorithm(bestRun.Job.Data, bestRun.Job.Seed);
+            replayGa.StoreHistory = true;
+            await Task.Run(() => replayGa.Run());
+
+            _history = replayGa.History
+                .Select(generation => generation.Select(individual => individual.Clone()).ToList())
+                .ToList();
+
+            var bestGeneration = replayGa.CurrentPopulation;
+            DisplayLastGeneration(bestGeneration);
+            DisplayMatrix(GetMatrixForDisplay(bestGeneration.OrderByDescending(o => o.Fitness).First().Genotype));
+            DrawFitnessChart(replayGa.StatisticsHistory);
             DrawCumulativeChart(cumulativeSuccesses, experimentCount);
             DrawMutationChart(iterationCount);
 
+            UpdateRunStatus(() =>
+            {
+                _runStatusStateLabel.Text = "Stan: zakończono";
+                _runStatusBestLabel.Text = $"Najlepszy wynik: {bestRun.BestFitness:F4} (exp. {bestRun.Job.ExperimentNo}, seed {bestRun.Job.Seed}, gen. {bestRun.BestGeneration})";
+                _runStatusElapsedLabel.Text = $"Czas: {FormatTestDuration(stopwatch.Elapsed)}";
+                _runStatusEtaLabel.Text = "Pozostało: 00:00";
+                _runStatusActiveLabel.Text = $"Aktywne: 0 / {maxParallel}";
+            });
+
             var elapsed = stopwatch.Elapsed;
             MessageBox.Show(
-                $"Genetic algorithm finished {experimentCount} experiment(s) in {elapsed.TotalMilliseconds:N0} ms\n" +
-                $"({elapsed.TotalSeconds:F2} seconds)",
-                "Execution time",
+                $"Algorytm genetyczny zakończył {experimentCount} niezależnych uruchomień w {elapsed.TotalMilliseconds:N0} ms\n" +
+                $"Najlepszy wynik: {bestRun.BestFitness:F4}, eksperyment {bestRun.Job.ExperimentNo}, seed {bestRun.Job.Seed}",
+                "Czas wykonania",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information
             );
 
         }
-
         private void ClearPreviousRunState()
         {
             _history.Clear();
@@ -608,7 +758,7 @@ namespace Lab2
             var runGroup = new GroupBox
             {
                 Text = "Uruchamianie",
-                Size = new System.Drawing.Size(235, 180)
+                Size = new System.Drawing.Size(235, 215)
             };
 
             _archiveResultsCheckBox = new CheckBox
@@ -618,14 +768,31 @@ namespace Lab2
                 Checked = true
             };
 
+            var runMaxParallelLabel = new Label
+            {
+                Text = "Maks. równoległe",
+                AutoSize = true,
+                Location = new System.Drawing.Point(16, 137)
+            };
+
+            _runMaxParallelInput = new NumericUpDown
+            {
+                Location = new System.Drawing.Point(136, 133),
+                Size = new System.Drawing.Size(70, 23),
+                Minimum = 1,
+                Maximum = 1024,
+                Value = 1
+            };
+
             MoveControl(startButton, runGroup, 16, 28);
             MoveControl(runProgressBar, runGroup, 16, 66);
             MoveControl(historyViewButton, runGroup, 16, 100);
-            MoveControl(_archiveResultsCheckBox, runGroup, 16, 136);
+            runGroup.Controls.Add(runMaxParallelLabel);
+            runGroup.Controls.Add(_runMaxParallelInput);
+            MoveControl(_archiveResultsCheckBox, runGroup, 16, 172);
 
             return runGroup;
         }
-
         private void CreateMutationChartTab()
         {
             if (_mutationChart != null)
@@ -1307,6 +1474,45 @@ namespace Lab2
 
 
 
+        private sealed class RunJob
+        {
+            public int JobNo { get; init; }
+            public int ExperimentIndex { get; init; }
+            public int ExperimentNo => ExperimentIndex + 1;
+            public int Seed { get; init; }
+            public InitialData Data { get; init; } = null!;
+            public int GridRowIndex { get; set; } = -1;
+        }
+
+        private sealed class RunJobResult
+        {
+            public RunJob Job { get; init; } = null!;
+            public decimal MinFitness { get; init; }
+            public decimal AvgFitness { get; init; }
+            public decimal BestFitness { get; init; }
+            public int BestGeneration { get; init; }
+            public TimeSpan Elapsed { get; init; }
+            public List<PopulationStatistics> Statistics { get; init; } = new();
+            public Individual? PerfectSolution { get; init; }
+            public int? PerfectSolutionGeneration { get; init; }
+        }
+
+        private List<RunJob> BuildRunJobs(InitialData baseData, int experimentCount)
+        {
+            var jobs = new List<RunJob>();
+            for (int experimentIndex = 0; experimentIndex < experimentCount; experimentIndex++)
+            {
+                jobs.Add(new RunJob
+                {
+                    JobNo = experimentIndex + 1,
+                    ExperimentIndex = experimentIndex,
+                    Seed = unchecked(baseData.RandomSeed + experimentIndex),
+                    Data = CloneInitialData(baseData)
+                });
+            }
+
+            return jobs;
+        }
         private sealed class TestJob
         {
             public int JobNo { get; init; }
@@ -1326,9 +1532,12 @@ namespace Lab2
             public int GridRowIndex { get; set; } = -1;
         }
 
+
         private sealed class TestJobResult
         {
             public TestJob Job { get; init; } = null!;
+            public decimal MinFitness { get; init; }
+            public decimal AvgFitness { get; init; }
             public decimal BestFitness { get; init; }
             public int BestGeneration { get; init; }
             public TimeSpan Elapsed { get; init; }
@@ -1902,6 +2111,177 @@ namespace Lab2
             //GC.Collect();
 
 
+        private void CreateRunJobsPageControls()
+        {
+            if (_runJobsPage != null)
+                return;
+
+            _runJobsPage = new TabPage
+            {
+                Text = "Uruchomienia",
+                Padding = new Padding(12),
+                UseVisualStyleBackColor = true
+            };
+
+            _runStatusGroupBox = new GroupBox
+            {
+                Text = "Status uruchomień",
+                Location = new System.Drawing.Point(12, 12),
+                Size = new System.Drawing.Size(590, 185)
+            };
+
+            _runStatusStateLabel = CreateRunStatusLabel(24);
+            _runStatusExperimentLabel = CreateRunStatusLabel(49);
+            _runStatusGenerationLabel = CreateRunStatusLabel(74);
+            _runStatusSeedLabel = CreateRunStatusLabel(99);
+            _runStatusBestLabel = CreateRunStatusLabel(124);
+            _runStatusProgressLabel = CreateRunStatusLabel(149);
+            _runStatusElapsedLabel = CreateRunStatusLabel(24, 330);
+            _runStatusAverageLabel = CreateRunStatusLabel(49, 330);
+            _runStatusEtaLabel = CreateRunStatusLabel(74, 330);
+            _runStatusActiveLabel = CreateRunStatusLabel(99, 330);
+
+            _runStatusGroupBox.Controls.AddRange(new System.Windows.Forms.Control[]
+            {
+                _runStatusStateLabel,
+                _runStatusExperimentLabel,
+                _runStatusGenerationLabel,
+                _runStatusSeedLabel,
+                _runStatusBestLabel,
+                _runStatusProgressLabel,
+                _runStatusElapsedLabel,
+                _runStatusAverageLabel,
+                _runStatusEtaLabel,
+                _runStatusActiveLabel
+            });
+
+            _runJobsGrid = new DataGridView
+            {
+                Location = new System.Drawing.Point(12, 215),
+                Size = new System.Drawing.Size(1060, 380),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom,
+                AllowUserToAddRows = false,
+                AllowUserToDeleteRows = false,
+                AllowUserToResizeRows = false,
+                ReadOnly = true,
+                RowHeadersVisible = false,
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None,
+                ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
+            };
+
+            AddRunJobColumn("Job", "Job", 55);
+            AddRunJobColumn("Experiment", "Exp.", 55);
+            AddRunJobColumn("Seed", "Seed", 100);
+            AddRunJobColumn("Status", "Status", 110);
+            AddRunJobColumn("Generation", "Gen", 90);
+            AddRunJobColumn("Best", "Best", 90);
+            AddRunJobColumn("BestGeneration", "Best gen", 80);
+            AddRunJobColumn("Elapsed", "Czas", 80);
+
+            _runJobsPage.Controls.Add(_runStatusGroupBox);
+            _runJobsPage.Controls.Add(_runJobsGrid);
+            tabs.TabPages.Add(_runJobsPage);
+            ResetRunStatus();
+        }
+
+        private static Label CreateRunStatusLabel(int top, int left = 12)
+        {
+            int maxWidth = left > 250 ? 235 : 300;
+            return new Label
+            {
+                AutoSize = true,
+                Location = new System.Drawing.Point(left, top),
+                MaximumSize = new System.Drawing.Size(maxWidth, 0)
+            };
+        }
+
+        private void ResetRunStatus()
+        {
+            if (_runStatusStateLabel == null)
+                return;
+
+            _runStatusStateLabel.Text = "Stan: bezczynny";
+            _runStatusExperimentLabel.Text = "Eksperyment: -";
+            _runStatusGenerationLabel.Text = "Generacja: -";
+            _runStatusSeedLabel.Text = "Seed: -";
+            _runStatusBestLabel.Text = "Najlepszy wynik: -";
+            _runStatusProgressLabel.Text = "Postęp eksperymentów: -";
+            _runStatusElapsedLabel.Text = "Czas: -";
+            _runStatusAverageLabel.Text = "Śr. czas eksperymentu: -";
+            _runStatusEtaLabel.Text = "Pozostało: -";
+            _runStatusActiveLabel.Text = "Aktywne: -";
+        }
+
+        private void UpdateRunStatus(Action update)
+        {
+            if (IsDisposed)
+                return;
+
+            try
+            {
+                if (InvokeRequired)
+                    BeginInvoke(update);
+                else
+                    update();
+            }
+            catch (InvalidOperationException)
+            {
+            }
+        }
+
+        private void AddRunJobColumn(string name, string header, int width)
+        {
+            _runJobsGrid.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = name,
+                HeaderText = header,
+                Width = width,
+                SortMode = DataGridViewColumnSortMode.NotSortable
+            });
+        }
+
+        private void InitializeRunJobsGrid(IReadOnlyList<RunJob> jobs)
+        {
+            if (_runJobsGrid == null)
+                return;
+
+            _runJobsGrid.Rows.Clear();
+            foreach (var job in jobs)
+            {
+                int rowIndex = _runJobsGrid.Rows.Add(
+                    job.JobNo,
+                    job.ExperimentNo,
+                    job.Seed,
+                    "Oczekuje",
+                    $"0 / {job.Data.NumberOfIterations}",
+                    "-",
+                    "-",
+                    "-"
+                );
+                job.GridRowIndex = rowIndex;
+            }
+        }
+
+        private void UpdateRunJobGridRow(RunJob job, string status, int? generation = null, decimal? best = null, int? bestGeneration = null, TimeSpan? elapsed = null)
+        {
+            UpdateRunStatus(() =>
+            {
+                if (_runJobsGrid == null || job.GridRowIndex < 0 || job.GridRowIndex >= _runJobsGrid.Rows.Count)
+                    return;
+
+                var row = _runJobsGrid.Rows[job.GridRowIndex];
+                row.Cells["Status"].Value = status;
+                if (generation.HasValue)
+                    row.Cells["Generation"].Value = $"{Math.Min(generation.Value, (int)job.Data.NumberOfIterations)} / {job.Data.NumberOfIterations}";
+                if (best.HasValue)
+                    row.Cells["Best"].Value = best.Value.ToString("F4", CultureInfo.InvariantCulture);
+                if (bestGeneration.HasValue)
+                    row.Cells["BestGeneration"].Value = bestGeneration.Value;
+                if (elapsed.HasValue)
+                    row.Cells["Elapsed"].Value = FormatTestDuration(elapsed.Value);
+            });
+        }
         private void CreateTestRunStatusControls()
         {
             _testRunStatusGroupBox = new GroupBox
@@ -2790,6 +3170,17 @@ namespace Lab2
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

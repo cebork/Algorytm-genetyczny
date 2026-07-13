@@ -22,6 +22,7 @@ namespace Lab2.Infrastructure
         private static readonly string GaTunningFilePath = Path.Combine(ResultDirectory, "tunning_GA.txt");
         private static readonly string DetailedGaTunningFilePath = Path.Combine(ResultDirectory, "detailed_tunning_GA.txt");
         private static readonly string GaResultsFilePath = Path.Combine(ResultDirectory, "results_GA.txt");
+        private static readonly string DetailedGaResultsFilePath = Path.Combine(ResultDirectory, "detailed_result_GA.txt");
         private static readonly string maxFCCorr = Path.Combine(ResultDirectory, "max_f_C_corr.txt");
         private static readonly string CumulativeFilePath = Path.Combine(ResultDirectory, "cumulative.txt");
         private static readonly string LastSeedFilePath = Path.Combine(ResultDirectory, "last_seed.txt");
@@ -305,6 +306,32 @@ namespace Lab2.Infrastructure
         }
 
 
+        public static void SaveDetailedGaResults(List<DetailedRunObject> runObjects, InitialData initialData)
+        {
+            Directory.CreateDirectory(ResultDirectory);
+
+            using var writer = new StreamWriter(DetailedGaResultsFilePath, false, Encoding.UTF8);
+
+            writer.WriteLine("# szczegolowe wyniki zwyklego uruchomienia - jeden wiersz na niezalezny run");
+            writer.WriteLine($"# Rozmiar macierzy: {initialData.RequestedMatrixSize}");
+            writer.WriteLine($"# Efektywny rozmiar macierzy: {initialData.MatrixSize}");
+            writer.WriteLine($"# Typ algorytmu: {initialData.AlgorithmType}");
+            writer.WriteLine($"# Typ selekcji: {initialData.SelectionType}");
+            writer.WriteLine($"# Typ krzyzowania: {initialData.CrossType}");
+            writer.WriteLine($"# Typ mutacji: {initialData.MutationType}");
+            writer.WriteLine($"# Liczba eksperymentow: {initialData.NumberOfExperiments}");
+            writer.WriteLine();
+            writer.WriteLine("#  1          2            3           4             5         6       7       8       9       10              11              12              13              14");
+            writer.WriteLine("# ExpNo      Seed          N           T             Pk        Pm      Rt      Ps      IPK      MinFitness      AvgFitness      BestFitness     BestGeneration  ElapsedMs");
+
+            foreach (var result in runObjects.OrderBy(run => run.ExperimentIndex))
+            {
+                writer.WriteLine(
+                    $"{result.ExperimentIndex + 1,-10} {result.Seed,12} {result.N,12} {result.T,12} {result.pk,10:F3} {result.pm,8:F4} {result.Rt,7} {result.Ps,7:F3} {result.Ipk,8} {result.MinMark,16:F4} {result.AvgMark,16:F4} {result.BestMark,16:F4} {result.BestGeneration,15} {result.Elapsed.TotalMilliseconds,14:F0}"
+                );
+            }
+        }
+
         public static void SaveDetailedGaTunningResults(List<DetailedTestObject> testObjects, InitialData initialData)
         {
             Directory.CreateDirectory(ResultDirectory);
@@ -362,3 +389,5 @@ namespace Lab2.Infrastructure
         public bool[,] Genotype { get; init; } = null!;
     }
 }
+
+
