@@ -135,6 +135,7 @@
             tournamentSizeInput = new NumericUpDown();
             tournamentSoftRadio = new RadioButton();
             tournamentHardRadio = new RadioButton();
+            rankingRadio = new RadioButton();
             ruletteRadio = new RadioButton();
             crossGroup = new GroupBox();
             crossPoints = new NumericUpDown();
@@ -1226,6 +1227,7 @@
             selectionGroup.Controls.Add(tournamentSizeInput);
             selectionGroup.Controls.Add(tournamentSoftRadio);
             selectionGroup.Controls.Add(tournamentHardRadio);
+            selectionGroup.Controls.Add(rankingRadio);
             selectionGroup.Controls.Add(ruletteRadio);
             selectionGroup.Location = new Point(945, 79);
             selectionGroup.Name = "selectionGroup";
@@ -1293,6 +1295,17 @@
             tournamentHardRadio.Text = "turniej twardy";
             tournamentHardRadio.UseVisualStyleBackColor = true;
             tournamentHardRadio.CheckedChanged += tournamentHardRadio_CheckedChanged;
+            // 
+            // rankingRadio
+            // 
+            rankingRadio.AutoSize = true;
+            rankingRadio.Location = new Point(111, 47);
+            rankingRadio.Name = "rankingRadio";
+            rankingRadio.Size = new Size(83, 19);
+            rankingRadio.TabIndex = 3;
+            rankingRadio.Text = "rankingowa";
+            rankingRadio.UseVisualStyleBackColor = true;
+            rankingRadio.CheckedChanged += rankingRadio_CheckedChanged;
             // 
             // ruletteRadio
             // 
@@ -1725,6 +1738,7 @@
         private RadioButton classicalGARadio;
         private GroupBox selectionGroup;
         private RadioButton tournamentHardRadio;
+        private RadioButton rankingRadio;
         private RadioButton ruletteRadio;
         private GroupBox crossGroup;
         private NumericUpDown crossPoints;

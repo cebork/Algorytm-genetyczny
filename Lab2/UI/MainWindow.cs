@@ -995,6 +995,9 @@ namespace Lab2
                         random
                     ),
 
+                SelectionType.RANKING =>
+                    new RankingSelection(random),
+
                 _ => throw new InvalidOperationException("Nieznany typ selekcji")
             };
         }
@@ -2677,6 +2680,20 @@ namespace Lab2
 
                 tournamentSizeGroupBox.Enabled = true;
                 selectionThresholdGroupBox.Enabled = true;
+            }
+        }
+
+        private void rankingRadio_CheckedChanged(object sender, EventArgs e)
+        {
+            RadioButton selected = sender as RadioButton;
+            if (selected != null && selected.Checked)
+            {
+                _data.SelectionType = SelectionType.RANKING;
+                tournamentSizeInput.Enabled = false;
+                tournamentTresholdInput.Enabled = false;
+
+                tournamentSizeGroupBox.Enabled = false;
+                selectionThresholdGroupBox.Enabled = false;
             }
         }
 
