@@ -1,8 +1,10 @@
 using Lab2.Core.Domain;
+using Lab2.Core.Statistics;
 using Lab2.objects;
 using Lab2.UI.Domain;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -27,6 +29,8 @@ namespace Lab2.Infrastructure
         private static readonly string CumulativeFilePath = Path.Combine(ResultDirectory, "cumulative.txt");
         private static readonly string LastSeedFilePath = Path.Combine(ResultDirectory, "last_seed.txt");
         private static readonly string PerfectSeedsFilePath = Path.Combine(ResultDirectory, "perfect_seeds.txt");
+        private static readonly string FullBestRunFilePath = Path.Combine(ResultDirectory, "full_best_run.txt");
+        private static readonly string TunningBestsDirectory = Path.Combine(ResultDirectory, "Tunning bests");
 
 
 
@@ -200,7 +204,12 @@ namespace Lab2.Infrastructure
                 .Where(path => !string.Equals(path, LastSeedFilePath, StringComparison.OrdinalIgnoreCase))
                 .ToList();
 
-            if (filesToArchive.Count == 0)
+            var directoriesToArchive = Directory
+                .EnumerateDirectories(ResultDirectory, "*", SearchOption.TopDirectoryOnly)
+                .Where(path => !string.Equals(Path.GetFileName(path), "Archive", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (filesToArchive.Count == 0 && directoriesToArchive.Count == 0)
                 return;
 
             string archiveRoot = Path.Combine(ResultDirectory, "Archive");
@@ -217,6 +226,12 @@ namespace Lab2.Infrastructure
             {
                 string destinationPath = Path.Combine(archiveDirectory, Path.GetFileName(sourcePath));
                 File.Move(sourcePath, destinationPath, overwrite: false);
+            }
+
+            foreach (string sourcePath in directoriesToArchive)
+            {
+                string destinationPath = Path.Combine(archiveDirectory, Path.GetFileName(sourcePath));
+                Directory.Move(sourcePath, destinationPath);
             }
         }
 
@@ -360,6 +375,123 @@ namespace Lab2.Infrastructure
             }
         }
 
+        public static void SaveFullBestRun(FullRunExport run)
+        {
+            Directory.CreateDirectory(ResultDirectory);
+
+            using var writer = new StreamWriter(FullBestRunFilePath, false, Encoding.UTF8);
+            WriteFullRun(writer, run);
+        }
+
+        public static void SaveTunningBestRun(FullRunExport run, IEnumerable<string> sweptParameters)
+        {
+            Directory.CreateDirectory(TunningBestsDirectory);
+
+            string fileName = BuildTunningBestFileName(run, sweptParameters);
+            string filePath = Path.Combine(TunningBestsDirectory, fileName);
+
+            using var writer = new StreamWriter(filePath, false, Encoding.UTF8);
+            WriteFullRun(writer, run);
+        }
+
+        private static void WriteFullRun(StreamWriter writer, FullRunExport run)
+        {
+            writer.WriteLine("# Full best GA run export");
+            writer.WriteLine("# FormatVersion: 1");
+            writer.WriteLine();
+
+            writer.WriteLine("[Metadata]");
+            writer.WriteLine($"Mode={run.Mode}");
+            writer.WriteLine($"ConfigurationNo={run.ConfigurationNo}");
+            writer.WriteLine($"ExperimentNo={run.ExperimentNo}");
+            writer.WriteLine($"ExperimentIndex={run.ExperimentIndex}");
+            writer.WriteLine($"Seed={run.Seed}");
+            writer.WriteLine($"BestFitness={FormatDecimal(run.BestFitness)}");
+            writer.WriteLine($"BestGeneration={run.BestGeneration}");
+            writer.WriteLine($"ElapsedMs={run.Elapsed.TotalMilliseconds:F0}");
+            writer.WriteLine();
+
+            writer.WriteLine("[Configuration]");
+            writer.WriteLine($"RequestedMatrixSize={FormatDecimal(run.InitialData.RequestedMatrixSize)}");
+            writer.WriteLine($"EffectiveMatrixSize={FormatDecimal(run.InitialData.MatrixSize)}");
+            writer.WriteLine($"AlgorithmType={run.InitialData.AlgorithmType}");
+            writer.WriteLine($"AlgorithmOption={run.InitialData.AlgorithmOption}");
+            writer.WriteLine($"SelectionType={run.InitialData.SelectionType}");
+            writer.WriteLine($"CrossType={run.InitialData.CrossType}");
+            writer.WriteLine($"MutationType={run.InitialData.MutationType}");
+            writer.WriteLine($"N={FormatDecimal(run.InitialData.NumberOfIndividuals)}");
+            writer.WriteLine($"T={FormatDecimal(run.InitialData.NumberOfIterations)}");
+            writer.WriteLine($"Pk={FormatDecimal(run.InitialData.CrossProbability)}");
+            writer.WriteLine($"Pm={FormatDecimal(run.InitialData.MutationProbability)}");
+            writer.WriteLine($"Rt={FormatDecimal(run.InitialData.TournamentSelectionSize)}");
+            writer.WriteLine($"Ps={FormatDecimal(run.InitialData.TournamentSoftSelectionTreshold)}");
+            writer.WriteLine($"IPK={FormatDecimal(run.InitialData.CrossCount)}");
+            writer.WriteLine($"EliteOn={run.InitialData.EliteOn}");
+            writer.WriteLine($"EliteToMove={FormatDecimal(run.InitialData.EliteToMove)}");
+            writer.WriteLine($"StopAtFirstCorrect={run.InitialData.StopAtFirstCorrect}");
+            writer.WriteLine($"UseEvenMatrixPadding={run.InitialData.UseEvenMatrixPadding}");
+            writer.WriteLine($"EmptyRowIndex={run.InitialData.EmptyRowIndex}");
+            writer.WriteLine($"EmptyColumnIndex={run.InitialData.EmptyColumnIndex}");
+            writer.WriteLine($"StagnationEnabled={run.InitialData.StagnationEnabled}");
+            writer.WriteLine($"StagnationWindow={run.InitialData.StagnationWindow}");
+            writer.WriteLine($"StagnationResetFraction={FormatDecimal(run.InitialData.StagnationResetFraction)}");
+            writer.WriteLine($"StagnationDiversityThreshold={FormatDecimal(run.InitialData.StagnationDiversityThreshold)}");
+            writer.WriteLine();
+
+            writer.WriteLine("[Statistics]");
+            writer.WriteLine("Generation BestFitness AverageFitness WorstFitness FitnessStdDev Diversity");
+            foreach (var stat in run.Statistics.OrderBy(stat => stat.Generation))
+            {
+                writer.WriteLine(
+                    $"{stat.Generation} {FormatDecimal(stat.BestFitness)} {FormatDecimal(stat.AverageFitness)} {FormatDecimal(stat.WorstFitness)} {FormatDecimal(stat.FitnessStdDev)} {stat.Diversity.ToString("0.######", CultureInfo.InvariantCulture)}"
+                );
+            }
+            writer.WriteLine();
+
+            writer.WriteLine("[BestIndividualMatrix]");
+            WriteMatrix(writer, run.BestGenotype);
+            writer.WriteLine();
+        }
+
+        private static string BuildTunningBestFileName(FullRunExport run, IEnumerable<string> sweptParameters)
+        {
+            var parts = new List<string> { $"config_{run.ConfigurationNo:000}" };
+
+            foreach (string parameter in sweptParameters)
+            {
+                string value = parameter switch
+                {
+                    "N" => FormatDecimal(run.InitialData.NumberOfIndividuals),
+                    "T" => FormatDecimal(run.InitialData.NumberOfIterations),
+                    "Pk" => FormatDecimal(run.InitialData.CrossProbability),
+                    "Pm" => FormatDecimal(run.InitialData.MutationProbability),
+                    "Rt" => FormatDecimal(run.InitialData.TournamentSelectionSize),
+                    "Ps" => FormatDecimal(run.InitialData.TournamentSoftSelectionTreshold),
+                    "IPK" => FormatDecimal(run.InitialData.CrossCount),
+                    _ => string.Empty
+                };
+
+                if (!string.IsNullOrWhiteSpace(value))
+                    parts.Add($"{parameter}-{value}");
+            }
+
+            return SanitizeFileName(string.Join("_", parts) + ".txt");
+        }
+
+        private static string SanitizeFileName(string fileName)
+        {
+            foreach (char invalidChar in Path.GetInvalidFileNameChars())
+            {
+                fileName = fileName.Replace(invalidChar, '_');
+            }
+
+            return fileName;
+        }
+
+        private static string FormatDecimal(decimal value)
+        {
+            return value.ToString("0.######", CultureInfo.InvariantCulture);
+        }
         private static void WriteMatrix(StreamWriter writer, bool[,] matrix)
         {
             int rows = matrix.GetLength(0);
@@ -388,6 +520,26 @@ namespace Lab2.Infrastructure
         public decimal Fitness { get; init; }
         public bool[,] Genotype { get; init; } = null!;
     }
+    public sealed class FullRunExport
+    {
+        public string Mode { get; init; } = string.Empty;
+        public int ConfigurationNo { get; init; }
+        public int ExperimentIndex { get; init; }
+        public int ExperimentNo => ExperimentIndex + 1;
+        public int Seed { get; init; }
+        public decimal BestFitness { get; init; }
+        public int BestGeneration { get; init; }
+        public TimeSpan Elapsed { get; init; }
+        public InitialData InitialData { get; init; } = null!;
+        public bool[,] BestGenotype { get; init; } = null!;
+        public IReadOnlyList<PopulationStatistics> Statistics { get; init; } = Array.Empty<PopulationStatistics>();
+        public IReadOnlyList<IReadOnlyList<Individual>> History { get; init; } = Array.Empty<IReadOnlyList<Individual>>();
+    }
 }
+
+
+
+
+
 
 

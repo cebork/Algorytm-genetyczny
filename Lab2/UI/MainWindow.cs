@@ -324,6 +324,17 @@ namespace Lab2
             replayGa.StoreHistory = true;
             await Task.Run(() => replayGa.Run());
 
+            FileUtils.SaveFullBestRun(BuildFullRunExport(
+                "multirun",
+                1,
+                bestRun.Job.ExperimentIndex,
+                bestRun.Job.Seed,
+                bestRun.BestFitness,
+                bestRun.BestGeneration,
+                bestRun.Elapsed,
+                bestRun.Job.Data,
+                replayGa));
+
             _history = replayGa.History
                 .Select(generation => generation.Select(individual => individual.Clone()).ToList())
                 .ToList();
@@ -1666,6 +1677,74 @@ namespace Lab2
             return clones;
         }
 
+
+        private FullRunExport BuildFullRunExport(
+            string mode,
+            int configurationNo,
+            int experimentIndex,
+            int seed,
+            decimal bestFitness,
+            int bestGeneration,
+            TimeSpan elapsed,
+            InitialData data,
+            GeneticAlgorithm ga)
+        {
+            var history = ga.History
+                .Select(generation => (IReadOnlyList<Individual>)generation.Select(individual => individual.Clone()).ToList())
+                .ToList();
+
+            return new FullRunExport
+            {
+                Mode = mode,
+                ConfigurationNo = configurationNo,
+                ExperimentIndex = experimentIndex,
+                Seed = seed,
+                BestFitness = bestFitness,
+                BestGeneration = bestGeneration,
+                Elapsed = elapsed,
+                InitialData = CloneInitialData(data),
+                BestGenotype = FindBestGenotype(history),
+                Statistics = ga.StatisticsHistory.ToList(),
+                History = history
+            };
+        }
+
+        private static bool[,] FindBestGenotype(IReadOnlyList<IReadOnlyList<Individual>> history)
+        {
+            Individual? best = null;
+
+            foreach (var generation in history)
+            {
+                foreach (var individual in generation)
+                {
+                    if (best == null || individual.Fitness > best.Fitness)
+                        best = individual;
+                }
+            }
+
+            if (best == null)
+                return new bool[0, 0];
+
+            return (bool[,])best.Genotype.Clone();
+        }
+
+        private List<string> GetSweptParameterNames()
+        {
+            var names = new List<string>();
+
+            if (_testSweepNCheckBox.Checked) names.Add("N");
+            if (_testSweepTCheckBox.Checked) names.Add("T");
+            if (_testSweepPkCheckBox.Checked) names.Add("Pk");
+            if (_testSweepPmCheckBox.Checked) names.Add("Pm");
+            if (_testSweepRtCheckBox.Checked) names.Add("Rt");
+            if (_testSweepPsCheckBox.Checked) names.Add("Ps");
+            if (_testSweepIpkCheckBox.Checked) names.Add("IPK");
+
+            if (names.Count == 0)
+                names.AddRange(new[] { "N", "T", "Pk", "Pm", "Rt", "Ps", "IPK" });
+
+            return names;
+        }
         private static void ApplyTestConfiguration(InitialData data, decimal n, decimal pk, decimal pm, decimal t, decimal rt, decimal ps, decimal ipk)
         {
             data.NumberOfIndividuals = n;
@@ -1884,6 +1963,34 @@ namespace Lab2
                     _testStatusEtaLabel.Text = "Pozostało: 00:00";
                     _testStatusConfigStatsLabel.Text = $"Konfiguracje: {results.Count}, joby: {jobResults.Length}";
                 });
+
+                var sweptParameters = GetSweptParameterNames();
+                var bestRunsByConfiguration = jobResults
+                    .GroupBy(result => result.Job.ConfigurationNo)
+                    .Select(group => group
+                        .OrderByDescending(result => result.BestFitness)
+                        .ThenBy(result => result.BestGeneration)
+                        .First())
+                    .OrderBy(result => result.Job.ConfigurationNo)
+                    .ToList();
+
+                foreach (var bestConfigurationRun in bestRunsByConfiguration)
+                {
+                    var replayGa = CreateGeneticAlgorithm(bestConfigurationRun.Job.Data, bestConfigurationRun.Job.Seed);
+                    replayGa.StoreHistory = true;
+                    await Task.Run(() => replayGa.Run());
+
+                    FileUtils.SaveTunningBestRun(BuildFullRunExport(
+                        "tunning",
+                        bestConfigurationRun.Job.ConfigurationNo,
+                        bestConfigurationRun.Job.ExperimentIndex,
+                        bestConfigurationRun.Job.Seed,
+                        bestConfigurationRun.BestFitness,
+                        bestConfigurationRun.BestGeneration,
+                        bestConfigurationRun.Elapsed,
+                        bestConfigurationRun.Job.Data,
+                        replayGa), sweptParameters);
+                }
 
                 _testSeedOverride = null;
                 ApplyTestConfigurationFromUi();
@@ -3170,6 +3277,9 @@ namespace Lab2
         }
     }
 }
+
+
+
 
 
 
