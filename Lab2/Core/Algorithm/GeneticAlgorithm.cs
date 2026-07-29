@@ -14,7 +14,7 @@ namespace Lab2.Core.Algorithm
 {
     public class GeneticAlgorithm
     {
-        private List<Individual> _population;
+        private List<Individual> _population; 
         private readonly IFitnessEvaluator _fitness;
         private readonly ISelectionStrategy _selection;
         private readonly ICrossoverOperator _crossover;
