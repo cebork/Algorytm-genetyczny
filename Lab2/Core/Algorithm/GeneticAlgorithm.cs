@@ -47,6 +47,8 @@ namespace Lab2.Core.Algorithm
         public IReadOnlyList<IReadOnlyList<Individual>> History => _history;
         private readonly List<IReadOnlyList<Individual>> _history = new();
         public IReadOnlyList<Individual> CurrentPopulation => _population;
+        public Individual? BestSolution { get; private set; }
+        public int? BestSolutionGeneration { get; private set; }
         public Individual? PerfectSolution { get; private set; }
         public int? PerfectSolutionGeneration { get; private set; }
         public bool StoreHistory { get; set; }
@@ -105,6 +107,7 @@ namespace Lab2.Core.Algorithm
             EvaluatePopulation();
             _statistics.Update(_population, iteration);
             _statisticsHistory.Add(_statistics.Current);
+            CaptureBestSolution(iteration);
             CapturePerfectSolution(iteration);
             StorePopulationSnapshot();
             progress?.Report(iteration);
@@ -180,6 +183,7 @@ namespace Lab2.Core.Algorithm
                 }
 
                 _statisticsHistory.Add(_statistics.Current);
+                CaptureBestSolution(iteration + 1);
                 CapturePerfectSolution(iteration + 1);
                 StorePopulationSnapshot();
                 iteration++;
@@ -216,6 +220,24 @@ namespace Lab2.Core.Algorithm
             }
         }
 
+        private void CaptureBestSolution(int generation)
+        {
+            Individual? best = null;
+            for (int i = 0; i < _population.Count; i++)
+            {
+                if (best == null || _population[i].Fitness > best.Fitness)
+                    best = _population[i];
+            }
+
+            if (best == null)
+                return;
+
+            if (BestSolution != null && best.Fitness <= BestSolution.Fitness)
+                return;
+
+            BestSolution = best.Clone();
+            BestSolutionGeneration = generation;
+        }
         private void CapturePerfectSolution(int generation)
         {
             if (PerfectSolution != null)
@@ -307,3 +329,4 @@ namespace Lab2.Core.Algorithm
         }
     }
 }
+

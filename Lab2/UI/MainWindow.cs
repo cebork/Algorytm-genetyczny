@@ -227,7 +227,9 @@ namespace Lab2
                             Elapsed = jobStopwatch.Elapsed,
                             Statistics = ga.StatisticsHistory.ToList(),
                             PerfectSolution = ga.PerfectSolution?.Clone(),
-                            PerfectSolutionGeneration = ga.PerfectSolutionGeneration
+                            PerfectSolutionGeneration = ga.PerfectSolutionGeneration,
+                            BestSolution = ga.BestSolution?.Clone(),
+                            FinalPopulation = ga.CurrentPopulation.Select(individual => individual.Clone()).ToList()
                         };
                     });
 
@@ -320,9 +322,8 @@ namespace Lab2
                 .ThenBy(result => result.BestGeneration)
                 .First();
 
-            var replayGa = CreateGeneticAlgorithm(bestRun.Job.Data, bestRun.Job.Seed);
-            replayGa.StoreHistory = true;
-            await Task.Run(() => replayGa.Run());
+            var bestGeneration = bestRun.FinalPopulation;
+            var bestIndividual = bestRun.BestSolution ?? bestGeneration.OrderByDescending(o => o.Fitness).First();
 
             FileUtils.SaveFullBestRun(BuildFullRunExport(
                 "multirun",
@@ -333,16 +334,14 @@ namespace Lab2
                 bestRun.BestGeneration,
                 bestRun.Elapsed,
                 bestRun.Job.Data,
-                replayGa));
+                bestIndividual.Genotype,
+                bestRun.Statistics));
 
-            _history = replayGa.History
-                .Select(generation => generation.Select(individual => individual.Clone()).ToList())
-                .ToList();
+            _history.Clear();
 
-            var bestGeneration = replayGa.CurrentPopulation;
             DisplayLastGeneration(bestGeneration);
-            DisplayMatrix(GetMatrixForDisplay(bestGeneration.OrderByDescending(o => o.Fitness).First().Genotype));
-            DrawFitnessChart(replayGa.StatisticsHistory);
+            DisplayMatrix(GetMatrixForDisplay(bestIndividual.Genotype));
+            DrawFitnessChart(bestRun.Statistics);
             DrawCumulativeChart(cumulativeSuccesses, experimentCount);
             DrawMutationChart(iterationCount);
 
@@ -1506,6 +1505,8 @@ namespace Lab2
             public List<PopulationStatistics> Statistics { get; init; } = new();
             public Individual? PerfectSolution { get; init; }
             public int? PerfectSolutionGeneration { get; init; }
+            public Individual? BestSolution { get; init; }
+            public List<Individual> FinalPopulation { get; init; } = new();
         }
 
         private List<RunJob> BuildRunJobs(InitialData baseData, int experimentCount)
@@ -1552,6 +1553,9 @@ namespace Lab2
             public decimal BestFitness { get; init; }
             public int BestGeneration { get; init; }
             public TimeSpan Elapsed { get; init; }
+            public List<PopulationStatistics> Statistics { get; init; } = new();
+            public Individual? BestSolution { get; init; }
+            public List<Individual> FinalPopulation { get; init; } = new();
         }
 
         private List<TestJob> BuildTestJobs(
@@ -1687,12 +1691,9 @@ namespace Lab2
             int bestGeneration,
             TimeSpan elapsed,
             InitialData data,
-            GeneticAlgorithm ga)
+            bool[,] bestGenotype,
+            IReadOnlyList<PopulationStatistics> statistics)
         {
-            var history = ga.History
-                .Select(generation => (IReadOnlyList<Individual>)generation.Select(individual => individual.Clone()).ToList())
-                .ToList();
-
             return new FullRunExport
             {
                 Mode = mode,
@@ -1703,29 +1704,9 @@ namespace Lab2
                 BestGeneration = bestGeneration,
                 Elapsed = elapsed,
                 InitialData = CloneInitialData(data),
-                BestGenotype = FindBestGenotype(history),
-                Statistics = ga.StatisticsHistory.ToList(),
-                History = history
+                BestGenotype = (bool[,])bestGenotype.Clone(),
+                Statistics = statistics.ToList()
             };
-        }
-
-        private static bool[,] FindBestGenotype(IReadOnlyList<IReadOnlyList<Individual>> history)
-        {
-            Individual? best = null;
-
-            foreach (var generation in history)
-            {
-                foreach (var individual in generation)
-                {
-                    if (best == null || individual.Fitness > best.Fitness)
-                        best = individual;
-                }
-            }
-
-            if (best == null)
-                return new bool[0, 0];
-
-            return (bool[,])best.Genotype.Clone();
         }
 
         private List<string> GetSweptParameterNames()
@@ -1863,7 +1844,10 @@ namespace Lab2
                                 Job = job,
                                 BestFitness = bestStatistic?.BestFitness ?? 0m,
                                 BestGeneration = bestStatistic?.Generation ?? 0,
-                                Elapsed = jobStopwatch.Elapsed
+                                Elapsed = jobStopwatch.Elapsed,
+                                Statistics = ga.StatisticsHistory.ToList(),
+                                BestSolution = ga.BestSolution?.Clone(),
+                                FinalPopulation = ga.CurrentPopulation.Select(individual => individual.Clone()).ToList()
                             };
                         });
 
@@ -1976,9 +1960,8 @@ namespace Lab2
 
                 foreach (var bestConfigurationRun in bestRunsByConfiguration)
                 {
-                    var replayGa = CreateGeneticAlgorithm(bestConfigurationRun.Job.Data, bestConfigurationRun.Job.Seed);
-                    replayGa.StoreHistory = true;
-                    await Task.Run(() => replayGa.Run());
+                    var bestIndividual = bestConfigurationRun.BestSolution
+                        ?? bestConfigurationRun.FinalPopulation.OrderByDescending(o => o.Fitness).First();
 
                     FileUtils.SaveTunningBestRun(BuildFullRunExport(
                         "tunning",
@@ -1989,7 +1972,8 @@ namespace Lab2
                         bestConfigurationRun.BestGeneration,
                         bestConfigurationRun.Elapsed,
                         bestConfigurationRun.Job.Data,
-                        replayGa), sweptParameters);
+                        bestIndividual.Genotype,
+                        bestConfigurationRun.Statistics), sweptParameters);
                 }
 
                 _testSeedOverride = null;
@@ -3277,6 +3261,8 @@ namespace Lab2
         }
     }
 }
+
+
 
 
 

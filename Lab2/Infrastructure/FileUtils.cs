@@ -533,9 +533,9 @@ namespace Lab2.Infrastructure
         public InitialData InitialData { get; init; } = null!;
         public bool[,] BestGenotype { get; init; } = null!;
         public IReadOnlyList<PopulationStatistics> Statistics { get; init; } = Array.Empty<PopulationStatistics>();
-        public IReadOnlyList<IReadOnlyList<Individual>> History { get; init; } = Array.Empty<IReadOnlyList<Individual>>();
     }
 }
+
 
 
 
