@@ -92,11 +92,30 @@ namespace Lab2
         private Label _selectedDataPreviewSummaryLabel = null!;
         private CheckBox _archiveResultsCheckBox = null!;
         private int? _testSeedOverride;
+        private volatile bool _isComputationRunning;
 
         public MainWindow()
         {
             InitializeComponent();
             _data = new InitialData();
+            FormClosing += MainWindow_FormClosing;
+        }
+
+        private void MainWindow_FormClosing(object? sender, FormClosingEventArgs e)
+        {
+            if (!_isComputationRunning)
+                return;
+
+            var result = MessageBox.Show(
+                "Trwa obliczanie algorytmu genetycznego. Zamknięcie aplikacji teraz przerwie bieżący przebieg " +
+                "i wszystkie niezapisane wyniki zostaną utracone.\n\nCzy na pewno chcesz zamknąć aplikację?",
+                "Obliczenia w toku",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning,
+                MessageBoxDefaultButton.Button2);
+
+            if (result != DialogResult.Yes)
+                e.Cancel = true;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -131,6 +150,7 @@ namespace Lab2
 
                 FileUtils.SaveLastSeed(_data.RandomSeed);
                 startButton.Enabled = false;
+                _isComputationRunning = true;
                 await RunGeneticAlgorithm();
             }
             catch (Exception ex)
@@ -140,6 +160,7 @@ namespace Lab2
             finally
             {
                 startButton.Enabled = true;
+                _isComputationRunning = false;
             }
         }
 
@@ -1776,6 +1797,7 @@ namespace Lab2
                 int testProgressMaximum;
 
                 testyStart.Enabled = false;
+                _isComputationRunning = true;
                 runProgressBar.Visible = true;
                 runProgressBar.Minimum = 0;
                 runProgressBar.Maximum = totalExperimentRuns > int.MaxValue ? int.MaxValue : (int)totalExperimentRuns;
@@ -1994,6 +2016,7 @@ namespace Lab2
             {
                 _testSeedOverride = null;
                 testyStart.Enabled = true;
+                _isComputationRunning = false;
             }
         }            //    foreach (var pk in pkValues)
             //    {
