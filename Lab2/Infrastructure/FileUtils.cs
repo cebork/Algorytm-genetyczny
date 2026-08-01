@@ -264,7 +264,7 @@ namespace Lab2.Infrastructure
             writer.WriteLine($"# Efektywny rozmiar macierzy: {initialData.MatrixSize}");
             writer.WriteLine($"# Liczba eksperymentow: {initialData.NumberOfExperiments}");
             writer.WriteLine($"# Typ algorytmu: {initialData.AlgorithmType}");
-            writer.WriteLine($"# Typ selekcji: {initialData.SelectionType}");
+            writer.WriteLine($"# Typ selekcji: {FormatSelectionDescription(initialData)}");
             writer.WriteLine($"# Typ krzyzowania: {initialData.CrossType}");
             writer.WriteLine($"# Typ mutacji: {initialData.MutationType}");
             writer.WriteLine();
@@ -301,7 +301,7 @@ namespace Lab2.Infrastructure
             writer.WriteLine($"# Rozmiar macierzy: {initialData.RequestedMatrixSize}");
             writer.WriteLine($"# Efektywny rozmiar macierzy: {initialData.MatrixSize}");
             writer.WriteLine($"# Typ algorytmu: {initialData.AlgorithmType}");
-            writer.WriteLine($"# Typ selekcji: {initialData.SelectionType}");
+            writer.WriteLine($"# Typ selekcji: {FormatSelectionDescription(initialData)}");
             writer.WriteLine($"# Typ krzyzowania: {initialData.CrossType}");
             writer.WriteLine($"# Typ mutacji: {initialData.MutationType}");
             writer.WriteLine($"# Liczba eksperymentow na konfiguracje: {initialData.NumberOfExperiments}");
@@ -331,7 +331,7 @@ namespace Lab2.Infrastructure
             writer.WriteLine($"# Rozmiar macierzy: {initialData.RequestedMatrixSize}");
             writer.WriteLine($"# Efektywny rozmiar macierzy: {initialData.MatrixSize}");
             writer.WriteLine($"# Typ algorytmu: {initialData.AlgorithmType}");
-            writer.WriteLine($"# Typ selekcji: {initialData.SelectionType}");
+            writer.WriteLine($"# Typ selekcji: {FormatSelectionDescription(initialData)}");
             writer.WriteLine($"# Typ krzyzowania: {initialData.CrossType}");
             writer.WriteLine($"# Typ mutacji: {initialData.MutationType}");
             writer.WriteLine($"# Liczba eksperymentow: {initialData.NumberOfExperiments}");
@@ -357,7 +357,7 @@ namespace Lab2.Infrastructure
             writer.WriteLine($"# Rozmiar macierzy: {initialData.RequestedMatrixSize}");
             writer.WriteLine($"# Efektywny rozmiar macierzy: {initialData.MatrixSize}");
             writer.WriteLine($"# Typ algorytmu: {initialData.AlgorithmType}");
-            writer.WriteLine($"# Typ selekcji: {initialData.SelectionType}");
+            writer.WriteLine($"# Typ selekcji: {FormatSelectionDescription(initialData)}");
             writer.WriteLine($"# Typ krzyzowania: {initialData.CrossType}");
             writer.WriteLine($"# Typ mutacji: {initialData.MutationType}");
             writer.WriteLine($"# Liczba eksperymentow na konfiguracje: {initialData.NumberOfExperiments}");
@@ -417,6 +417,8 @@ namespace Lab2.Infrastructure
             writer.WriteLine($"AlgorithmType={run.InitialData.AlgorithmType}");
             writer.WriteLine($"AlgorithmOption={run.InitialData.AlgorithmOption}");
             writer.WriteLine($"SelectionType={run.InitialData.SelectionType}");
+            writer.WriteLine($"AdvancedSelectionEnabled={run.InitialData.AdvancedSelectionEnabled}");
+            writer.WriteLine($"SelectionStages={FormatSelectionStages(run.InitialData)}");
             writer.WriteLine($"CrossType={run.InitialData.CrossType}");
             writer.WriteLine($"MutationType={run.InitialData.MutationType}");
             writer.WriteLine($"N={FormatDecimal(run.InitialData.NumberOfIndividuals)}");
@@ -453,6 +455,22 @@ namespace Lab2.Infrastructure
             writer.WriteLine();
         }
 
+        private static string FormatSelectionDescription(InitialData initialData)
+        {
+            if (!initialData.AdvancedSelectionEnabled)
+                return initialData.SelectionType.ToString();
+
+            return $"ADVANCED ({FormatSelectionStages(initialData)})";
+        }
+
+        private static string FormatSelectionStages(InitialData initialData)
+        {
+            if (initialData.SelectionStages == null || initialData.SelectionStages.Count == 0)
+                return string.Empty;
+
+            return string.Join("; ", initialData.SelectionStages.Select(stage =>
+                $"{stage.SelectionType}<={FormatDecimal(stage.Threshold)}"));
+        }
         private static string BuildTunningBestFileName(FullRunExport run, IEnumerable<string> sweptParameters)
         {
             var parts = new List<string> { $"config_{run.ConfigurationNo:000}" };

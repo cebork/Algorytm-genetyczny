@@ -1,4 +1,4 @@
-﻿using Lab2.Core.Domain;
+using Lab2.Core.Domain;
 using Lab2.Core.Enums;
 using System;
 using System.Collections.Generic;
@@ -69,6 +69,32 @@ namespace Lab2.Core.Validation
 
             if (data.ProbGen1 is < 0 or > 1)
                 result.Errors.Add("ProbGen1 musi być w [0,1]");
+
+            if (data.AdvancedSelectionEnabled)
+            {
+                if (data.SelectionStages == null || data.SelectionStages.Count < 2)
+                {
+                    result.Errors.Add("Zaawansowana selekcja wymaga co najmniej dwóch etapów");
+                }
+                else
+                {
+                    decimal previousThreshold = 0m;
+                    for (int i = 0; i < data.SelectionStages.Count; i++)
+                    {
+                        var stage = data.SelectionStages[i];
+                        if (stage.Threshold is <= 0 or > 1)
+                        {
+                            result.Errors.Add($"Próg etapu selekcji {i + 1} musi być w zakresie (0,1]");
+                            continue;
+                        }
+
+                        if (stage.Threshold <= previousThreshold)
+                            result.Errors.Add($"Próg etapu selekcji {i + 1} musi być większy od poprzedniego progu");
+
+                        previousThreshold = stage.Threshold;
+                    }
+                }
+            }
 
             if (data.StagnationWindow <= 0)
                 result.Errors.Add("Okno stagnacji musi być > 0");

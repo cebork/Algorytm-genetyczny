@@ -91,6 +91,11 @@ namespace Lab2
         private FlowLayoutPanel _selectedDataPreviewFlow = null!;
         private Label _selectedDataPreviewSummaryLabel = null!;
         private CheckBox _archiveResultsCheckBox = null!;
+        private GroupBox _advancedSelectionGroupBox = null!;
+        private CheckBox _advancedSelectionCheckBox = null!;
+        private DataGridView _advancedSelectionGrid = null!;
+        private System.Windows.Forms.Button _advancedSelectionAddButton = null!;
+        private System.Windows.Forms.Button _advancedSelectionRemoveButton = null!;
         private int? _testSeedOverride;
         private volatile bool _isComputationRunning;
 
@@ -130,6 +135,7 @@ namespace Lab2
             CreateBitFlipMutationControls();
             CreateNarrowingMutationControls();
             CreateEvenMatrixPaddingControls();
+            CreateAdvancedSelectionControls();
             SetupDefaultAlgorithmOtpions();
             ApplyVisualLayout();
             CreateTestSweepControls();
@@ -468,6 +474,170 @@ namespace Lab2
             }
         }
 
+        private void CreateAdvancedSelectionControls()
+        {
+            _advancedSelectionGroupBox = new GroupBox
+            {
+                Text = "Zaawansowana selekcja",
+                Size = new System.Drawing.Size(420, 128),
+                Enabled = false
+            };
+
+            _advancedSelectionCheckBox = new CheckBox
+            {
+                Text = "Łącz selekcje wg progu generacji",
+                AutoSize = true,
+                Location = new System.Drawing.Point(8, 20)
+            };
+            _advancedSelectionCheckBox.CheckedChanged += (_, _) => UpdateAdvancedSelectionControls();
+
+            _advancedSelectionGrid = new DataGridView
+            {
+                Location = new System.Drawing.Point(8, 46),
+                Size = new System.Drawing.Size(288, 72),
+                AllowUserToAddRows = false,
+                AllowUserToDeleteRows = false,
+                RowHeadersVisible = false,
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                MultiSelect = false,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+            };
+
+            var selectionColumn = new DataGridViewComboBoxColumn
+            {
+                HeaderText = "Selekcja",
+                Name = "SelectionType",
+                ValueType = typeof(SelectionType),
+                FlatStyle = FlatStyle.Flat
+            };
+            selectionColumn.Items.Add(SelectionType.ROULETTE);
+            selectionColumn.Items.Add(SelectionType.TOURNAMENT_HARD);
+            selectionColumn.Items.Add(SelectionType.TOURNAMENT_SOFT);
+            selectionColumn.Items.Add(SelectionType.RANKING);
+
+            var thresholdColumn = new DataGridViewTextBoxColumn
+            {
+                HeaderText = "Próg",
+                Name = "Threshold"
+            };
+
+            _advancedSelectionGrid.Columns.Add(selectionColumn);
+            _advancedSelectionGrid.Columns.Add(thresholdColumn);
+            _advancedSelectionGrid.Rows.Add(SelectionType.ROULETTE, 0.2m);
+            _advancedSelectionGrid.Rows.Add(SelectionType.TOURNAMENT_HARD, 1.0m);
+
+            _advancedSelectionAddButton = new System.Windows.Forms.Button
+            {
+                Text = "Dodaj",
+                Location = new System.Drawing.Point(305, 46),
+                Size = new System.Drawing.Size(96, 28)
+            };
+            _advancedSelectionAddButton.Click += (_, _) => AddAdvancedSelectionStageRow();
+
+            _advancedSelectionRemoveButton = new System.Windows.Forms.Button
+            {
+                Text = "Usuń",
+                Location = new System.Drawing.Point(305, 82),
+                Size = new System.Drawing.Size(96, 28)
+            };
+            _advancedSelectionRemoveButton.Click += (_, _) => RemoveAdvancedSelectionStageRow();
+
+            _advancedSelectionGroupBox.Controls.Add(_advancedSelectionCheckBox);
+            _advancedSelectionGroupBox.Controls.Add(_advancedSelectionGrid);
+            _advancedSelectionGroupBox.Controls.Add(_advancedSelectionAddButton);
+            _advancedSelectionGroupBox.Controls.Add(_advancedSelectionRemoveButton);
+            Controls.Add(_advancedSelectionGroupBox);
+            UpdateAdvancedSelectionControls();
+        }
+
+        private void UpdateAdvancedSelectionControls()
+        {
+            if (_advancedSelectionGrid == null)
+                return;
+
+            bool enabled = _advancedSelectionGroupBox.Enabled && _advancedSelectionCheckBox.Checked;
+            _advancedSelectionGrid.Enabled = enabled;
+            _advancedSelectionAddButton.Enabled = enabled;
+            _advancedSelectionRemoveButton.Enabled = enabled;
+        }
+
+        private void AddAdvancedSelectionStageRow()
+        {
+            decimal lastThreshold = 0m;
+            if (_advancedSelectionGrid.Rows.Count > 0 &&
+                TryReadThreshold(_advancedSelectionGrid.Rows[^1].Cells[1].Value, out decimal parsedThreshold))
+            {
+                lastThreshold = parsedThreshold;
+            }
+
+            if (lastThreshold >= 1m)
+            {
+                MessageBox.Show("Nie można dodać kolejnego etapu po progu 1.0.", "Zaawansowana selekcja");
+                return;
+            }
+
+            decimal nextThreshold = Math.Min(1m, lastThreshold + 0.2m);
+            _advancedSelectionGrid.Rows.Add(SelectionType.ROULETTE, nextThreshold);
+        }
+
+        private void RemoveAdvancedSelectionStageRow()
+        {
+            if (_advancedSelectionGrid.Rows.Count <= 0)
+                return;
+
+            int index = _advancedSelectionGrid.SelectedRows.Count > 0
+                ? _advancedSelectionGrid.SelectedRows[0].Index
+                : _advancedSelectionGrid.Rows.Count - 1;
+
+            _advancedSelectionGrid.Rows.RemoveAt(index);
+        }
+
+        private List<SelectionStage> GetAdvancedSelectionStagesFromGrid()
+        {
+            var stages = new List<SelectionStage>();
+
+            if (_advancedSelectionGrid == null)
+                return stages;
+
+            foreach (DataGridViewRow row in _advancedSelectionGrid.Rows)
+            {
+                if (row.IsNewRow)
+                    continue;
+
+                var selectionValue = row.Cells[0].Value;
+                var thresholdValue = row.Cells[1].Value;
+
+                SelectionType selectionType = selectionValue is SelectionType typedSelection
+                    ? typedSelection
+                    : Enum.TryParse(selectionValue?.ToString(), out SelectionType parsedSelection)
+                        ? parsedSelection
+                        : SelectionType.ROULETTE;
+
+                if (!TryReadThreshold(thresholdValue, out decimal threshold))
+                    throw new InvalidOperationException("Próg zaawansowanej selekcji musi być liczbą z zakresu 0..1.");
+
+                stages.Add(new SelectionStage
+                {
+                    SelectionType = selectionType,
+                    Threshold = threshold
+                });
+            }
+
+            return stages;
+        }
+
+        private static bool TryReadThreshold(object value, out decimal threshold)
+        {
+            if (value is decimal decimalValue)
+            {
+                threshold = decimalValue;
+                return true;
+            }
+
+            string text = Convert.ToString(value, CultureInfo.CurrentCulture) ?? string.Empty;
+            return decimal.TryParse(text, NumberStyles.Number, CultureInfo.CurrentCulture, out threshold) ||
+                   decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out threshold);
+        }
         private void CreateStagnationControls()
         {
             // GroupBox positioned below the eliteGroupBox (1644, 79 + 153 + 8)
@@ -608,6 +778,7 @@ namespace Lab2
             runGroup.Location = new System.Drawing.Point(970, 72);
 
             MoveControl(selectionGroup, operatorsTab, 12, 12);
+            MoveControl(_advancedSelectionGroupBox, operatorsTab, 12, 175);
             MoveControl(crossGroup, operatorsTab, 230, 12);
             MoveControl(mutationGroup, operatorsTab, 345, 12);
             MoveControl(_bitFlipMutationGroupBox, operatorsTab, 480, 12);
@@ -1088,6 +1259,8 @@ namespace Lab2
             _data.ProbGen1 = propGen1.Value;
             _data.TournamentSelectionSize = tournamentSizeInput.Value;
             _data.TournamentSoftSelectionTreshold = tournamentTresholdInput.Value;
+            _data.AdvancedSelectionEnabled = _advancedSelectionCheckBox.Checked;
+            _data.SelectionStages = GetAdvancedSelectionStagesFromGrid();
             _data.UniformBlockMutationProbWhite = uniformProbWhite.Value;
             _data.UniformBlockMutationProbRed = uniformProbRed.Value;
             _data.BitFlipEarlyExplorationMultiplier = _bitFlipEarlyMultiplierInput.Value;
@@ -1175,7 +1348,23 @@ namespace Lab2
 
         private ISelectionStrategy CreateSelection(InitialData data, IRandomProvider random)
         {
-            return data.SelectionType switch
+            if (data.AdvancedSelectionEnabled)
+            {
+                var stages = data.SelectionStages
+                    .Select(stage => new ThresholdSelectionStage(
+                        CreateSingleSelection(stage.SelectionType, data, random),
+                        stage.Threshold))
+                    .ToList();
+
+                return new ThresholdSelectionStrategy(stages);
+            }
+
+            return CreateSingleSelection(data.SelectionType, data, random);
+        }
+
+        private ISelectionStrategy CreateSingleSelection(SelectionType selectionType, InitialData data, IRandomProvider random)
+        {
+            return selectionType switch
             {
                 SelectionType.ROULETTE =>
                     new RouletteSelection(random),
@@ -1662,6 +1851,12 @@ namespace Lab2
                 NumberOfExperiments = source.NumberOfExperiments,
                 AlgorithmOption = source.AlgorithmOption,
                 SelectionType = source.SelectionType,
+                AdvancedSelectionEnabled = source.AdvancedSelectionEnabled,
+                SelectionStages = source.SelectionStages.Select(stage => new SelectionStage
+                {
+                    SelectionType = stage.SelectionType,
+                    Threshold = stage.Threshold
+                }).ToList(),
                 TournamentSelectionSize = source.TournamentSelectionSize,
                 TournamentSoftSelectionTreshold = source.TournamentSoftSelectionTreshold,
                 CrossType = source.CrossType,
@@ -3101,6 +3296,8 @@ namespace Lab2
                 _data.MutationType = MutationType.EQUALY;
 
                 selectionGroup.Enabled = true;
+                _advancedSelectionGroupBox.Enabled = true;
+                UpdateAdvancedSelectionControls();
                 crossGroup.Enabled = true;
                 mutationGroup.Enabled = true;
                 _bitFlipMutationGroupBox.Enabled = _data.MutationType == MutationType.EQUALY;
@@ -3120,6 +3317,9 @@ namespace Lab2
             eliteOn.Checked = false;
 
             selectionGroup.Enabled = false;
+            _advancedSelectionCheckBox.Checked = false;
+            _advancedSelectionGroupBox.Enabled = false;
+            UpdateAdvancedSelectionControls();
             crossGroup.Enabled = false;
             mutationGroup.Enabled = false;
             _bitFlipMutationGroupBox.Enabled = false;

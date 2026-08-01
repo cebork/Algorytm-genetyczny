@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -30,6 +30,8 @@ namespace Lab2.Core.Domain
         public decimal NumberOfExperiments { get; set; }
         public AlgorithmOption AlgorithmOption { get; set; }
         public SelectionType SelectionType { get; set; }
+        public bool AdvancedSelectionEnabled { get; set; }
+        public List<SelectionStage> SelectionStages { get; set; } = new();
         public decimal TournamentSelectionSize { get; set; }
         public decimal TournamentSoftSelectionTreshold { get; set; }
         public CrossType CrossType { get; set; }

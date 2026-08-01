@@ -122,6 +122,9 @@ namespace Lab2.Core.Algorithm
 
             while (!_termination.ShouldStop(iteration))
             {
+                if (_selection is IGenerationAwareSelectionStrategy generationAwareSelection)
+                    generationAwareSelection.SetGenerationContext(iteration, maxIterations);
+
                 var parents = new List<Individual>(_selection.Select(_population));
                 ShuffleParents(parents);
                 var offspring = GetEliteClones();
