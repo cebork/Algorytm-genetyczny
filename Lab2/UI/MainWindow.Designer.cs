@@ -1532,14 +1532,15 @@
             eliteGroupBox.Text = "Elita";
             // 
             // eliteToMove
-            // 
-            eliteToMove.Increment = new decimal(new int[] { 1, 0, 0, 131072 });
+            //
+            eliteToMove.DecimalPlaces = 2;
+            eliteToMove.Increment = new decimal(new int[] { 1, 0, 0, 0 });
             eliteToMove.Location = new Point(6, 63);
-            eliteToMove.Maximum = new decimal(new int[] { 10000000, 0, 0, 0 });
+            eliteToMove.Maximum = new decimal(new int[] { 100, 0, 0, 0 });
             eliteToMove.Name = "eliteToMove";
             eliteToMove.Size = new Size(188, 23);
             eliteToMove.TabIndex = 32;
-            eliteToMove.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            eliteToMove.Value = new decimal(new int[] { 10, 0, 0, 0 });
             // 
             // eliteOn
             // 
@@ -1558,7 +1559,7 @@
             eliteToMoveLabel.Name = "eliteToMoveLabel";
             eliteToMoveLabel.Size = new Size(138, 15);
             eliteToMoveLabel.TabIndex = 31;
-            eliteToMoveLabel.Text = "Liczba elit do przeniesienia";
+            eliteToMoveLabel.Text = "Elita (% populacji)";
             // 
             // stopAtFirstCorrect
             // 

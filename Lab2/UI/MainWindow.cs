@@ -439,7 +439,7 @@ namespace Lab2
                 .WithSelection(selection)
                 .WithCrossover(crossover)
                 .WithCrossoverProbability(data.CrossProbability, random)
-                .WithElitism(data.EliteOn, (int)data.EliteToMove)
+                .WithElitism(data.EliteOn, data.EliteFraction)
                 .StopAtFirstCorrect(data.StopAtFirstCorrect)
                 .WithMutation(mutation)
                 .WithTermination(
@@ -1254,7 +1254,7 @@ namespace Lab2
             _data.CrossProbability = crossProbabilityInput.Value;
             _data.CrossCount = crossPoints.Value;
             _data.EliteOn = eliteOn.Checked;
-            _data.EliteToMove = eliteToMove.Value;
+            _data.EliteFraction = eliteToMove.Value / 100m;
             _data.StopAtFirstCorrect = stopAtFirstCorrect.Checked;
             _data.ProbGen1 = propGen1.Value;
             _data.TournamentSelectionSize = tournamentSizeInput.Value;
@@ -1867,7 +1867,7 @@ namespace Lab2
                 UniformBlockMutationProbWhite = source.UniformBlockMutationProbWhite,
                 UniformBlockMutationProbRed = source.UniformBlockMutationProbRed,
                 EliteOn = source.EliteOn,
-                EliteToMove = source.EliteToMove,
+                EliteFraction = source.EliteFraction,
                 StopAtFirstCorrect = source.StopAtFirstCorrect,
                 UseSeed = source.UseSeed,
                 RandomSeed = source.RandomSeed,

@@ -42,7 +42,7 @@ namespace Lab2.Core.Domain
         public decimal UniformBlockMutationProbWhite { get; set; }
         public decimal UniformBlockMutationProbRed { get; set; }
         public bool EliteOn { get; set; }
-        public decimal EliteToMove { get; set; }
+        public decimal EliteFraction { get; set; }
         public bool StopAtFirstCorrect { get; set; }
         public bool UseSeed { get; set; }
         public int RandomSeed { get; set; }

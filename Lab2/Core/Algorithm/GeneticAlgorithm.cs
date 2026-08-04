@@ -21,7 +21,7 @@ namespace Lab2.Core.Algorithm
         private readonly decimal _crossProbability;
         private readonly IRandomProvider _random;
         private readonly bool _eliteEnabled;
-        private readonly int _eliteCount;
+        private readonly decimal _eliteFraction;
         private readonly bool _stopAtFirstCorrect;
         private readonly IMutationOperator _mutation;
         private readonly ITerminationCondition _termination;
@@ -61,7 +61,7 @@ namespace Lab2.Core.Algorithm
             decimal crossProbability,
             IRandomProvider random,
             bool eliteEnabled,
-            int eliteCount,
+            decimal eliteFraction,
             bool stopAtFirstCorrect,
             IMutationOperator mutation,
             ITerminationCondition termination,
@@ -76,7 +76,7 @@ namespace Lab2.Core.Algorithm
             _crossProbability = crossProbability;
             _random = random;
             _eliteEnabled = eliteEnabled;
-            _eliteCount = Math.Max(0, eliteCount);
+            _eliteFraction = Math.Clamp(eliteFraction, 0m, 1m);
             _stopAtFirstCorrect = stopAtFirstCorrect;
             _mutation = mutation;
             _termination = termination;
@@ -201,13 +201,13 @@ namespace Lab2.Core.Algorithm
         private List<Individual> GetEliteClones()
         {
             var elites = new List<Individual>();
-            if (!_eliteEnabled || _eliteCount <= 0)
+            if (!_eliteEnabled || _eliteFraction <= 0m)
                 return elites;
 
             var sortedPopulation = new List<Individual>(_population);
             sortedPopulation.Sort((a, b) => b.Fitness.CompareTo(a.Fitness));
 
-            int count = Math.Min(_eliteCount, _populationSize);
+            int count = Math.Min((int)Math.Ceiling(_populationSize * _eliteFraction), _populationSize);
             for (int i = 0; i < count; i++)
                 elites.Add(sortedPopulation[i].Clone());
 

@@ -20,7 +20,7 @@ namespace Lab2.Core.Algorithm
         private decimal _crossProbability = 1m;
         private IRandomProvider _crossoverRandom;
         private bool _eliteEnabled;
-        private int _eliteCount;
+        private decimal _eliteFraction;
         private bool _stopAtFirstCorrect;
         private IMutationOperator _mutation;
         private ITerminationCondition _termination;
@@ -80,13 +80,13 @@ namespace Lab2.Core.Algorithm
         }
 
 
-        public GeneticAlgorithmBuilder WithElitism(bool enabled, int eliteCount)
+        public GeneticAlgorithmBuilder WithElitism(bool enabled, decimal eliteFraction)
         {
-            if (eliteCount < 0)
-                throw new ArgumentOutOfRangeException(nameof(eliteCount), "Elite count must be >= 0.");
+            if (eliteFraction < 0m || eliteFraction > 1m)
+                throw new ArgumentOutOfRangeException(nameof(eliteFraction), "Elite fraction must be in [0,1].");
 
             _eliteEnabled = enabled;
-            _eliteCount = eliteCount;
+            _eliteFraction = eliteFraction;
             return this;
         }
 
@@ -161,7 +161,7 @@ namespace Lab2.Core.Algorithm
                 _crossProbability,
                 _crossoverRandom,
                 _eliteEnabled,
-                _eliteCount,
+                _eliteFraction,
                 _stopAtFirstCorrect,
                 _mutation,
                 _termination,

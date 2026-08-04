@@ -429,7 +429,7 @@ namespace Lab2.Infrastructure
             writer.WriteLine($"Ps={FormatDecimal(run.InitialData.TournamentSoftSelectionTreshold)}");
             writer.WriteLine($"IPK={FormatDecimal(run.InitialData.CrossCount)}");
             writer.WriteLine($"EliteOn={run.InitialData.EliteOn}");
-            writer.WriteLine($"EliteToMove={FormatDecimal(run.InitialData.EliteToMove)}");
+            writer.WriteLine($"EliteFraction={FormatDecimal(run.InitialData.EliteFraction)}");
             writer.WriteLine($"StopAtFirstCorrect={run.InitialData.StopAtFirstCorrect}");
             writer.WriteLine($"UseEvenMatrixPadding={run.InitialData.UseEvenMatrixPadding}");
             writer.WriteLine($"EmptyRowIndex={run.InitialData.EmptyRowIndex}");
